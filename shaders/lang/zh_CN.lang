@@ -1,4 +1,5 @@
-## Language format v1.0.3
+## Language format v1.0.4
+## 该文件的 Language format 版本需要与 en_US.lang 保持相同
 
 ## Profiles
     profile.POTATO = 非常低
@@ -85,10 +86,8 @@ screen.LIGHTING = 光照
     screen.RAY_TRACING = 光线追踪设置
         option.SSGI = SSGI
         option.SSR = SSR
-        option.SSGI_STEPS = SSGI 步进次数
-        option.SSR_STEPS = SSR 步进次数
-        option.SSGI_BISTEPS = SSGI 细化步进次数
-        option.SSR_BISTEPS = SSR 细化步进次数
+        option.RAYTRACER_STEPS = 光线追踪步进
+        option.RAYTRACER_BISTEPS = 光线追踪细化步进
         option.ROUGH_REFLECTIONS = 粗糙反射
         option.PREVIOUS_FRAME = 前帧缓冲
 
@@ -133,7 +132,7 @@ screen.PBR = PBR
         value.PBR_MODE.1 = 集成 PBR
         value.PBR_MODE.2 = Lab PBR 1.3
 
-    option.SPECULAR_HIGHLIGHTS = 反射高光
+    option.SPECULAR_HIGHLIGHTS = 镜面高光
     option.ENVIRONMENT_PBR = 环境 PBR 材质
     option.NORMAL_GENERATION = 自动生成法线
     option.NORMAL_GENERATION_RESOLUTION = 自动生成法线分辨率
@@ -141,11 +140,11 @@ screen.PBR = PBR
     option.EMISSIVE_INTENSITY = 自发光强度
     option.SLOPE_NORMALS = 斜率法线
     option.NORMAL_STRENGTH = 法线强度
-    option.DIRECTIONAL_LIGHTMAPS = 指向性光照贴图
-    option.DIRECTIONAL_LIGHTMAP_STRENGTH = 指向性光照贴图强度
+    option.DIRECTIONAL_LIGHTMAPS = 定向光照贴图
+    option.DIRECTIONAL_LIGHTMAP_STRENGTH = 定向光照贴图强度
 
-    screen.POM_SETTINGS = 视差遮挡设置
-        option.PARALLAX_OCCLUSION = 视差遮挡
+    screen.POM_SETTINGS = 视差遮蔽设置
+        option.PARALLAX_OCCLUSION = 视差遮蔽
         option.PARALLAX_DEPTH = 视差深度
         option.PARALLAX_STEPS = 视差步进
         option.PARALLAX_SHADOW = 视差阴影
@@ -175,10 +174,10 @@ screen.CONFIGURATION = 配置
             option.LIGHT0_DB = 光照蓝色
             option.LIGHT0_DI = 光照强度
 
-            option.SKY0_DR = 天空光红色
-            option.SKY0_DG = 天空光绿色
-            option.SKY0_DB = 天空光蓝色
-            option.SKY0_DI = 天空光强度
+            option.SKY0_DR = 天空红色
+            option.SKY0_DG = 天空绿色
+            option.SKY0_DB = 天空蓝色
+            option.SKY0_DI = 天空强度
 
         screen.NIGHT_SETTINGS = 夜晚设置
             option.LIGHT0_NR = 光照红色
@@ -186,10 +185,10 @@ screen.CONFIGURATION = 配置
             option.LIGHT0_NB = 光照蓝色
             option.LIGHT0_NI = 光照强度
 
-            option.SKY0_NR = 天空光红色
-            option.SKY0_NG = 天空光绿色
-            option.SKY0_NB = 天空光蓝色
-            option.SKY0_NI = 天空光强度
+            option.SKY0_NR = 天空红色
+            option.SKY0_NG = 天空绿色
+            option.SKY0_NB = 天空蓝色
+            option.SKY0_NI = 天空强度
 
         screen.TWILIGHT_SETTINGS = 日暮设置
             option.LIGHT0_TR = 光照红色
@@ -197,10 +196,10 @@ screen.CONFIGURATION = 配置
             option.LIGHT0_TB = 光照蓝色
             option.LIGHT0_TI = 光照强度
 
-            option.SKY0_TR = 天空光红色
-            option.SKY0_TG = 天空光绿色
-            option.SKY0_TB = 天空光蓝色
-            option.SKY0_TI = 天空光强度
+            option.SKY0_TR = 天空红色
+            option.SKY0_TG = 天空绿色
+            option.SKY0_TB = 天空蓝色
+            option.SKY0_TI = 天空强度
 
         screen.FOG_SETTINGS0 = 雾设置
             option.FOG0_VERTICAL_DENSITY_D = 白天垂直密度
@@ -211,7 +210,7 @@ screen.CONFIGURATION = 配置
     screen.NETHER_SETTINGS = 下界设置
         option.FOGn1_VERTICAL_DENSITY = 垂直密度
         option.FOGn1_TOTAL_DENSITY = 总体密度
-        option.WORLDn1_VANILLA_FOGCOLI = 天空光强度
+        option.WORLDn1_VANILLA_FOGCOLI = 天空强度
 
     screen.END_SETTINGS = 末地设置
         option.LIGHT1_CR = 光照红色
@@ -219,10 +218,10 @@ screen.CONFIGURATION = 配置
         option.LIGHT1_CB = 光照蓝色
         option.LIGHT1_CI = 光照强度
 
-        option.SKY1_CR = 天空光红色
-        option.SKY1_CG = 天空光绿色
-        option.SKY1_CB = 天空光蓝色
-        option.SKY1_CI = 天空光强度
+        option.SKY1_CR = 天空红色
+        option.SKY1_CG = 天空绿色
+        option.SKY1_CB = 天空蓝色
+        option.SKY1_CI = 天空强度
 
         option.FOG1_VERTICAL_DENSITY = 垂直密度
         option.FOG1_TOTAL_DENSITY = 总体密度
@@ -246,7 +245,7 @@ screen.CONFIGURATION = 配置
     option.SHARPEN_FILTER.comment = 启用图像锐化. 如果图像出现模糊, 请启用抗锯齿.
 
         option.DOF.comment = 启用景深. 启用抗锯齿来获得更好的结果.
-        option.DOF_STRENGTH.comment = 景深强度.
+        option.DOF_STRENGTH.comment = 景深的强度.
         option.CHROMATIC_ABERRATION.comment = 启用色差.
         option.ABERRATION_PIXEL_SIZE.comment = 色差长度. 增加以获得更强的效果.
         option.BLOOM.comment = 启用泛光.
@@ -256,14 +255,14 @@ screen.CONFIGURATION = 配置
         option.VIGNETTE.comment = 启用晕影.
         option.VIGNETTE_STRENGTH.comment = 晕影强烈程度
         option.MOTION_BLUR.comment = 启用动态模糊.
-        option.MOTION_BLUR_STRENGTH.comment = 动态模糊强度.
+        option.MOTION_BLUR_STRENGTH.comment = 动态模糊的强度.
 
         option.CONTRAST.comment = 对比度, 控制颜色对比度.
         option.SATURATION.comment = 饱和度, 控制颜色饱和度的多少.
-        option.WHITE_POINT.comment = 色调映射白点
-        option.SHOULDER_STRENGTH.comment = 色调映射上曲线强度.
+        option.WHITE_POINT.comment = 色调图白点
+        option.SHOULDER_STRENGTH.comment = 色调图上曲线的强度.
         option.AUTO_EXPOSURE.comment = 启用实时自动曝光. 不能和 Optifine 自定义截图分辨率一起工作!
-        option.AUTO_EXPOSURE_SPEED.comment = 自动曝光时间速度. 更改自动曝光将会调整屏幕曝光的快慢. 较小的值表示较慢, 较大的值表示较快.
+        option.AUTO_EXPOSURE_SPEED.comment = 自动曝光时间性速度. 更改自动曝光将会调整屏幕曝光的快慢. 较小的值表示较慢, 较大的值表示较快.
         option.EXPOSURE.comment = 曝光, 控制颜色曝光.
         option.MINIMUM_EXPOSURE.comment = 最小自动曝光值. 较低的值可能会在开启自动曝光时增加昏暗场景的曝光.
         option.TINT_R.comment = 红色色调值
@@ -278,16 +277,14 @@ screen.CONFIGURATION = 配置
     option.shadowMapResolution.comment = 阴影贴图分辨率. 增加来以性能为代价获得更高的分辨率.
     option.shadowDistance.comment = 阴影距离. 增加来以方块为单位延伸阴影贴图至更远的距离. 建议将此项设置为与你的渲染距离相同, 并增加阴影贴图分辨率.
     option.sunPathRotation.comment = 光线路径倾角. 这也会影响天空倾角.
-    option.UNDERWATER_CAUSTICS.comment = 启用水下焦散. 阴影颜色必须被启用!
+    option.UNDERWATER_CAUSTICS.comment = 启用水下焦散. 阴影贴图颜色必须被启用!
     option.SSAO.comment = 启用屏幕空间环境光遮蔽 (SSAO).
-    option.AMBIENT_LIGHTING.comment = 整体环境照明值. 如果你不喜欢漆黑的黑暗就增加它, 较高的值可能使照明不现实. 如果启用了 SSGI, 则将其设置为零以获得更现实的方法. 夜视设置为 0.50.
+    option.AMBIENT_LIGHTING.comment = 整体环境照明值. 如果你不喜欢漆黑的黑暗就增加它, 较高的值可能使光照不真实. 如果启用了 SSGI, 则将其设置为零以获得更真实的方法. 将其设置为 0.50 来获得夜视.
 
-        option.SSGI.comment = 启用屏幕空间全局照明 (SSGI), 目前为实验性且可能优化不是很好, 可能会改善黑暗区域的环境, 尽管有噪点. 打开 TAA 以获得最佳效果.
+        option.SSGI.comment = 启用屏幕空间全局光照 (SSGI). 可能会改善黑暗区域的环境, 尽管会有噪点. 目前为实验性且未被优化. 打开 TAA 以获得最佳效果.
         option.SSR.comment = 启用屏幕空间反射 (SSR), 可能在某些区域看起来不太好.
-        option.SSGI_STEPS.comment = SSGI 步进次数, 增加可能会提升品质, 但会消耗更多的性能.
-        option.SSR_STEPS.comment = SSR 步进次数, 增加可能会提升品质, 但会消耗更多的性能.
-        option.SSGI_BISTEPS.comment = SSGI 二进制细化步进次数, 会提升品质, 尤其是在使用低步进次数的时候, 平衡这些值是最佳性能所必需的.
-        option.SSR_BISTEPS.comment = SSR 二进制细化步进次数, 会提升品质, 尤其是在使用低步进次数的时候, 平衡这些值是最佳性能所必需的.
+        option.RAYTRACER_STEPS.comment = 光线追踪步进次数. 增加可能会提高质量并且需要更多的性能.
+        option.RAYTRACER_BISTEPS.comment = 光线追踪二进制细化步进次数. 会提高质量, 尤其是在使用较低的步进次数的时候. 平衡这些值对于性能来说可能是必要的.
         option.ROUGH_REFLECTIONS.comment = 使较粗糙的物体具有较粗糙的反射. 可能会显示奇怪的伪影, 但抗锯齿可能会修复它.
         option.PREVIOUS_FRAME.comment = 读取前一帧缓冲的颜色, 允许 SSR 或 SSGI 具有无限的光反射. 对性能有影响!
 
@@ -302,7 +299,7 @@ screen.CONFIGURATION = 配置
     option.DYNAMIC_CLOUDS.comment = 使云更为动态, 并允许天气影响它. （对原版和故事模式的云都有影响）.
     option.FADE_SPEED.comment = 云层消失速度.
     option.SECOND_CLOUD_HEIGHT.comment = 第二层云的高度, 仅在双层云启用时有效.
-    option.SKYBOX_BRIGHTNESS.comment = 天空盒子的亮度.
+    option.SKYBOX_BRIGHTNESS.comment = 天空盒的亮度.
 
     option.TERRAIN_ANIMATION.comment = 启用地表植被摆动动画.
     option.WATER_ANIMATION.comment = 启用水面起伏动画.
@@ -316,27 +313,27 @@ screen.CONFIGURATION = 配置
     option.WORLD_CURVATURE_SIZE.comment = 世界曲率大小.
 
     option.PBR_MODE.comment = 启用 PBR. 集成 PBR 依赖于原版反照率纹理来映射出材质. 资源 PBR 使用你的资源包的 PBR, 在可用的前提下. 资源 PBR 需要最新的 LabPBR 版本!
-    option.SPECULAR_HIGHLIGHTS.comment = 启用反射高光. 反射高光是太阳的近似反射.
+    option.SPECULAR_HIGHLIGHTS.comment = 启用镜面高光. 镜面高光是太阳的近似反射.
     option.ENVIRONMENT_PBR.comment = 启用环境材质. 环境材质会根据你所处的环境, 比如雨来影响你的周围环境.
     option.NORMAL_GENERATION.comment = 启用自动生成的法线. 在 LabPBR 启用时被禁用. 主要适用于原版资源包.
     option.NORMAL_GENERATION_RESOLUTION.comment = 自动生成法线的分辨率. 对性能有轻微影响.
-    option.SUBSURFACE_SCATTERING.comment = 启用次表面散射. 
-    option.EMISSIVE_INTENSITY.comment = 自发光贴图强度. 不影响光照贴图且需要启用 PBR.
-    option.SLOPE_NORMALS.comment = 启用斜率法线. 如果你使用的是带有法线贴图的高分辨率包, 请禁用此功能. 感谢@Null!
-    option.NORMAL_STRENGTH.comment = 法线贴图强度. 仅在使用资源包法线的 PBR 启用, 斜率法线关闭时有效.
-    option.DIRECTIONAL_LIGHTMAPS.comment = 启用指向性光照贴图. 仅在自动生成法线或 PBR 中的法线贴图启用时有效.
-    option.DIRECTIONAL_LIGHTMAP_STRENGTH.comment = 指向性光照贴图强度. 在指向性光照贴图启用时有效.
+    option.SUBSURFACE_SCATTERING.comment = 启用次表面散射.
+    option.EMISSIVE_INTENSITY.comment = 自发光贴图的强度. 不影响光照贴图且需要启用 PBR.
+    option.SLOPE_NORMALS.comment = 启用斜率法线. 如果你使用的是带有法线贴图的高分辨率包, 请禁用此功能. 感谢 @Null!
+    option.NORMAL_STRENGTH.comment = 法线贴图的强度. 仅在使用资源包法线的 PBR 启用, 斜率法线关闭时有效.
+    option.DIRECTIONAL_LIGHTMAPS.comment = 启用定向光照贴图. 仅在自动生成法线或 PBR 中的法线贴图启用时有效.
+    option.DIRECTIONAL_LIGHTMAP_STRENGTH.comment = 定向光照贴图的强度. 在启用定向光照贴图时有效.
 
-        option.PARALLAX_OCCLUSION.comment = 启用视差遮挡. 需要 LabPBR 被启用和一个启用 LabPBR 材质的资源包.
-        option.PARALLAX_DEPTH.comment = 视差遮挡深度. 增加以获得更深的深度.
-        option.PARALLAX_STEPS.comment = 视差遮挡步进次数. 增加以提升视差遮挡贴图的品质.
+        option.PARALLAX_OCCLUSION.comment = 启用视差遮蔽. 需要 LabPBR 被启用和一个启用 LabPBR 材质的资源包.
+        option.PARALLAX_DEPTH.comment = 视差遮蔽深度. 增加以获得更深的深度.
+        option.PARALLAX_STEPS.comment = 视差遮蔽步进次数. 增加以提升视差遮蔽映射的质量.
         option.PARALLAX_SHADOW.comment = 启用视差自投影.
-        option.PARALLAX_SHADOW_STEPS.comment = 视差自投影步进次数. 增加以提升自投影的品质.
+        option.PARALLAX_SHADOW_STEPS.comment = 视差自投影步进次数. 增加以提升自投影的质量.
 
-        option.WATER_NOISE.comment = 启用水面噪声. 通过改变水面噪声的亮度来接近于 SDGP.
+        option.WATER_NOISE.comment = 启用水面噪声. 通过改变水面噪声的亮度来接近于 Super Duper Graphics Pack.
         option.WATER_BRIGHTNESS.comment = 水体亮度, 值越低代表颜色越深
         option.WATER_NORMAL.comment = 启用水面法线
-        option.WATER_BLUR_SIZE.comment = 水法线地图模糊大小, 较小的值代表更清晰的波浪, 较大的值代表更平滑的波浪
+        option.WATER_BLUR_SIZE.comment = 水面法线贴图的模糊尺寸, 较小的值代表更清晰的波浪, 较大的值代表更平滑的波浪
         option.WATER_DEPTH_SIZE.comment = 波浪的法线贴图深度, 值越小深度越深
         option.WATER_TILE_SIZE.comment = 水砖的尺寸大小
         option.WATER_STYLIZE_ABSORPTION.comment = 启用风格化的水体吸光率. 根据深度改变水的颜色.
