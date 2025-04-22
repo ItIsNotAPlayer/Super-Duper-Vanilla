@@ -15,10 +15,32 @@
 
 #ifdef VERTEX
     #ifdef WORLD_LIGHT
+        out vec2 texCoord;
+
         uniform mat4 shadowModelView;
         uniform mat4 shadowModelViewInverse;
 
+        #if defined TERRAIN_ANIMATION || defined WATER_ANIMATION || defined PHYSICS_OCEAN
+            uniform float vertexFrameTime;
+
+            uniform vec3 cameraPosition;
+
+            attribute vec3 at_midBlock;
+
+            #ifdef PHYSICS_OCEAN
+                // Physics mod compatibility
+                #include "/lib/modded/physicsMod/physicsModVertex.glsl"
+            #endif
+
+            #include "/lib/vertex/shadowWave.glsl"
+        #endif
+
+        attribute vec3 mc_Entity;
+
         void main(){
+            // Get buffer texture coordinates
+            texCoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
+
             // Get vertex view position
             vec3 vertexShdViewPos = mat3(gl_ModelViewMatrix) * gl_Vertex.xyz + gl_ModelViewMatrix[3].xyz;
             // Get vertex eye player position
@@ -27,16 +49,20 @@
             // Get vertex feet player position
             vec2 vertexShdFeetPlayerPosXZ = vertexShdEyePlayerPos.xz + shadowModelViewInverse[3].xz;
 
+            #if defined TERRAIN_ANIMATION || defined WATER_ANIMATION || defined PHYSICS_OCEAN
+                // Apply terrain wave animation
+                vertexShdEyePlayerPos = getShadowWave(vertexShdEyePlayerPos, vertexShdFeetPlayerPosXZ + cameraPosition.xz, at_midBlock.y * 0.015625, mc_Entity.x, min(gl_MultiTexCoord1.y * 0.00416667, 1.0), vertexFrameTime);
+            #endif
+
             #ifdef WORLD_CURVATURE
                 // Apply curvature distortion
                 vertexShdEyePlayerPos.y -= dot(vertexShdFeetPlayerPosXZ, vertexShdFeetPlayerPosXZ) * worldCurvatureInv;
+            #endif
 
+            #if defined TERRAIN_ANIMATION || defined WATER_ANIMATION || defined WORLD_CURVATURE || defined PHYSICS_OCEAN
                 // Convert back to vertex view position
                 vertexShdViewPos = mat3(shadowModelView) * vertexShdEyePlayerPos;
             #endif
-
-            // Simple bias offset, uses a large bias to account for distorted geometry using distorted shadow mapping and LOD size
-            vertexShdViewPos.z -= 4.0;
 
             // Convert to clip position and output as final position
             // gl_Position = gl_ProjectionMatrix * vertexShdViewPos;
@@ -62,7 +88,14 @@
         /* RENDERTARGETS: 0 */
         layout(location = 0) out vec3 shadowColOut; // gcolor
 
+        in vec2 texCoord;
+
+        uniform sampler2D tex;
+
         void main(){
+            // Alpha test, discard and return immediately
+            if(textureLod(tex, texCoord, 0).a < ALPHA_THRESHOLD){ discard; return; }
+
             shadowColOut = vec3(0);
         }
     #else

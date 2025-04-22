@@ -1,11 +1,12 @@
-// Fragment GL version
+// Vertex GL version
 #version 330 compatibility
 
 #define SHADOW
-#define FRAGMENT
+#define WATER
+#define VERTEX
 
 #include "/lib/settings.glsl"
 #include "/lib/utility/common.glsl"
 
 #include "world.glsl"
-#include "/main/shadow.glsl"
+#include "/main/shadow_water.glsl"
