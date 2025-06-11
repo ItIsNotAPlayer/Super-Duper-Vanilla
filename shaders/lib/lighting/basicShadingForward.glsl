@@ -62,7 +62,7 @@ vec3 basicShadingForward(in vec3 albedo){
 				float shdCol = max(0.0, vertexNLZ * 0.6 + 0.4) * shdFade;
 			#else
 				// Sample fake shadows
-				float shdCol = saturate(hermiteMix(0.96, 0.98, lmCoord.y)) * shdFade;
+				float shdCol = saturate(hermiteMix(0.9, 1.0, lmCoord.y)) * shdFade;
 			#endif
 		#endif
 

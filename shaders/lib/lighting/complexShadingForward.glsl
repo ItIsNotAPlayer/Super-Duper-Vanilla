@@ -94,7 +94,7 @@ vec3 complexShadingForward(in dataPBR material){
 			}
 		#else
 			// Calculate fake shadows
-			float shdCol = saturate(hermiteMix(0.96, 0.98, lmCoord.y)) * shdFade;
+			float shdCol = saturate(hermiteMix(0.9, 1.0, lmCoord.y)) * shdFade;
 
 			#if defined PARALLAX_OCCLUSION && defined PARALLAX_SHADOW
 				shdCol *= material.parallaxShd;
