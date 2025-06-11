@@ -286,13 +286,13 @@
                 WavePixelData wave = physics_wavePixel(physics_localPosition, physics_localWaviness);
 
                 // Underwater normal fix
-                material.normal = !gl_FrontFacing ? -wave.normal : wave.normal;
+                material.normal = wave.normal;
 
                 // Apply physics foam
                 float physicsFoam = fastSqrt(wave.foam);
                 material.albedo = min(vec4(1), material.albedo + physicsFoam);
 
-                waterNoise *= physicsFoam;
+                waterNoise *= (getCellNoise(waterNoiseUv) + physicsFoam) * 0.5;
             #elif defined WATER_NORMAL
                 vec4 waterData = H2NWater(waterNoiseUv).xzyw;
                 material.normal = fastNormalize(waterData.yxz * TBN[2].x + waterData.xyz * TBN[2].y + waterData.xzy * TBN[2].z);
