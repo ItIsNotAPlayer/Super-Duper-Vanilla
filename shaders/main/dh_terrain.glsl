@@ -1,18 +1,3 @@
-/*
-================================ /// Super Duper Vanilla v1.3.7 /// ================================
-
-    Developed by Eldeston, presented by FlameRender (C) Studios.
-
-    Copyright (C) 2023 Eldeston | FlameRender (C) Studios License
-
-
-    By downloading this content you have agreed to the license and its terms of use.
-
-================================ /// Super Duper Vanilla v1.3.7 /// ================================
-*/
-
-/// Buffer features: TAA jittering, simple shading, and world curvature
-
 /// -------------------------------- /// Vertex Shader /// -------------------------------- ///
 
 #ifdef VERTEX
@@ -36,10 +21,6 @@
 
     #ifdef WORLD_LIGHT
         uniform mat4 shadowModelView;
-
-        #ifdef SHADOW_MAPPING
-            uniform mat4 shadowProjection;
-        #endif
     #endif
 
     #if ANTI_ALIASING == 2
@@ -52,14 +33,16 @@
     #endif
     
     void main(){
+        // Get block id
+        blockId = dhMaterialId;
         // Distant horizons terrain color is stored here
         vertexColor = gl_Color.rgb;
 
         // Distant horizons lightmap calculation
         #ifdef WORLD_CUSTOM_SKYLIGHT
-            lmCoord = vec2(min(gl_MultiTexCoord2.x, 1.0), WORLD_CUSTOM_SKYLIGHT);
+            lmCoord = vec2(min((gl_MultiTexCoord1.x - 0.03125) * 1.06666667, 1.0), WORLD_CUSTOM_SKYLIGHT);
         #else
-            lmCoord = min(gl_MultiTexCoord2.xy, vec2(1));
+            lmCoord = min((gl_MultiTexCoord1.xy - 0.03125) * 1.06666667, vec2(1));
         #endif
 
         // Get vertex normal
@@ -72,15 +55,6 @@
 
         // Get world position
         vertexWorldPos = vertexFeetPlayerPos + cameraPosition;
-
-        if(dhMaterialId == DH_BLOCK_ILLUMINATED) blockId = 0;
-        else if(dhMaterialId == DH_BLOCK_LAVA) blockId = 1;
-        else if(dhMaterialId == DH_BLOCK_LEAVES) blockId = 2;
-
-        #if defined SHADOW_MAPPING && defined WORLD_LIGHT || defined WORLD_CURVATURE
-            // Get vertex feet player position
-            vertexFeetPlayerPos = mat3(gbufferModelViewInverse) * vertexViewPos + gbufferModelViewInverse[3].xyz;
-        #endif
 
 	    #ifdef WORLD_CURVATURE
             // Apply curvature distortion
@@ -122,10 +96,7 @@
     uniform int isEyeInWater;
 
     uniform float nightVision;
-
-    #ifdef IS_IRIS
-        uniform float lightningFlash;
-    #endif
+    uniform float lightningFlash;
 
     #ifndef FORCE_DISABLE_WEATHER
         uniform float rainStrength;
@@ -156,12 +127,6 @@
         uniform float shdFade;
 
         uniform mat4 shadowModelView;
-
-        #ifdef SHADOW_MAPPING
-            uniform mat4 shadowProjection;
-
-            #include "/lib/lighting/shdMapping.glsl"
-        #endif
 
         #include "/lib/lighting/GGX.glsl"
     #endif
@@ -202,10 +167,10 @@
         material.ambient = 1.0;
 
         // If illuminated block
-        if(blockId == 0) material.emissive = 1.0;
+        if(blockId == DH_BLOCK_ILLUMINATED) material.emissive = 1.0;
 
         // If lava
-        else if(blockId == 1){
+        else if(blockId == DH_BLOCK_LAVA){
             #ifdef LAVA_NOISE
                 // Lava tile size inverse
                 const float lavaTileSizeInv = 1.0 / LAVA_TILE_SIZE;
@@ -221,7 +186,7 @@
         }
 
         // If leaves
-        else if(blockId == 2) material.ss = 0.5;
+        else if(blockId == DH_BLOCK_LEAVES) material.ss = 0.5;
 
         // Convert to linear space
         material.albedo.rgb = toLinear(material.albedo.rgb);

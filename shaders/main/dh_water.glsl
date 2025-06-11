@@ -1,16 +1,3 @@
-/*
-================================ /// Super Duper Vanilla v1.3.7 /// ================================
-
-    Developed by Eldeston, presented by FlameRender (C) Studios.
-
-    Copyright (C) 2023 Eldeston | FlameRender (C) Studios License
-
-
-    By downloading this content you have agreed to the license and its terms of use.
-
-================================ /// Super Duper Vanilla v1.3.7 /// ================================
-*/
-
 /// Buffer features: TAA jittering, simple shading, and world curvature
 
 /// -------------------------------- /// Vertex Shader /// -------------------------------- ///
@@ -37,10 +24,6 @@
 
     #ifdef WORLD_LIGHT
         uniform mat4 shadowModelView;
-
-        #ifdef SHADOW_MAPPING
-            uniform mat4 shadowProjection;
-        #endif
     #endif
 
     #if ANTI_ALIASING == 2
@@ -53,14 +36,16 @@
     #endif
     
     void main(){
+        // Get block id
+        blockId = dhMaterialId;
         // Distant horizons terrain color is stored here
         vertexColor = gl_Color.rgb;
 
         // Distant horizons lightmap calculation
         #ifdef WORLD_CUSTOM_SKYLIGHT
-            lmCoord = vec2(min(gl_MultiTexCoord2.x, 1.0), WORLD_CUSTOM_SKYLIGHT);
+            lmCoord = vec2(min((gl_MultiTexCoord1.x - 0.03125) * 1.06666667, 1.0), WORLD_CUSTOM_SKYLIGHT);
         #else
-            lmCoord = min(gl_MultiTexCoord2.xy, vec2(1));
+            lmCoord = min((gl_MultiTexCoord1.xy - 0.03125) * 1.06666667, vec2(1));
         #endif
 
         // Get vertex normal
@@ -76,8 +61,6 @@
 
         // Get water noise uv position
         waterNoiseUv = vertexWorldPos.xz * waterTileSizeInv;
-
-        if(dhMaterialId == DH_BLOCK_WATER) blockId = 2;
 
 	    #ifdef WORLD_CURVATURE
             // Apply curvature distortion
@@ -123,15 +106,12 @@
     uniform int isEyeInWater;
 
     uniform float nightVision;
+    uniform float lightningFlash;
 
     uniform mat4 gbufferProjectionInverse;
 
     uniform sampler2D depthtex1;
     uniform sampler2D dhDepthTex1;
-
-    #ifdef IS_IRIS
-        uniform float lightningFlash;
-    #endif
 
     #ifndef FORCE_DISABLE_WEATHER
         uniform float rainStrength;
@@ -169,12 +149,6 @@
 
         uniform mat4 shadowModelView;
 
-        #ifdef SHADOW_MAPPING
-            uniform mat4 shadowProjection;
-
-            #include "/lib/lighting/shdMapping.glsl"
-        #endif
-
         #include "/lib/lighting/GGX.glsl"
     #endif
 
@@ -211,7 +185,7 @@
         material.ambient = 1.0;
 
         // If water
-        if(blockId == 2){
+        if(blockId == DH_BLOCK_WATER){
             float waterNoise = WATER_BRIGHTNESS;
 
             #ifdef WATER_NORMAL
