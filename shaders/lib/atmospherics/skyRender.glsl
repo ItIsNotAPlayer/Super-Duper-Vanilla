@@ -71,9 +71,7 @@ vec3 getSkyBasic(in float nEyePlayerPosY, in float skyPosZ){
         #endif
     #endif
 
-    #ifdef IS_IRIS
-        currSkyCol += lightningFlash;
-    #endif
+    currSkyCol += lightningFlash;
 
     return currSkyCol;
 }

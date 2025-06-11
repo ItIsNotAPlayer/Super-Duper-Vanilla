@@ -2,10 +2,8 @@ vec3 complexShadingForward(in dataPBR material){
 	// Calculate sky diffusion first, begining with the sky itself
 	vec3 totalIllumination = toLinear(SKY_COLOR_DATA_BLOCK);
 
-	#ifdef IS_IRIS
-		// Calculate thunder flash
-		totalIllumination += lightningFlash;
-	#endif
+	// Calculate thunder flash
+	totalIllumination += lightningFlash;
 
 	// Get sky light squared
 	float skyLightSquared = squared(lmCoord.y);
@@ -45,7 +43,7 @@ vec3 complexShadingForward(in dataPBR material){
 		bool isShadow = NLZ > 0;
 		bool isSubSurface = material.ss > 0;
 
-		#if defined SHADOW_MAPPING && !defined ENTITIES_GLOWING
+		#if defined SHADOW_MAPPING && !defined DH_GBUFFERS
 			vec3 shdCol = vec3(0);
 
 			// If the area isn't shaded, apply shadow mapping

@@ -2,10 +2,8 @@ vec3 basicShadingForward(in vec3 albedo){
 	// Calculate sky diffusion first, begining with the sky itself
 	vec3 totalDiffuse = toLinear(SKY_COLOR_DATA_BLOCK);
 
-	#ifdef IS_IRIS
-		// Calculate thunder flash
-		totalDiffuse += lightningFlash;
-	#endif
+	// Calculate thunder flash
+	totalDiffuse += lightningFlash;
 
 	#if !defined CLOUDS && !defined DH_GENERIC
 		// Get sky light squared
@@ -26,7 +24,7 @@ vec3 basicShadingForward(in vec3 albedo){
 			vec3 shdPos = vec3(vertexShdPos.xy / (length(vertexShdPos.xy) * 2.0 + 0.2) + 0.5, vertexShdPos.z);
 
 			// There is no need for bias for particles, leads, etc.
-			#if defined CLOUDS || defined DH_GENERIC
+			#if defined CLOUDS || defined DH_GBUFFERS
 				// Bias mutilplier, adjusts according to the current resolution -exp2(-shadowDistance * 0.03125 - 9.0)
 				// The Z is instead a constant and the only extra bias that isn't accounted for is shadow distortion "blobs"
 				// 0.00006103515625 = exp2(-14)
@@ -52,14 +50,14 @@ vec3 basicShadingForward(in vec3 albedo){
 			// Cave light leak fix
 			float shdFactor = shdFade;
 
-			#if defined CLOUDS || defined DH_GENERIC
+			#if defined CLOUDS || defined DH_GBUFFERS
 				// Apply simple diffuse for clouds
 				shdFactor *= max(0.0, vertexNLZ * 0.6 + 0.4);
 			#endif
 
 			shdCol *= shdFactor;
 		#else
-			#if defined CLOUDS || defined DH_GENERIC
+			#if defined CLOUDS || defined DH_GBUFFERS
 				// Apply simple diffuse for clouds
 				float shdCol = max(0.0, vertexNLZ * 0.6 + 0.4) * shdFade;
 			#else
@@ -73,7 +71,7 @@ vec3 basicShadingForward(in vec3 albedo){
 			float rainDiffuseAmount = rainStrength * 0.5;
 			shdCol *= 1.0 - rainDiffuseAmount;
 
-			#if defined CLOUDS || defined DH_GENERIC
+			#if defined CLOUDS || defined DH_GBUFFERS
 				shdCol += rainDiffuseAmount;
 			#else
 				shdCol += rainDiffuseAmount * skyLightSquared;
