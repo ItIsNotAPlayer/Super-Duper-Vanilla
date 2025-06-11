@@ -1,5 +1,5 @@
 /*
-================================ /// Super Duper Vanilla v1.3.7 /// ================================
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
 
     Developed by Eldeston, presented by FlameRender (C) Studios.
 
@@ -8,7 +8,7 @@
 
     By downloading this content you have agreed to the license and its terms of use.
 
-================================ /// Super Duper Vanilla v1.3.7 /// ================================
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
 */
 
 /// -------------------------------- /// Vertex Shader /// -------------------------------- ///
@@ -22,22 +22,27 @@
         out vec2 texCoord;
         out vec2 waterNoiseUv;
 
-        uniform vec3 cameraPosition;
-
-        uniform mat4 shadowModelView;
         uniform mat4 shadowModelViewInverse;
 
-        #if defined TERRAIN_ANIMATION || defined WATER_ANIMATION || defined PHYSICS_OCEAN
-            uniform float vertexFrameTime;
+        #if defined WATER_ANIMATION || defined WORLD_CURVATURE
+            uniform mat4 shadowModelView;
+        #endif
 
-            attribute vec3 at_midBlock;
-
+        #ifdef WATER_ANIMATION
             #ifdef PHYSICS_OCEAN
-                // Physics mod compatibility
+                // Physics mod varyings
+                out float physics_localWaviness;
+
+                out vec2 physics_localPosition;
+
                 #include "/lib/modded/physicsMod/physicsModVertex.glsl"
             #endif
 
-            #include "/lib/vertex/shadowWave.glsl"
+            uniform float vertexFrameTime;
+
+            uniform vec3 cameraPosition;
+
+            #include "/lib/vertex/waveWater.glsl"
         #endif
 
         attribute vec3 mc_Entity;
@@ -63,9 +68,22 @@
             // Get water noise uv position
             waterNoiseUv = vertexShdWorldPosXZ * waterTileSizeInv;
 
-            #if defined TERRAIN_ANIMATION || defined WATER_ANIMATION || defined PHYSICS_OCEAN
-                // Apply terrain wave animation
-                vertexShdEyePlayerPos = getShadowWave(vertexShdEyePlayerPos, vertexShdWorldPosXZ, at_midBlock.y * 0.015625, mc_Entity.x, min(gl_MultiTexCoord1.y * 0.00416667, 1.0), vertexFrameTime);
+            #ifdef WATER_ANIMATION
+                #ifdef PHYSICS_OCEAN
+                    // Physics mod vertex displacement
+                    if(mc_Entity.x == 11102){
+                        // basic texture to determine how shallow/far away from the shore the water is
+                        float physics_localWaviness = texelFetch(physics_waviness, ivec2(gl_Vertex.xz) - physics_textureOffset, 0).r;
+
+                        // pass this to the fragment shader to fetch the texture there for per fragment normals
+                        vec2 physics_localPosition = (gl_Vertex.xz - physics_waveOffset) * PHYSICS_XZ_SCALE * physics_oceanWaveHorizontalScale;
+
+                        // transform gl_Vertex (since it is the raw mesh, i.e. not transformed yet)
+                        vertexShdEyePlayerPos.y += physics_waveHeight(physics_localPosition, physics_localWaviness);
+                    }
+                #endif
+
+                vertexShdEyePlayerPos = getWaterWave(vertexShdEyePlayerPos, vertexShdWorldPosXZ, mc_Entity.x, vertexFrameTime);
             #endif
 
             #ifdef WORLD_CURVATURE
@@ -73,7 +91,7 @@
                 vertexShdEyePlayerPos.y -= dot(vertexShdFeetPlayerPosXZ, vertexShdFeetPlayerPosXZ) * worldCurvatureInv;
             #endif
 
-            #if defined TERRAIN_ANIMATION || defined WATER_ANIMATION || defined WORLD_CURVATURE || defined PHYSICS_OCEAN
+            #if defined WATER_ANIMATION || defined WORLD_CURVATURE
                 // Convert back to vertex view position
                 vertexShdViewPos = mat3(shadowModelView) * vertexShdEyePlayerPos;
             #endif

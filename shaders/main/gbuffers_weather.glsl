@@ -1,5 +1,5 @@
 /*
-================================ /// Super Duper Vanilla v1.3.7 /// ================================
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
 
     Developed by Eldeston, presented by FlameRender (C) Studios.
 
@@ -8,7 +8,7 @@
 
     By downloading this content you have agreed to the license and its terms of use.
 
-================================ /// Super Duper Vanilla v1.3.7 /// ================================
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
 */
 
 /// Buffer features: TAA jittering, and direct shading
@@ -102,12 +102,9 @@
         in vec2 texCoord;
 
         uniform float nightVision;
+        uniform float lightningFlash;
 
         uniform sampler2D tex;
-
-        #ifdef IS_IRIS
-            uniform float lightningFlash;
-        #endif
 
         #ifndef FORCE_DISABLE_DAY_CYCLE
             uniform float dayCycle;
@@ -129,9 +126,7 @@
 
             vec3 totalDiffuse = toLinear(SKY_COLOR_DATA_BLOCK) + toLinear(lmCoordX * blockLightColor) + toLinear(AMBIENT_LIGHTING + nightVision * 0.5);
 
-            #ifdef IS_IRIS
-                totalDiffuse += lightningFlash;
-            #endif
+            totalDiffuse += lightningFlash;
 
             sceneColOut = vec4(albedo.rgb * totalDiffuse, albedo.a);
         }

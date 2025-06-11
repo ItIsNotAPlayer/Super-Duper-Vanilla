@@ -1,5 +1,5 @@
 /*
-================================ /// Super Duper Vanilla v1.3.7 /// ================================
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
 
     Developed by Eldeston, presented by FlameRender (C) Studios.
 
@@ -8,7 +8,7 @@
 
     By downloading this content you have agreed to the license and its terms of use.
 
-================================ /// Super Duper Vanilla v1.3.7 /// ================================
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
 */
 
 /// -------------------------------- /// Vertex Shader /// -------------------------------- ///
@@ -17,22 +17,19 @@
     #ifdef WORLD_LIGHT
         out vec2 texCoord;
 
-        uniform mat4 shadowModelView;
-        uniform mat4 shadowModelViewInverse;
+        #if defined TERRAIN_ANIMATION || defined WORLD_CURVATURE
+            uniform mat4 shadowModelView;
+            uniform mat4 shadowModelViewInverse;
+        #endif
 
-        #if defined TERRAIN_ANIMATION || defined WATER_ANIMATION || defined PHYSICS_OCEAN
+        #ifdef TERRAIN_ANIMATION
             uniform float vertexFrameTime;
 
             uniform vec3 cameraPosition;
 
             attribute vec3 at_midBlock;
 
-            #ifdef PHYSICS_OCEAN
-                // Physics mod compatibility
-                #include "/lib/modded/physicsMod/physicsModVertex.glsl"
-            #endif
-
-            #include "/lib/vertex/shadowWave.glsl"
+            #include "/lib/vertex/waveTerrain.glsl"
         #endif
 
         attribute vec3 mc_Entity;
@@ -43,23 +40,26 @@
 
             // Get vertex view position
             vec3 vertexShdViewPos = mat3(gl_ModelViewMatrix) * gl_Vertex.xyz + gl_ModelViewMatrix[3].xyz;
-            // Get vertex eye player position
-            vec3 vertexShdEyePlayerPos = mat3(shadowModelViewInverse) * vertexShdViewPos;
 
-            // Get vertex feet player position
-            vec2 vertexShdFeetPlayerPosXZ = vertexShdEyePlayerPos.xz + shadowModelViewInverse[3].xz;
+            #if defined TERRAIN_ANIMATION || defined WORLD_CURVATURE
+                // Get vertex eye player position
+                vec3 vertexShdEyePlayerPos = mat3(shadowModelViewInverse) * vertexShdViewPos;
 
-            #if defined TERRAIN_ANIMATION || defined WATER_ANIMATION || defined PHYSICS_OCEAN
-                // Apply terrain wave animation
-                vertexShdEyePlayerPos = getShadowWave(vertexShdEyePlayerPos, vertexShdFeetPlayerPosXZ + cameraPosition.xz, at_midBlock.y * 0.015625, mc_Entity.x, min(gl_MultiTexCoord1.y * 0.00416667, 1.0), vertexFrameTime);
+                // Get vertex feet player position
+                vec2 vertexShdFeetPlayerPosXZ = vertexShdEyePlayerPos.xz + shadowModelViewInverse[3].xz;
             #endif
 
+            #ifdef TERRAIN_ANIMATION
+                // Apply terrain wave animation
+                vertexShdEyePlayerPos = getTerrainWave(vertexShdEyePlayerPos, vertexShdFeetPlayerPosXZ + cameraPosition.xz, at_midBlock.y * 0.015625, mc_Entity.x, min(gl_MultiTexCoord1.y * 0.00416667, 1.0), vertexFrameTime);
+            #endif
+    
             #ifdef WORLD_CURVATURE
                 // Apply curvature distortion
                 vertexShdEyePlayerPos.y -= dot(vertexShdFeetPlayerPosXZ, vertexShdFeetPlayerPosXZ) * worldCurvatureInv;
             #endif
 
-            #if defined TERRAIN_ANIMATION || defined WATER_ANIMATION || defined WORLD_CURVATURE || defined PHYSICS_OCEAN
+            #if defined TERRAIN_ANIMATION || defined WORLD_CURVATURE
                 // Convert back to vertex view position
                 vertexShdViewPos = mat3(shadowModelView) * vertexShdEyePlayerPos;
             #endif

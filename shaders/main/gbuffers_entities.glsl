@@ -1,5 +1,5 @@
 /*
-================================ /// Super Duper Vanilla v1.3.7 /// ================================
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
 
     Developed by Eldeston, presented by FlameRender (C) Studios.
 
@@ -8,7 +8,7 @@
 
     By downloading this content you have agreed to the license and its terms of use.
 
-================================ /// Super Duper Vanilla v1.3.7 /// ================================
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
 */
 
 /// Buffer features: TAA jittering, complex shading, PBR, lightning, and world curvature
@@ -142,14 +142,11 @@
     uniform int isEyeInWater;
 
     uniform float nightVision;
+    uniform float lightningFlash;
 
     uniform vec4 entityColor;
 
     uniform sampler2D tex;
-
-    #ifdef IS_IRIS
-        uniform float lightningFlash;
-    #endif
 
     #ifndef FORCE_DISABLE_WEATHER
         uniform float rainStrength;

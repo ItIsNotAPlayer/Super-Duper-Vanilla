@@ -1,5 +1,5 @@
 /*
-================================ /// Super Duper Vanilla v1.3.7 /// ================================
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
 
     Developed by Eldeston, presented by FlameRender (C) Studios.
 
@@ -8,7 +8,7 @@
 
     By downloading this content you have agreed to the license and its terms of use.
 
-================================ /// Super Duper Vanilla v1.3.7 /// ================================
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
 */
 
 /// -------------------------------- /// Vertex Shader /// -------------------------------- ///
@@ -20,24 +20,10 @@
         flat out vec3 vertexColor;
 
         out vec2 texCoord;
-        out vec2 waterNoiseUv;
 
-        uniform vec3 cameraPosition;
-
-        uniform mat4 shadowModelView;
-        uniform mat4 shadowModelViewInverse;
-
-        #if defined TERRAIN_ANIMATION || defined WATER_ANIMATION || defined PHYSICS_OCEAN
-            uniform float vertexFrameTime;
-
-            attribute vec3 at_midBlock;
-
-            #ifdef PHYSICS_OCEAN
-                // Physics mod compatibility
-                #include "/lib/modded/physicsMod/physicsModVertex.glsl"
-            #endif
-
-            #include "/lib/vertex/shadowWave.glsl"
+        #ifdef WORLD_CURVATURE
+            uniform mat4 shadowModelView;
+            uniform mat4 shadowModelViewInverse;
         #endif
 
         attribute vec3 mc_Entity;
@@ -52,28 +38,17 @@
 
             // Get vertex view position
             vec3 vertexShdViewPos = mat3(gl_ModelViewMatrix) * gl_Vertex.xyz + gl_ModelViewMatrix[3].xyz;
-            // Get vertex eye player position
-            vec3 vertexShdEyePlayerPos = mat3(shadowModelViewInverse) * vertexShdViewPos;
-
-            // Get vertex feet player position
-            vec2 vertexShdFeetPlayerPosXZ = vertexShdEyePlayerPos.xz + shadowModelViewInverse[3].xz;
-            // Get world position
-            vec2 vertexShdWorldPosXZ = vertexShdFeetPlayerPosXZ + cameraPosition.xz;
-
-            // Get water noise uv position
-            waterNoiseUv = vertexShdWorldPosXZ * waterTileSizeInv;
-
-            #if defined TERRAIN_ANIMATION || defined WATER_ANIMATION || defined PHYSICS_OCEAN
-                // Apply terrain wave animation
-                vertexShdEyePlayerPos = getShadowWave(vertexShdEyePlayerPos, vertexShdWorldPosXZ, at_midBlock.y * 0.015625, mc_Entity.x, min(gl_MultiTexCoord1.y * 0.00416667, 1.0), vertexFrameTime);
-            #endif
 
             #ifdef WORLD_CURVATURE
+                // Get vertex eye player position
+                vec3 vertexShdEyePlayerPos = mat3(shadowModelViewInverse) * vertexShdViewPos;
+
+                // Get vertex feet player position
+                vec2 vertexShdFeetPlayerPosXZ = vertexShdEyePlayerPos.xz + shadowModelViewInverse[3].xz;
+
                 // Apply curvature distortion
                 vertexShdEyePlayerPos.y -= dot(vertexShdFeetPlayerPosXZ, vertexShdFeetPlayerPosXZ) * worldCurvatureInv;
-            #endif
-
-            #if defined TERRAIN_ANIMATION || defined WATER_ANIMATION || defined WORLD_CURVATURE || defined PHYSICS_OCEAN
+                
                 // Convert back to vertex view position
                 vertexShdViewPos = mat3(shadowModelView) * vertexShdEyePlayerPos;
             #endif
@@ -107,20 +82,8 @@
         flat in vec3 vertexColor;
 
         in vec2 texCoord;
-        in vec2 waterNoiseUv;
 
         uniform sampler2D tex;
-        
-        #if UNDERWATER_CAUSTICS != 0 && defined SHADOW_COLOR
-            uniform float fragmentFrameTime;
-
-            #if UNDERWATER_CAUSTICS == 1
-                uniform int isEyeInWater;
-            #endif
-
-            #include "/lib/utility/noiseFunctions.glsl"
-            #include "/lib/surface/water.glsl"
-        #endif
 
         void main(){
             #ifdef SHADOW_COLOR
@@ -141,26 +104,7 @@
                     return;
                 }
 
-                // If the object is not opaque, proceed with shadow coloring and caustics
-                #ifdef WATER_FLAT
-                    shadowColOut = vec3(0.8);
-
-                    #if UNDERWATER_CAUSTICS == 2
-                        shadowColOut = vec3(squared(0.256 + getCellNoise(waterNoiseUv)) * 0.8);
-                    #elif UNDERWATER_CAUSTICS == 1
-                        if(isEyeInWater == 1) shadowColOut = vec3(squared(0.256 + getCellNoise(waterNoiseUv)) * 0.8);
-                    #endif
-                #else
-                    shadowColOut = shdAlbedo.rgb;
-
-                    #if UNDERWATER_CAUSTICS == 2
-                        shadowColOut *= squared(0.256 + getCellNoise(waterNoiseUv));
-                    #elif UNDERWATER_CAUSTICS == 1
-                        if(isEyeInWater == 1) shadowColOut *= squared(0.256 + getCellNoise(waterNoiseUv));
-                    #endif
-                #endif
-
-                shadowColOut = toLinear(shadowColOut * vertexColor);
+                shadowColOut = toLinear(shdAlbedo.rgb * vertexColor);
             #else
                 // Alpha test, discard and return immediately
                 if(textureLod(tex, texCoord, 0).a < ALPHA_THRESHOLD){ discard; return; }

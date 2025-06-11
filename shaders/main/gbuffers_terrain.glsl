@@ -1,5 +1,5 @@
 /*
-================================ /// Super Duper Vanilla v1.3.7 /// ================================
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
 
     Developed by Eldeston, presented by FlameRender (C) Studios.
 
@@ -8,7 +8,7 @@
 
     By downloading this content you have agreed to the license and its terms of use.
 
-================================ /// Super Duper Vanilla v1.3.7 /// ================================
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
 */
 
 /// Buffer features: TAA jittering, complex shading, animation, lava noise, PBR, and world curvature
@@ -58,7 +58,7 @@
 
         attribute vec3 at_midBlock;
 
-        #include "/lib/vertex/terrainWave.glsl"
+        #include "/lib/vertex/waveTerrain.glsl"
     #endif
 
     attribute vec3 mc_Entity;
@@ -113,7 +113,7 @@
 
         #ifdef TERRAIN_ANIMATION
             // Apply terrain wave animation
-            vertexFeetPlayerPos = getTerrainWave(vertexFeetPlayerPos, vertexWorldPos, at_midBlock.y * 0.015625, mc_Entity.x, lmCoord.y, vertexFrameTime);
+            vertexFeetPlayerPos = getTerrainWave(vertexFeetPlayerPos, vertexWorldPos.xz, at_midBlock.y * 0.015625, mc_Entity.x, lmCoord.y, vertexFrameTime);
         #endif
 
         #ifdef WORLD_CURVATURE
@@ -173,12 +173,9 @@
     uniform int isEyeInWater;
 
     uniform float nightVision;
+    uniform float lightningFlash;
 
     uniform sampler2D tex;
-
-    #ifdef IS_IRIS
-        uniform float lightningFlash;
-    #endif
 
     #ifndef FORCE_DISABLE_WEATHER
         uniform float rainStrength;

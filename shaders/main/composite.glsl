@@ -1,5 +1,5 @@
 /*
-================================ /// Super Duper Vanilla v1.3.7 /// ================================
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
 
     Developed by Eldeston, presented by FlameRender (C) Studios.
 
@@ -8,7 +8,7 @@
 
     By downloading this content you have agreed to the license and its terms of use.
 
-================================ /// Super Duper Vanilla v1.3.7 /// ================================
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
 */
 
 /// Buffer features: Transparent complex shading and volumetric lighting
@@ -98,6 +98,7 @@
 
     uniform float blindness;
     uniform float nightVision;
+    uniform float lightningFlash;
     uniform float darknessFactor;
     uniform float darknessLightFactor;
 
@@ -115,16 +116,14 @@
 
     uniform mat4 shadowModelView;
 
+    // Main HDR buffer
     uniform sampler2D gcolor;
     uniform sampler2D colortex1;
+    // For SSAO and material masks
     uniform sampler2D colortex2;
     uniform sampler2D colortex3;
 
     uniform sampler2D depthtex0;
-
-    #ifdef IS_IRIS
-        uniform float lightningFlash;
-    #endif
 
     #if ANTI_ALIASING >= 2
         uniform float frameFract;
@@ -194,29 +193,6 @@
     #include "/lib/rayTracing/rayTracer.glsl"
 
     #include "/lib/lighting/complexShadingDeferred.glsl"
-
-    #ifndef IS_IRIS
-        bool isSpectralMask(in ivec2 iUv){
-            return texelFetch(colortex3, iUv, 0).z == 1;
-        }
-
-        float getSpectral(in ivec2 iUv){
-            ivec2 topRightCorner = iUv - 1;
-            ivec2 bottomLeftCorner = iUv + 1;
-
-            bool sample0 = isSpectralMask(topRightCorner);
-            bool sample1 = isSpectralMask(bottomLeftCorner);
-
-            if(sample0 && !sample1 || sample1 && !sample0) return EMISSIVE_INTENSITY;
-
-            bool sample2 = isSpectralMask(ivec2(topRightCorner.x, bottomLeftCorner.y));
-            bool sample3 = isSpectralMask(ivec2(bottomLeftCorner.x, topRightCorner.y));
-
-            if(sample2 && !sample3 || sample3 && !sample2) return EMISSIVE_INTENSITY;
-
-            return 0.0;
-        }
-    #endif
 
     void main(){
         // Screen texel coordinates
@@ -299,11 +275,6 @@
 
         // Apply darkness pulsing effect
         sceneColOut *= 1.0 - darknessLightFactor;
-
-        #ifndef IS_IRIS
-            // Apply spectral effect
-            sceneColOut += getSpectral(screenTexelCoord);
-        #endif
 
         #ifdef WORLD_LIGHT
             // Apply volumetric light

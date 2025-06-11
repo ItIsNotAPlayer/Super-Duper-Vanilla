@@ -1,5 +1,5 @@
 /*
-================================ /// Super Duper Vanilla v1.3.7 /// ================================
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
 
     Developed by Eldeston, presented by FlameRender (C) Studios.
 
@@ -8,7 +8,7 @@
 
     By downloading this content you have agreed to the license and its terms of use.
 
-================================ /// Super Duper Vanilla v1.3.7 /// ================================
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
 */
 
 /// Buffer features: TAA jittering, complex shading, animation, water noise, PBR, and world curvature
@@ -35,15 +35,6 @@
         out vec2 vTexCoord;
     #endif
 
-    #ifdef PHYSICS_OCEAN
-        // Physics mod varyings
-        out float physics_localWaviness;
-
-        out vec2 physics_localPosition;
-
-        #include "/lib/modded/physicsMod/physicsModVertex.glsl"
-    #endif
-
     uniform vec3 cameraPosition;
 
     uniform mat4 gbufferModelViewInverse;
@@ -62,9 +53,18 @@
     #endif
 
     #ifdef WATER_ANIMATION
+        #ifdef PHYSICS_OCEAN
+            // Physics mod varyings
+            out float physics_localWaviness;
+
+            out vec2 physics_localPosition;
+
+            #include "/lib/modded/physicsMod/physicsModVertex.glsl"
+        #endif
+
         uniform float vertexFrameTime;
 
-        #include "/lib/vertex/waterWave.glsl"
+        #include "/lib/vertex/waveWater.glsl"
     #endif
 
     attribute vec3 mc_Entity;
@@ -121,11 +121,11 @@
         #ifdef PHYSICS_OCEAN
             // Physics mod vertex displacement
             if(mc_Entity.x == 11102){
-                // pass this to the fragment shader to fetch the texture there for per fragment normals
-                physics_localPosition = (gl_Vertex.xz - physics_waveOffset) * PHYSICS_XZ_SCALE * physics_oceanWaveHorizontalScale;
-
                 // basic texture to determine how shallow/far away from the shore the water is
                 physics_localWaviness = texelFetch(physics_waviness, ivec2(gl_Vertex.xz) - physics_textureOffset, 0).r;
+
+                // pass this to the fragment shader to fetch the texture there for per fragment normals
+                physics_localPosition = (gl_Vertex.xz - physics_waveOffset) * PHYSICS_XZ_SCALE * physics_oceanWaveHorizontalScale;
 
                 // transform gl_Vertex (since it is the raw mesh, i.e. not transformed yet)
                 vertexFeetPlayerPos.y += physics_waveHeight(physics_localPosition, physics_localWaviness);
@@ -133,8 +133,7 @@
         #endif
 
         #ifdef WATER_ANIMATION
-            // Apply water wave animation
-            if(mc_Entity.x == 11102 && CURRENT_SPEED > 0) vertexFeetPlayerPos.y = getWaterWave(vertexWorldPos.xz, vertexFeetPlayerPos.y, vertexFrameTime);
+            vertexFeetPlayerPos = getWaterWave(vertexFeetPlayerPos, vertexWorldPos.xz, mc_Entity.x, vertexFrameTime);
         #endif
 
         #ifdef WORLD_CURVATURE
@@ -200,12 +199,9 @@
     uniform int isEyeInWater;
 
     uniform float nightVision;
+    uniform float lightningFlash;
 
     uniform sampler2D tex;
-
-    #ifdef IS_IRIS
-        uniform float lightningFlash;
-    #endif
 
     #ifndef FORCE_DISABLE_WEATHER
         uniform float rainStrength;

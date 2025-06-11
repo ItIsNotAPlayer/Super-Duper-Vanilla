@@ -1,7 +1,7 @@
 // Fragment GL version
 #version 330 compatibility
 
-#define GBUFFERS
+#define DH_GBUFFERS
 #define DH_WATER
 #define FRAGMENT
 

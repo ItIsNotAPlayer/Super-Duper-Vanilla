@@ -1,3 +1,16 @@
+/*
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
+
+    Developed by Eldeston, presented by FlameRender (C) Studios.
+
+    Copyright (C) 2023 Eldeston | FlameRender (C) Studios License
+
+
+    By downloading this content you have agreed to the license and its terms of use.
+
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
+*/
+
 /// -------------------------------- /// Vertex Shader /// -------------------------------- ///
 
 #ifdef VERTEX

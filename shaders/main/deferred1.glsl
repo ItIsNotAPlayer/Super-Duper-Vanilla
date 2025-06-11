@@ -1,5 +1,5 @@
 /*
-================================ /// Super Duper Vanilla v1.3.7 /// ================================
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
 
     Developed by Eldeston, presented by FlameRender (C) Studios.
 
@@ -8,7 +8,7 @@
 
     By downloading this content you have agreed to the license and its terms of use.
 
-================================ /// Super Duper Vanilla v1.3.7 /// ================================
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
 */
 
 /// Buffer features: Solid complex shading
@@ -105,6 +105,7 @@
 
     uniform float blindness;
     uniform float nightVision;
+    uniform float lightningFlash;
     uniform float darknessFactor;
     uniform float darknessLightFactor;
 
@@ -122,16 +123,14 @@
 
     uniform mat4 shadowModelView;
 
+    // Main HDR buffer
     uniform sampler2D gcolor;
     uniform sampler2D colortex1;
+    // For SSAO and material masks
     uniform sampler2D colortex2;
     uniform sampler2D colortex3;
     
     uniform sampler2D depthtex0;
-
-    #ifdef IS_IRIS
-        uniform float lightningFlash;
-    #endif
 
     #ifdef WORLD_LIGHT
         uniform float shdFade;

@@ -1,7 +1,7 @@
 // Vertex GL version
 #version 330 compatibility
 
-#define GBUFFERS
+#define DH_GBUFFERS
 #define DH_GENERIC
 #define VERTEX
 
