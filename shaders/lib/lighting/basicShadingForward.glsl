@@ -12,7 +12,7 @@ vec3 basicShadingForward(in vec3 albedo){
 		totalDiffuse *= skyLightSquared;
 
 		// Calculate block light
-		totalDiffuse += toLinear(lmCoord.x * blockLightColor);
+		totalDiffuse += toLinear(squared(lmCoord.x) * blockLightColor * 1.25);
 	#endif
 
 	// Lastly, calculate ambient lightning

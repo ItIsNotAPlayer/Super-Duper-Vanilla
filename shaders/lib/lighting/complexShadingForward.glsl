@@ -5,8 +5,11 @@ vec3 complexShadingForward(in dataPBR material){
 	// Calculate thunder flash
 	totalIllumination += lightningFlash;
 
+	// Get block light squared
+	float blockLightSquared = squared(lmCoord.x);
 	// Get sky light squared
 	float skyLightSquared = squared(lmCoord.y);
+
 	// Occlude the appled sky and thunder flash calculation by sky light amount
 	totalIllumination *= skyLightSquared;
 
@@ -14,14 +17,14 @@ vec3 complexShadingForward(in dataPBR material){
 	totalIllumination += toLinear(AMBIENT_LIGHTING + nightVision * 0.5);
 
 	#if defined DIRECTIONAL_LIGHTMAPS && (defined TERRAIN || defined WATER)
-		vec3 dirLightMapCoord = dFdx(vertexFeetPlayerPos) * dFdx(lmCoord.x) + dFdy(vertexFeetPlayerPos) * dFdy(lmCoord.x);
-		float dirLightMap = min(1.0, max(0.0, dot(fastNormalize(dirLightMapCoord), material.normal)) * lmCoord.x * DIRECTIONAL_LIGHTMAP_STRENGTH + lmCoord.x);
+		vec3 dirLightMapPos = fastNormalize(dFdx(vertexFeetPlayerPos) * dFdx(lmCoord.x) + dFdy(vertexFeetPlayerPos) * dFdy(lmCoord.x));
+		float dirLightMap = min(1.0, max(0.0, dot(dirLightMapPos, material.normal)) * blockLightSquared * DIRECTIONAL_LIGHTMAP_STRENGTH + lmCoord.x);
 
 		// Calculate block light
-		totalIllumination += toLinear(dirLightMap * blockLightColor);
+		totalIllumination += toLinear((float(material.emissive == 0) * 0.25 + 1.0) * squared(dirLightMap) * blockLightColor);
 	#else
 		// Calculate block light
-		totalIllumination += toLinear(lmCoord.x * blockLightColor);
+		totalIllumination += toLinear((float(material.emissive == 0) * 0.25 + 1.0) * blockLightSquared * blockLightColor);
 	#endif
 
 	// Apply baked ambient occlussion
