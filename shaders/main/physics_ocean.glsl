@@ -15,27 +15,18 @@
 
 /// -------------------------------- /// Vertex Shader /// -------------------------------- ///
 
-#undef PHYSICS_OCEAN
+#define PHYSICS_OCEAN
 
 #ifdef VERTEX
-    flat out int blockId;
-
     out vec2 lmCoord;
     out vec2 texCoord;
     out vec2 waterNoiseUv;
 
     out vec3 vertexColor;
+
     out vec3 vertexFeetPlayerPos;
     out vec3 vertexWorldPos;
-
-    out mat3 TBN;
-
-    #if defined NORMAL_GENERATION || defined PARALLAX_OCCLUSION
-        flat out vec2 vTexCoordScale;
-        flat out vec2 vTexCoordPos;
-
-        out vec2 vTexCoord;
-    #endif
+    out vec3 vertexNormal;
 
     uniform vec3 cameraPosition;
 
@@ -60,17 +51,16 @@
         #include "/lib/vertex/waveWater.glsl"
     #endif
 
-    attribute vec3 mc_Entity;
+    #ifdef PHYSICS_OCEAN
+        // Physics mod varyings
+        out float physics_localWaviness;
 
-    attribute vec4 at_tangent;
+        out vec2 physics_localPosition;
 
-    #if defined NORMAL_GENERATION || defined PARALLAX_OCCLUSION
-        attribute vec2 mc_midTexCoord;
+        #include "/lib/modded/physicsMod/physicsModVertex.glsl"
     #endif
 
     void main(){
-        // Get block id
-        blockId = int(mc_Entity.x);
         // Get buffer texture coordinates
         texCoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
         // Get vertex color
@@ -84,9 +74,7 @@
         #endif
 
         // Get vertex normal
-        vec3 vertexNormal = fastNormalize(gl_Normal);
-        // Get vertex tangent
-        vec3 vertexTangent = fastNormalize(at_tangent.xyz);
+        vertexNormal = fastNormalize(gl_Normal);
 
         // Get vertex view position
         vec3 vertexViewPos = mat3(gl_ModelViewMatrix) * gl_Vertex.xyz + gl_ModelViewMatrix[3].xyz;
@@ -99,20 +87,20 @@
         // Get water noise uv position
         waterNoiseUv = vertexWorldPos.xz * waterTileSizeInv;
 
-        // Calculate TBN matrix
-	    TBN = mat3(gbufferModelViewInverse) * (gl_NormalMatrix * mat3(vertexTangent, cross(vertexTangent, vertexNormal) * sign(at_tangent.w), vertexNormal));
+        #ifdef PHYSICS_OCEAN
+            // Physics mod vertex displacement
+            // basic texture to determine how shallow/far away from the shore the water is
+            physics_localWaviness = texelFetch(physics_waviness, ivec2(gl_Vertex.xz) - physics_textureOffset, 0).r;
 
-        #if defined NORMAL_GENERATION || defined PARALLAX_OCCLUSION
-            vec2 midCoord = (gl_TextureMatrix[0] * vec4(mc_midTexCoord, 0, 0)).xy;
-            vec2 texMinMidCoord = texCoord - midCoord;
+            // pass this to the fragment shader to fetch the texture there for per fragment normals
+            physics_localPosition = (gl_Vertex.xz - physics_waveOffset) * PHYSICS_XZ_SCALE * physics_oceanWaveHorizontalScale;
 
-            vTexCoordScale = abs(texMinMidCoord) * 2.0;
-            vTexCoordPos = min(texCoord, midCoord - texMinMidCoord);
-            vTexCoord = sign(texMinMidCoord) * 0.5 + 0.5;
+            // transform gl_Vertex (since it is the raw mesh, i.e. not transformed yet)
+            vertexFeetPlayerPos.y += physics_waveHeight(physics_localPosition, physics_localWaviness);
         #endif
 
         #ifdef WATER_ANIMATION
-            vertexFeetPlayerPos = getWaterWave(vertexFeetPlayerPos, vertexWorldPos.xz, mc_Entity.x, vertexFrameTime);
+            vertexFeetPlayerPos = getWaterWave(vertexFeetPlayerPos, vertexWorldPos.xz, 11102, vertexFrameTime);
         #endif
 
         #ifdef WORLD_CURVATURE
@@ -120,7 +108,7 @@
             vertexFeetPlayerPos.y -= dot(vertexFeetPlayerPos.xz, vertexFeetPlayerPos.xz) * worldCurvatureInv;
         #endif
 
-        #if defined WATER_ANIMATION || defined WORLD_CURVATURE
+        #if defined WATER_ANIMATION || defined PHYSICS_OCEAN || defined WORLD_CURVATURE
             // Convert back to vertex view position
             vertexViewPos = mat3(gbufferModelView) * vertexFeetPlayerPos + gbufferModelView[3].xyz;
         #endif
@@ -147,23 +135,23 @@
     layout(location = 2) out vec3 albedoDataOut; // colortex2
     layout(location = 3) out vec3 materialDataOut; // colortex3
 
-    flat in int blockId;
-
     in vec2 lmCoord;
     in vec2 texCoord;
     in vec2 waterNoiseUv;
 
     in vec3 vertexColor;
+
     in vec3 vertexFeetPlayerPos;
     in vec3 vertexWorldPos;
+    in vec3 vertexNormal;
 
-    in mat3 TBN;
+    #ifdef PHYSICS_OCEAN
+        // Physics mod varyings
+        in float physics_localWaviness;
 
-    #if defined NORMAL_GENERATION || defined PARALLAX_OCCLUSION
-        flat in vec2 vTexCoordScale;
-        flat in vec2 vTexCoordPos;
+        in vec2 physics_localPosition;
 
-        in vec2 vTexCoord;
+        #include "/lib/modded/physicsMod/physicsModFragment.glsl"
     #endif
 
     uniform int isEyeInWater;
@@ -220,12 +208,6 @@
 
     #include "/lib/PBR/dataStructs.glsl"
 
-    #if PBR_MODE <= 1
-        #include "/lib/PBR/integratedPBR.glsl"
-    #else
-        #include "/lib/PBR/labPBR.glsl"
-    #endif
-
     #include "/lib/utility/noiseFunctions.glsl"
 
     #if defined WATER_NORMAL || defined WATER_NOISE
@@ -234,63 +216,70 @@
         #include "/lib/surface/water.glsl"
     #endif
 
-    #if defined ENVIRONMENT_PBR && !defined FORCE_DISABLE_WEATHER
-        uniform float isPrecipitationRain;
-
-        #include "/lib/PBR/enviroPBR.glsl"
-    #endif
-
     #include "/lib/lighting/complexShadingForward.glsl"
+
+    // Texture coordinate derivatives
+    vec2 dcdx = dFdx(texCoord);
+    vec2 dcdy = dFdy(texCoord);
 
     void main(){
 	    // Declare materials
 	    dataPBR material;
-        getPBR(material, blockId);
-        
-        // If water
-        if(blockId == 11102){
-            float waterNoise = WATER_BRIGHTNESS;
+        material.albedo = textureGrad(tex, texCoord, dcdx, dcdy);
+        material.albedo.rgb *= vertexColor;
+        material.normal = vertexNormal;
 
-            #if defined WATER_NORMAL
-                vec4 waterData = H2NWater(waterNoiseUv).xzyw;
-                material.normal = fastNormalize(waterData.yxz * TBN[2].x + waterData.xyz * TBN[2].y + waterData.xzy * TBN[2].z);
+        #if COLOR_MODE == 0
+            material.albedo.rgb *= vertexColor;
+        #elif COLOR_MODE == 1
+            material.albedo.rgb = vec3(1);
+        #elif COLOR_MODE == 2
+            material.albedo.rgb = vec3(0);
+        #elif COLOR_MODE == 3
+            material.albedo.rgb = vertexColor;
+        #endif
 
-                #ifdef WATER_NOISE
-                    waterNoise *= squared(0.128 + waterData.w * 0.5);
-                #endif
-            #elif defined WATER_NOISE
-                float waterData = getCellNoise(waterNoiseUv);
+        material.smoothness = 0.96; material.emissive = 0.0;
+        material.metallic = 0.04; material.porosity = 0.0;
+        material.ss = 0.0; material.parallaxShd = 1.0;
+        material.ambient = 1.0;
 
-                waterNoise *= squared(0.128 + waterData * 0.5);
-            #endif
+        float waterNoise = WATER_BRIGHTNESS;
 
-            #if defined WATER_STYLIZE_ABSORPTION || defined WATER_FOAM
-                // Water color and foam. Fast depth linearization by DrDesten
-                // Not great, but plausible for most scenarios
-                float waterDepth = near / (1.0 - gl_FragCoord.z) - near / (1.0 - texelFetch(depthtex1, ivec2(gl_FragCoord.xy), 0).x);
-            #endif
+        // Physics mod water normal calculation
+        WavePixelData wave = physics_wavePixel(physics_localPosition, physics_localWaviness);
 
-            #ifdef WATER_STYLIZE_ABSORPTION
-                if(isEyeInWater == 0){
-                    float depthBrightness = exp2(waterDepth * 0.25);
-                    material.albedo.rgb = material.albedo.rgb * (waterNoise * (1.0 - depthBrightness) + depthBrightness);
-                    material.albedo.a = fastSqrt(material.albedo.a) * (1.0 - depthBrightness);
-                }
-                else material.albedo.rgb *= waterNoise;
-            #else
-                material.albedo.rgb *= waterNoise;
-            #endif
+        // Underwater normal fix
+        material.normal = wave.normal;
 
-            #ifdef WATER_FOAM
-                material.albedo = min(vec4(1), material.albedo + exp2((waterDepth + 0.0625) * 8.0));
-            #endif
-        }
+        // Apply physics foam
+        float physicsFoam = fastSqrt(wave.foam);
+        material.albedo = min(vec4(1), material.albedo + physicsFoam);
+
+        waterNoise *= (getCellNoise(waterNoiseUv) + physicsFoam) * 0.5;
+
+        #if defined WATER_STYLIZE_ABSORPTION || defined WATER_FOAM
+            // Water color and foam. Fast depth linearization by DrDesten
+            // Not great, but plausible for most scenarios
+            float waterDepth = near / (1.0 - gl_FragCoord.z) - near / (1.0 - texelFetch(depthtex1, ivec2(gl_FragCoord.xy), 0).x);
+        #endif
+
+        #ifdef WATER_STYLIZE_ABSORPTION
+            if(isEyeInWater == 0){
+                float depthBrightness = exp2(waterDepth * 0.25);
+                material.albedo.rgb = material.albedo.rgb * (waterNoise * (1.0 - depthBrightness) + depthBrightness);
+                material.albedo.a = fastSqrt(material.albedo.a) * (1.0 - depthBrightness);
+            }
+            else material.albedo.rgb *= waterNoise;
+        #else
+            material.albedo.rgb *= waterNoise;
+        #endif
+
+        #ifdef WATER_FOAM
+            material.albedo = min(vec4(1), material.albedo + exp2((waterDepth + 0.0625) * 8.0));
+        #endif
 
         material.albedo.rgb = toLinear(material.albedo.rgb);
-
-        #if defined ENVIRONMENT_PBR && !defined FORCE_DISABLE_WEATHER
-            if(blockId != 11102) enviroPBR(material, TBN[2]);
-        #endif
 
         // Write to HDR scene color
         sceneColOut = vec4(complexShadingForward(material), material.albedo.a);
