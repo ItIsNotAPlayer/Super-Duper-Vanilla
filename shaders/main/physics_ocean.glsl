@@ -218,14 +218,10 @@
 
     #include "/lib/lighting/complexShadingForward.glsl"
 
-    // Texture coordinate derivatives
-    vec2 dcdx = dFdx(texCoord);
-    vec2 dcdy = dFdy(texCoord);
-
     void main(){
 	    // Declare materials
 	    dataPBR material;
-        material.albedo = textureGrad(tex, texCoord, dcdx, dcdy);
+        material.albedo = textureGrad(tex, texCoord, dFdx(texCoord), dFdy(texCoord));
         material.albedo.rgb *= vertexColor;
         material.normal = vertexNormal;
 

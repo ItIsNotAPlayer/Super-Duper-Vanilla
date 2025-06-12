@@ -101,9 +101,9 @@
 #ifdef FRAGMENT
     /* RENDERTARGETS: 0,1,2,3 */
     layout(location = 0) out vec4 sceneColOut; // gcolor
-    layout(location = 1) out vec4 normalDataOut; // colortex1
-    layout(location = 2) out vec4 albedoDataOut; // colortex2
-    layout(location = 3) out vec4 materialDataOut; // colortex3
+    layout(location = 1) out vec3 normalDataOut; // colortex1
+    layout(location = 2) out vec3 albedoDataOut; // colortex2
+    layout(location = 3) out vec3 materialDataOut; // colortex3
 
     flat in int blockId;
 
@@ -123,7 +123,7 @@
 
     uniform mat4 gbufferProjectionInverse;
 
-    uniform sampler2D depthtex1;
+    uniform sampler2D depthtex0;
     uniform sampler2D dhDepthTex1;
 
     #ifndef FORCE_DISABLE_WEATHER
@@ -179,7 +179,7 @@
 
     void main(){
         // Fix for Distant Horizons translucents rendering over real geometry
-        if(texelFetch(depthtex1, ivec2(gl_FragCoord.xy), 0).x != 1.0){ discard; return; }
+        if(texelFetch(depthtex0, ivec2(gl_FragCoord.xy), 0).x != 1.0){ discard; return; }
 
         // Declare materials
 	    dataPBR material;
@@ -242,8 +242,8 @@
         sceneColOut = vec4(complexShadingForward(material), 1);
     
         // Write buffer datas
-        normalDataOut = vec4(material.normal, 1);
-        albedoDataOut = vec4(material.albedo.rgb, 1);
-        materialDataOut = vec4(material.metallic, material.smoothness, 0.5, 1);
+        normalDataOut = material.normal;
+        albedoDataOut = material.albedo.rgb;
+        materialDataOut = vec3(material.metallic, material.smoothness, 0.5);
     }
 #endif
