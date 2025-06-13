@@ -15,8 +15,6 @@
 
 #ifdef VERTEX
     #ifdef WORLD_LIGHT
-        flat out int blockId;
-
         flat out vec3 vertexColor;
 
         out vec2 texCoord;
@@ -30,17 +28,20 @@
             uniform mat4 shadowModelView;
         #endif
 
+        // Physics mod varyings
+        out float physics_localWaviness;
+
+        out vec2 physics_localPosition;
+
+        #include "/lib/modded/physicsMod/physicsModVertex.glsl"
+
         #ifdef WATER_ANIMATION
             uniform float vertexFrameTime;
 
             #include "/lib/vertex/waveWater.glsl"
         #endif
 
-        attribute vec3 mc_Entity;
-
         void main(){
-            // Get block id
-            blockId = int(mc_Entity.x);
             // Get buffer texture coordinates
             texCoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
             // Get vertex color
@@ -60,18 +61,26 @@
             waterNoiseUv = vertexShdWorldPosXZ * waterTileSizeInv;
 
             #ifdef WATER_ANIMATION
-                vertexShdEyePlayerPos = getWaterWave(vertexShdEyePlayerPos, vertexShdWorldPosXZ, mc_Entity.x, vertexFrameTime);
+                vertexShdEyePlayerPos = getWaterWave(vertexShdEyePlayerPos, vertexShdWorldPosXZ, 11102, vertexFrameTime);
             #endif
+
+            // Physics mod vertex displacement
+            // basic texture to determine how shallow/far away from the shore the water is
+            float physics_localWaviness = texelFetch(physics_waviness, ivec2(gl_Vertex.xz) - physics_textureOffset, 0).r;
+
+            // pass this to the fragment shader to fetch the texture there for per fragment normals
+            vec2 physics_localPosition = (gl_Vertex.xz - physics_waveOffset) * PHYSICS_XZ_SCALE * physics_oceanWaveHorizontalScale;
+
+            // transform gl_Vertex (since it is the raw mesh, i.e. not transformed yet)
+            vertexShdEyePlayerPos.y += physics_waveHeight(physics_localPosition, physics_localWaviness);
 
             #ifdef WORLD_CURVATURE
                 // Apply curvature distortion
                 vertexShdEyePlayerPos.y -= dot(vertexShdFeetPlayerPosXZ, vertexShdFeetPlayerPosXZ) * worldCurvatureInv;
             #endif
 
-            #if defined WATER_ANIMATION || defined WORLD_CURVATURE
-                // Convert back to vertex view position
-                vertexShdViewPos = mat3(shadowModelView) * vertexShdEyePlayerPos;
-            #endif
+            // Convert back to vertex view position
+            vertexShdViewPos = mat3(shadowModelView) * vertexShdEyePlayerPos;
 
             // Convert to clip position and output as final position
             // gl_Position = gl_ProjectionMatrix * vertexShdViewPos;
@@ -96,8 +105,6 @@
     #ifdef WORLD_LIGHT
         /* RENDERTARGETS: 0 */
         layout(location = 0) out vec3 shadowColOut; // gcolor
-
-        flat in int blockId;
 
         flat in vec3 vertexColor;
 
@@ -127,12 +134,6 @@
                 // If the object is fully opaque, set to black. This fixes "color leaking" filtered shadows
                 if(shdAlbedo.a == 1){
                     shadowColOut = vec3(0);
-                    return;
-                }
-
-                // To give white colored glass some proper shadows except water
-                if(blockId != 11102){
-                    shadowColOut = shdAlbedo.rgb;
                     return;
                 }
 

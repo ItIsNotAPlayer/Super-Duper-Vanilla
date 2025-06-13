@@ -15,8 +15,6 @@
 
 /// -------------------------------- /// Vertex Shader /// -------------------------------- ///
 
-#undef PHYSICS_OCEAN
-
 #ifdef VERTEX
     flat out int blockId;
 

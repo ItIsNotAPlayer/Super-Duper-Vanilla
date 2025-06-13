@@ -15,9 +15,12 @@
 
 /// -------------------------------- /// Vertex Shader /// -------------------------------- ///
 
-#define PHYSICS_OCEAN
-
 #ifdef VERTEX
+    // Physics Mod varyings
+    out float physics_localWaviness;
+
+    out vec2 physics_localPosition;
+
     out vec2 lmCoord;
     out vec2 texCoord;
     out vec2 waterNoiseUv;
@@ -51,14 +54,7 @@
         #include "/lib/vertex/waveWater.glsl"
     #endif
 
-    #ifdef PHYSICS_OCEAN
-        // Physics mod varyings
-        out float physics_localWaviness;
-
-        out vec2 physics_localPosition;
-
-        #include "/lib/modded/physicsMod/physicsModVertex.glsl"
-    #endif
+    #include "/lib/modded/physicsMod/physicsModVertex.glsl"
 
     void main(){
         // Get buffer texture coordinates
@@ -87,17 +83,15 @@
         // Get water noise uv position
         waterNoiseUv = vertexWorldPos.xz * waterTileSizeInv;
 
-        #ifdef PHYSICS_OCEAN
-            // Physics mod vertex displacement
-            // basic texture to determine how shallow/far away from the shore the water is
-            physics_localWaviness = texelFetch(physics_waviness, ivec2(gl_Vertex.xz) - physics_textureOffset, 0).r;
+        // Physics mod vertex displacement
+        // basic texture to determine how shallow/far away from the shore the water is
+        physics_localWaviness = texelFetch(physics_waviness, ivec2(gl_Vertex.xz) - physics_textureOffset, 0).r;
 
-            // pass this to the fragment shader to fetch the texture there for per fragment normals
-            physics_localPosition = (gl_Vertex.xz - physics_waveOffset) * PHYSICS_XZ_SCALE * physics_oceanWaveHorizontalScale;
+        // pass this to the fragment shader to fetch the texture there for per fragment normals
+        physics_localPosition = (gl_Vertex.xz - physics_waveOffset) * PHYSICS_XZ_SCALE * physics_oceanWaveHorizontalScale;
 
-            // transform gl_Vertex (since it is the raw mesh, i.e. not transformed yet)
-            vertexFeetPlayerPos.y += physics_waveHeight(physics_localPosition, physics_localWaviness);
-        #endif
+        // transform gl_Vertex (since it is the raw mesh, i.e. not transformed yet)
+        vertexFeetPlayerPos.y += physics_waveHeight(physics_localPosition, physics_localWaviness);
 
         #ifdef WATER_ANIMATION
             vertexFeetPlayerPos = getWaterWave(vertexFeetPlayerPos, vertexWorldPos.xz, 11102, vertexFrameTime);
@@ -108,10 +102,8 @@
             vertexFeetPlayerPos.y -= dot(vertexFeetPlayerPos.xz, vertexFeetPlayerPos.xz) * worldCurvatureInv;
         #endif
 
-        #if defined WATER_ANIMATION || defined PHYSICS_OCEAN || defined WORLD_CURVATURE
-            // Convert back to vertex view position
-            vertexViewPos = mat3(gbufferModelView) * vertexFeetPlayerPos + gbufferModelView[3].xyz;
-        #endif
+        // Convert back to vertex view position
+        vertexViewPos = mat3(gbufferModelView) * vertexFeetPlayerPos + gbufferModelView[3].xyz;
 
         // Convert to clip position and output as final position
         // gl_Position = gl_ProjectionMatrix * vertexViewPos;
@@ -135,6 +127,11 @@
     layout(location = 2) out vec3 albedoDataOut; // colortex2
     layout(location = 3) out vec3 materialDataOut; // colortex3
 
+    // Physics Mod varyings
+    in float physics_localWaviness;
+
+    in vec2 physics_localPosition;
+
     in vec2 lmCoord;
     in vec2 texCoord;
     in vec2 waterNoiseUv;
@@ -144,15 +141,6 @@
     in vec3 vertexFeetPlayerPos;
     in vec3 vertexWorldPos;
     in vec3 vertexNormal;
-
-    #ifdef PHYSICS_OCEAN
-        // Physics mod varyings
-        in float physics_localWaviness;
-
-        in vec2 physics_localPosition;
-
-        #include "/lib/modded/physicsMod/physicsModFragment.glsl"
-    #endif
 
     uniform int isEyeInWater;
 
@@ -217,6 +205,8 @@
     #endif
 
     #include "/lib/lighting/complexShadingForward.glsl"
+
+    #include "/lib/modded/physicsMod/physicsModFragment.glsl"
 
     void main(){
 	    // Declare materials
