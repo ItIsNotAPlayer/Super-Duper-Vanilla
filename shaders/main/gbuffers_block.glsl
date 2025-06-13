@@ -215,9 +215,7 @@
             endStarField += textureLod(tex, vec2(endStarCoord1.x, endStarCoord1.y + starSpeed), 0).r;
             endStarField += textureLod(tex, vec2(-endStarCoord1.x, starSpeed - endStarCoord1.y) * 2.0, 0).r;
 
-            vec3 endPortalAlbedo = toLinear((endStarField + 0.0625) * (getRng3(ivec2(screenPos * 128.0) & 255) * 0.5 + 0.5) * vertexColor.rgb);
-
-            sceneColOut = vec4(endPortalAlbedo * EMISSIVE_INTENSITY * EMISSIVE_INTENSITY, 1);
+            sceneColOut = vec4(toLinear((getRng3(ivec2(screenPos * 128.0) & 255) * 0.5 + 0.5) * ((endStarField + 0.0625) * EMISSIVE_INTENSITY) * vertexColor.rgb), 1);
 
             // End portal fix
             normalDataOut = TBN[2];
