@@ -93,6 +93,6 @@
         // Convert to linear space
         albedo.rgb = toLinear(albedo.rgb);
 
-        sceneColOut = albedo.rgb * vertexAlpha;
+        sceneColOut = albedo.rgb * max(squared(sumOf(albedo.rgb) * 0.33333333), vertexAlpha - 1.0);
     }
 #endif
