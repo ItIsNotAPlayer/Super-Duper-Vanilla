@@ -38,7 +38,7 @@
         // Get buffer texture coordinates
         texCoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
         // Get vertex alpha (in this case, the warden stores the heartbeat pulse here)
-        vertexAlpha = (gl_Color.a * 0.9 + 0.1) * EMISSIVE_INTENSITY;
+        vertexAlpha = gl_Color.a * EMISSIVE_INTENSITY;
 
 	    // Get vertex view position
         vec3 vertexViewPos = mat3(gl_ModelViewMatrix) * gl_Vertex.xyz + gl_ModelViewMatrix[3].xyz;
@@ -93,6 +93,9 @@
         // Convert to linear space
         albedo.rgb = toLinear(albedo.rgb);
 
-        sceneColOut = albedo.rgb * max(squared(sumOf(albedo.rgb) * 0.33333333), vertexAlpha - 1.0);
+        // Since the blend is set to add, simply base the glow from the avarage of the albedo's luminance squared
+        // Then use vertexAlpha where it stores the vanilla emissive brightness
+        float emissiveMap = sumOf(albedo.rgb) * 0.33333333;
+        sceneColOut = albedo.rgb * emissiveMap * max(emissiveMap, vertexAlpha);
     }
 #endif
