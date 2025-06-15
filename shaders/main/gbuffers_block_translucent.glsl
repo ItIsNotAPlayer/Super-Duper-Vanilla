@@ -113,7 +113,7 @@
 
 #ifdef FRAGMENT
     /* RENDERTARGETS: 0,1,2,3 */
-    layout(location = 0) out vec3 sceneColOut; // gcolor
+    layout(location = 0) out vec4 sceneColOut; // gcolor
     layout(location = 1) out vec3 normalDataOut; // colortex1
     layout(location = 2) out vec3 albedoDataOut; // colortex2
     layout(location = 3) out vec3 materialDataOut; // colortex3
@@ -200,30 +200,6 @@
     #include "/lib/lighting/complexShadingForward.glsl"
 
     void main(){
-        // End portal
-        if(blockEntityId == 12000){
-            // End star uv
-            vec2 screenPos = gl_FragCoord.xy * vec2(pixelWidth, pixelHeight);
-            float starSpeed = fragmentFrameTime * 0.0078125;
-
-            float endStarField = textureLod(tex, vec2(screenPos.y, screenPos.x + starSpeed) * 0.5, 0).r;
-            endStarField += textureLod(tex, vec2(screenPos.x, screenPos.y + starSpeed), 0).r;
-            endStarField += textureLod(tex, vec2(-screenPos.x, starSpeed - screenPos.y) * 2.0, 0).r;
-            
-            vec2 endStarCoord1 = vec2(screenPos.x - screenPos.y, screenPos.y + screenPos.x);
-            endStarField += textureLod(tex, vec2(endStarCoord1.y, endStarCoord1.x + starSpeed) * 0.5, 0).r;
-            endStarField += textureLod(tex, vec2(endStarCoord1.x, endStarCoord1.y + starSpeed), 0).r;
-            endStarField += textureLod(tex, vec2(-endStarCoord1.x, starSpeed - endStarCoord1.y) * 2.0, 0).r;
-
-            sceneColOut = toLinear((getRng3(ivec2(screenPos * 128.0) & 255) * 0.5 + 0.5) * ((endStarField + 0.0625) * EMISSIVE_INTENSITY) * vertexColor.rgb);
-
-            // End portal fix
-            normalDataOut = TBN[2];
-            materialDataOut = vec3(0, 0, 0.5);
-
-            return; // Return immediately, no need for lighting calculation
-        }
-
 	    // Declare materials
 	    dataPBR material;
         getPBR(material, blockEntityId);
@@ -232,7 +208,7 @@
         material.albedo.rgb = toLinear(material.albedo.rgb);
 
         // Write to HDR scene color
-        sceneColOut = complexShadingForward(material);
+        sceneColOut = vec4(complexShadingForward(material), material.albedo.a);
 
         // Write buffer datas
         normalDataOut = material.normal;
