@@ -18,7 +18,7 @@
 #ifdef VERTEX
     flat out vec2 lmCoord;
 
-    flat out vec3 vertexColor;
+    flat out vec4 vertexColor;
 
     #if defined WORLD_LIGHT && defined SHADOW_MAPPING
         out vec3 vertexShdPos;
@@ -49,7 +49,7 @@
     
     void main(){
         // Get vertex color
-        vertexColor = gl_Color.rgb;
+        vertexColor = gl_Color;
 
         // Lightmap fix for mods
         #ifdef WORLD_CUSTOM_SKYLIGHT
@@ -103,7 +103,7 @@
 
     flat in vec2 lmCoord;
 
-    flat in vec3 vertexColor;
+    flat in vec4 vertexColor;
 
     #if defined WORLD_LIGHT && defined SHADOW_MAPPING
         in vec3 vertexShdPos;
@@ -155,7 +155,9 @@
 
     void main(){
         // Get albedo color
-        vec4 albedo = vec4(vertexColor, 1);
+        vec4 albedo = vertexColor;
+
+        if(albedo.a < ALPHA_THRESHOLD) discard;
 
         #if COLOR_MODE == 1
             albedo.rgb = vec3(1);

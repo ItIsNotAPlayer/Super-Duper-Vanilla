@@ -127,6 +127,7 @@ Notes for pending features/bug fixes to be implemented categorized by importance
 ## CURRENT
 * Optimize day and night transition calculations (medium priority)
 * Improve fog calculation and settings (medium priority)
+* Implement portal depth for Nether and End
 
 ## DONE
 * Fix dragon death beam (medium priority) ?
