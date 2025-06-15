@@ -81,9 +81,9 @@
 
         // Lightmap fix for mods
         #ifdef WORLD_CUSTOM_SKYLIGHT
-            lmCoord = vec2(min(gl_MultiTexCoord1.x * 0.00416667, 1.0), WORLD_CUSTOM_SKYLIGHT);
+            lmCoord = vec2(lightMapCoord(gl_MultiTexCoord1.x), WORLD_CUSTOM_SKYLIGHT);
         #else
-            lmCoord = min(gl_MultiTexCoord1.xy * 0.00416667, vec2(1));
+            lmCoord = lightMapCoord(gl_MultiTexCoord1.xy);
         #endif
 
         // Get vertex normal
@@ -107,7 +107,7 @@
             vec2 texMinMidTexCoord = texCoord - midTexCoord;
 
             vTexCoordScale = abs(texMinMidTexCoord) * 2.0;
-            vTexCoordPos = min(texCoord, midTexCoord - texMinMidTexCoord);
+            vTexCoordPos = lightMapCoord(texCoord, midTexCoord - texMinMidTexCoord);
             vTexCoord = sign(texMinMidTexCoord) * 0.5 + 0.5;
         #endif
 

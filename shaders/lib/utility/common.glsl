@@ -8,6 +8,25 @@
 // Certain RP artists mistakingly add additional alpha to nontranslucent textures
 #define ALPHA_THRESHOLD 0.1
 
+const float lightMapEpsilon = 1.0 / 16.0;
+const float lightMapVertexScale = 1.0328125 / 240.0;
+const float oneMinusLightMapScale = 1.0 - lightMapEpsilon;
+
+// For some reason, the lightmap has precision errors and does not reach 0 or 1
+float lightMapCoord(in float lightMap){
+	// lightMap = (lightMap * 33.05 / 32.0) - (1.05 / 32.0);
+	lightMap = lightMap * lightMapVertexScale - 0.0328125;
+
+	if(lightMap < lightMapEpsilon) return 0.0;
+	if(lightMap > oneMinusLightMapScale) return 1.0;
+
+	return lightMap;
+}
+
+vec2 lightMapCoord(in vec2 lightMap){
+	return vec2(lightMapCoord(lightMap.x), lightMapCoord(lightMap.y));
+}
+
 // Saturate/clamp functions
 float saturate(in float x){ return clamp(x, 0.0, 1.0); }
 vec2 saturate(in vec2 x){ return clamp(x, vec2(0), vec2(1)); }

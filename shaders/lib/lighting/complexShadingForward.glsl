@@ -57,17 +57,21 @@ vec3 complexShadingForward(in dataPBR material){
 
 				// Apply shadow distortion and transform to shadow screen space
 				shdPos = vec3(shdPos.xy / (length(shdPos.xy) * 2.0 + 0.2), shdPos.z * 0.1) + 0.5;
-				// Bias mutilplier, adjusts according to the current resolution
-				// The Z is instead a constant and the only extra bias that isn't accounted for is shadow distortion "blobs"
-				// 0.00006103515625 = exp2(-14)
-				const vec3 biasAdjustFactor = vec3(shadowMapPixelSize * 2.0, shadowMapPixelSize * 2.0, -0.00006103515625);
 
-				// Since we already have NLZ, we just need NLX and NLY to complete the shadow normal
-				float NLX = dot(material.normal, vec3(shadowModelView[0].x, shadowModelView[1].x, shadowModelView[2].x));
-				float NLY = dot(material.normal, vec3(shadowModelView[0].y, shadowModelView[1].y, shadowModelView[2].y));
+				// Items that are not subject to depth do not need a bias
+				#if !defined HAND && !defined HAND_WATER
+					// Bias mutilplier, adjusts according to the current resolution
+					// The Z is instead a constant and the only extra bias that isn't accounted for is shadow distortion "blobs"
+					// 0.00006103515625 = exp2(-14)
+					const vec3 biasAdjustFactor = vec3(shadowMapPixelSize * 2.0, shadowMapPixelSize * 2.0, -0.00006103515625);
 
-				// Apply normal based bias
-				shdPos += vec3(NLX, NLY, NLZ) * biasAdjustFactor;
+					// Since we already have NLZ, we just need NLX and NLY to complete the shadow normal
+					float NLX = dot(material.normal, vec3(shadowModelView[0].x, shadowModelView[1].x, shadowModelView[2].x));
+					float NLY = dot(material.normal, vec3(shadowModelView[0].y, shadowModelView[1].y, shadowModelView[2].y));
+
+					// Apply normal based bias
+					shdPos += vec3(NLX, NLY, NLZ) * biasAdjustFactor;
+				#endif
 
 				// Sample shadows
 				#ifdef SHADOW_FILTER

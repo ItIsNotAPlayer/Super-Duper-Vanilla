@@ -49,7 +49,7 @@
 
         void main(){
             // Lightmap fix for mods
-            lmCoordX = min(gl_MultiTexCoord1.x * 0.00416667, 1.0);
+            lmCoordX = lightMapCoord(gl_MultiTexCoord1.x);
             // Get buffer texture coordinates
             texCoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
 

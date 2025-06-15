@@ -73,7 +73,7 @@
 
             #ifdef TERRAIN_ANIMATION
                 // Apply terrain wave animation
-                vertexShdEyePlayerPos = getTerrainWave(vertexShdEyePlayerPos, vertexShdWorldPosXZ, at_midBlock.y * 0.015625, mc_Entity.x, min(gl_MultiTexCoord1.y * 0.00416667, 1.0), vertexFrameTime);
+                vertexShdEyePlayerPos = getTerrainWave(vertexShdEyePlayerPos, vertexShdWorldPosXZ, at_midBlock.y * 0.015625, mc_Entity.x, lightMapCoord(gl_MultiTexCoord1.y), vertexFrameTime);
             #endif
 
             #ifdef WATER_ANIMATION
