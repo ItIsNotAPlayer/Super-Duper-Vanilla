@@ -27,9 +27,6 @@
             flat out float vertexNLZ;
 
             #ifdef SHADOW_MAPPING
-                flat out float vertexNLX;
-                flat out float vertexNLY;
-
                 out vec3 vertexShdPos;
             #endif
         #endif
@@ -95,10 +92,6 @@
                 vertexNLZ = dot(vertexNormal, vec3(shadowModelView[0].z, shadowModelView[1].z, shadowModelView[2].z));
 
                 #ifdef SHADOW_MAPPING
-                    // Since we already have vertexNLZ, we just need NLX and NLY to complete the shadow normal
-                    vertexNLX = dot(vertexNormal, vec3(shadowModelView[0].x, shadowModelView[1].x, shadowModelView[2].x));
-                    vertexNLY = dot(vertexNormal, vec3(shadowModelView[0].y, shadowModelView[1].y, shadowModelView[2].y));
-
                     // Calculate shadow pos in vertex
                     vertexShdPos = vec3(shadowProjection[0].x, shadowProjection[1].y, shadowProjection[2].z) * (mat3(shadowModelView) * vertexFeetPlayerPos + shadowModelView[3].xyz);
                     vertexShdPos.z += shadowProjection[3].z;
@@ -138,9 +131,6 @@
             flat in float vertexNLZ;
 
             #ifdef SHADOW_MAPPING
-                flat in float vertexNLX;
-                flat in float vertexNLY;
-
                 in vec3 vertexShdPos;
             #endif
         #endif

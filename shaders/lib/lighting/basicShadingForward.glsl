@@ -5,7 +5,7 @@ vec3 basicShadingForward(in vec3 albedo){
 	// Calculate thunder flash
 	totalDiffuse += lightningFlash;
 
-	#if !defined CLOUDS && !defined DH_GENERIC
+	#ifndef CLOUDS
 		// Get sky light squared
 		float skyLightSquared = squared(lmCoord.y);
 		// Occlude the appled sky and thunder flash calculation by sky light amount
@@ -22,17 +22,6 @@ vec3 basicShadingForward(in vec3 albedo){
 		#ifdef SHADOW_MAPPING
 			// Apply shadow distortion and transform to shadow screen space
 			vec3 shdPos = vec3(vertexShdPos.xy / (length(vertexShdPos.xy) * 2.0 + 0.2) + 0.5, vertexShdPos.z);
-
-			// There is no need for bias for particles, leads, etc.
-			#if defined CLOUDS || defined DH_GBUFFERS
-				// Bias mutilplier, adjusts according to the current resolution -exp2(-shadowDistance * 0.03125 - 9.0)
-				// The Z is instead a constant and the only extra bias that isn't accounted for is shadow distortion "blobs"
-				// 0.00006103515625 = exp2(-14)
-				const vec3 biasAdjustFactor = vec3(shadowMapPixelSize * 2.0, shadowMapPixelSize * 2.0, -0.00006103515625);
-
-				// Apply normal based bias
-				shdPos += vec3(vertexNLX, vertexNLY, vertexNLZ) * biasAdjustFactor;
-			#endif
 
 			// Sample shadows
 			#ifdef SHADOW_FILTER
