@@ -72,7 +72,7 @@ vec3 textureFXAA(in ivec2 screenTexelCoord){
     float gradientScaled = 0.25 * max(abs(gradient1), abs(gradient2));
 
     // Choose the step size (one pixel) according to the edge direction.
-    float stepLength = isHorizontal ? pixelWidth : pixelHeight;
+    float stepLength = isHorizontal ? pixelHeight : pixelWidth;
 
     // Average luma in the correct direction.
     float lumaLocalAverage = lumaCenter;
