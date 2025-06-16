@@ -14,7 +14,7 @@ void getPBR(inout dataPBR material, in int id){
     material.normal = TBN[2];
 
     // Generate bumped normals
-    #if (defined TERRAIN || defined WATER || defined BLOCK) && defined NORMAL_GENERATION
+    #if (defined TERRAIN || defined WATER || defined BLOCK || defined BLOCK_TRANSLUCENT) && defined NORMAL_GENERATION
         if(id != 11100 && id != 11102 && id != 12001 && id != 12101){
             const float autoGenNormPixSize = 1.0 / NORMAL_GENERATION_RESOLUTION;
             vec2 topRightCorner = fract(vTexCoord - autoGenNormPixSize) * vTexCoordScale + vTexCoordPos;
@@ -109,8 +109,13 @@ void getPBR(inout dataPBR material, in int id){
                 material.smoothness = 0.9;
             }
 
-            // Redstone block
+            // Creaking heart
             else if(id == 12302){
+                material.emissive = saturate(squared((material.albedo.r + material.albedo.g) * 0.66666667) - material.albedo.b);
+            }
+
+            // Redstone block
+            else if(id == 12303){
                 material.emissive = 0.45;
                 material.smoothness = 0.93 * material.albedo.r;
                 material.metallic = 1.0;
