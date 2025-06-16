@@ -1,4 +1,4 @@
-vec3 complexShadingDeferred(in vec3 sceneCol, in vec3 screenPos, in vec3 viewPos, in vec3 normal, in vec3 albedo, in float viewDotInvSqrt, in float metallic, in float smoothness, in vec3 dither){
+vec3 complexShadingDeferred(in vec3 sceneCol, in vec3 screenPos, in vec3 viewPos, in vec3 normal, in vec3 albedo, in vec3 dither, in float viewDotInvSqrt, in float metallic, in float smoothness, in bool realSky){
 	#if defined ROUGH_REFLECTIONS || defined SSGI
 		vec3 noiseUnitVector = generateUnitVector(dither.xy);
 	#endif
@@ -33,8 +33,22 @@ vec3 complexShadingDeferred(in vec3 sceneCol, in vec3 screenPos, in vec3 viewPos
 
 	// Calculate SSR and sky reflections
 	#ifdef SSR
-		// Get SSR screen coordinates
-		vec3 SSRCoord = rayTraceScene(screenPos, viewPos, reflectViewDir, dither.z);
+		#ifdef DISTANT_HORIZONS
+			// Get SSR screen coordinates
+			vec3 SSRCoord = vec3(0);
+
+			// Use really simple reflections for Distant Horizons chunks
+			if(realSky){
+				vec2 SSRDH = getScreenPos(gbufferProjection, viewPos + reflectViewDir * borderFar).xy;
+				if(SSRDH.x >= 0 && SSRDH.y >= 0 && SSRDH.x <= 1 && SSRDH.y <= 1) SSRCoord = vec3(SSRDH, getDepthTex(SSRDH) != 1);
+			}else{
+				SSRCoord = rayTraceScene(screenPos, viewPos, reflectViewDir, dither.z);
+			}
+			
+		#else
+			// Get SSR screen coordinates
+			vec3 SSRCoord = rayTraceScene(screenPos, viewPos, reflectViewDir, dither.z);
+		#endif
 
 		#ifdef PREVIOUS_FRAME
 			// Get reflections and check for sky

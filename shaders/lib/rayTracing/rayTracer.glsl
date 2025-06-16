@@ -33,7 +33,7 @@ vec3 rayTraceScene(in vec3 screenPos, in vec3 viewPos, in vec3 rayDir, in float 
 			#if RAYTRACER_BISTEPS != 0
 				for(int i = 0; i < RAYTRACER_BISTEPS; i++){
 					// If sky return immediately
-					if(currDepth == 1) return vec3(0);
+					if(getDepthTex(startPos.xy) == 1) return vec3(0);
 
 					// Continue refinement
 					screenPosRayDir *= 0.5;
@@ -46,7 +46,7 @@ vec3 rayTraceScene(in vec3 screenPos, in vec3 viewPos, in vec3 rayDir, in float 
 				}
 			#else
 				// If sky return immediately
-				if(currDepth == 1) return vec3(0);
+				if(getDepthTex(startPos.xy) == 1) return vec3(0);
 			#endif
 
 			// Return final results

@@ -212,6 +212,7 @@
         #include "/lib/post/outline.glsl"
     #endif
 
+    #include "/lib/utility/depthTex.glsl"
     #include "/lib/utility/noiseFunctions.glsl"
 
     #include "/lib/atmospherics/skyRender.glsl"
@@ -225,10 +226,12 @@
         // Screen texel coordinates
         ivec2 screenTexelCoord = ivec2(gl_FragCoord.xy);
 
+        bool realSky = false;
+
         // Distant Horizons apparently uses a different depth texture
         #ifdef DISTANT_HORIZONS
             float depth = texelFetch(depthtex0, screenTexelCoord, 0).x;
-            bool realSky = depth == 1;
+            realSky = depth == 1;
             if(realSky) depth = texelFetch(dhDepthTex0, screenTexelCoord, 0).x;
         #else
             float depth = texelFetch(depthtex0, screenTexelCoord, 0).x;
@@ -294,7 +297,7 @@
         vec3 normal = texelFetch(colortex1, screenTexelCoord, 0).xyz;
 
         // Apply deffered shading
-        sceneColOut = complexShadingDeferred(sceneColOut, screenPos, viewPos, mat3(gbufferModelView) * normal, albedo, viewDotInvSqrt, matRaw0.x, matRaw0.y, dither);
+        sceneColOut = complexShadingDeferred(sceneColOut, screenPos, viewPos, mat3(gbufferModelView) * normal, albedo, dither, viewDotInvSqrt, matRaw0.x, matRaw0.y, realSky);
 
         #if OUTLINES != 0
             // Outline calculation
