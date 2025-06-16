@@ -121,6 +121,7 @@ vec3 getSkyHalf(in vec3 nEyePlayerPos, in vec3 skyPos, in vec3 currSkyCol){
         #endif
 
         if(cloudHeightFade < 0.005) return currSkyCol;
+        if(cloudHeightFade > 1.0) cloudHeightFade = 1.0;
 
         float cloudTime = fragmentFrameTime * 0.125;
 
@@ -130,16 +131,16 @@ vec3 getSkyHalf(in vec3 nEyePlayerPos, in vec3 skyPos, in vec3 currSkyCol){
             float fadeTime = saturate(sin(fragmentFrameTime * FADE_SPEED) * 0.8 + 0.5);
 
             vec3 cloudData0 = cloudParallaxDynamic(planeUv, cloudTime);
-            float clouds = mix(mix(cloudData0.x, cloudData0.y, fadeTime), cloudData0.z, rainStrength) * min(cloudHeightFade, 1.0) * cloudStepSize;
+            float clouds = mix(mix(cloudData0.x, cloudData0.y, fadeTime), cloudData0.z, rainStrength) * cloudHeightFade * cloudStepSize;
 
             #ifdef DOUBLE_LAYERED_CLOUDS
                 const float cloudLayerAlpha = cloudStepSize * 0.25;
 
                 vec3 cloudData1 = cloudParallaxDynamic(-planeUv * 2.0, -cloudTime);
-                clouds += mix(mix(cloudData1.x, cloudData1.y, fadeTime), cloudData1.z, rainStrength) * (1.0 - clouds) * cloudLayerAlpha;
+                clouds += mix(mix(cloudData1.x, cloudData1.y, fadeTime), cloudData1.z, rainStrength) * (1.0 - clouds) * cloudHeightFade * cloudLayerAlpha;
             #endif
         #else
-            float clouds = cloudParallax(planeUv, cloudTime) * min(cloudHeightFade, 1.0) * cloudStepSize;
+            float clouds = cloudParallax(planeUv, cloudTime) * cloudHeightFade * cloudStepSize;
 
             #ifdef DOUBLE_LAYERED_CLOUDS
                 const float cloudLayerAlpha = cloudStepSize * 0.25;
