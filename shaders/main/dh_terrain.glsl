@@ -93,8 +93,11 @@
 /// -------------------------------- /// Fragment Shader /// -------------------------------- ///
 
 #ifdef FRAGMENT
-    /* RENDERTARGETS: 0 */
-    layout(location = 0) out vec4 sceneColOut; // gcolor
+    /* RENDERTARGETS: 0,1,2,3 */
+    layout(location = 0) out vec3 sceneColOut; // gcolor
+    layout(location = 1) out vec3 normalDataOut; // colortex1
+    layout(location = 2) out vec3 albedoDataOut; // colortex2
+    layout(location = 3) out vec3 materialDataOut; // colortex3
 
     flat in int blockId;
 
@@ -205,10 +208,15 @@
         material.albedo.rgb = toLinear(material.albedo.rgb);
 
         #if defined ENVIRONMENT_PBR && !defined FORCE_DISABLE_WEATHER
-            if(blockId != 0 && blockId != 1) enviroPBR(material, vertexNormal);
+            if(blockId != DH_BLOCK_LAVA && blockId != DH_BLOCK_ILLUMINATED) enviroPBR(material, vertexNormal);
         #endif
 
         // Apply simple shading
-        sceneColOut = vec4(complexShadingForward(material), 1);
+        sceneColOut = complexShadingForward(material);
+
+        // Write buffer datas
+        normalDataOut = material.normal;
+        albedoDataOut = material.albedo.rgb;
+        materialDataOut = vec3(material.metallic, material.smoothness, 0);
     }
 #endif

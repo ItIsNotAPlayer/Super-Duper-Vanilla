@@ -26,6 +26,7 @@
 
     out vec3 vertexColor;
     out vec3 vertexFeetPlayerPos;
+    out vec3 vertexWorldPos;
 
     uniform vec3 cameraPosition;
 
@@ -70,7 +71,7 @@
         vertexFeetPlayerPos = mat3(gbufferModelViewInverse) * vertexViewPos + gbufferModelViewInverse[3].xyz;
 
         // Get world position
-        vec3 vertexWorldPos = vertexFeetPlayerPos + cameraPosition;
+        vertexWorldPos = vertexFeetPlayerPos + cameraPosition;
 
         // Get water noise uv position
         waterNoiseUv = vertexWorldPos.xz * waterTileSizeInv;
@@ -115,6 +116,7 @@
 
     in vec3 vertexColor;
     in vec3 vertexFeetPlayerPos;
+    in vec3 vertexWorldPos;
 
     uniform int isEyeInWater;
 
@@ -173,6 +175,12 @@
         uniform float fragmentFrameTime;
 
         #include "/lib/surface/water.glsl"
+    #endif
+
+    #if defined ENVIRONMENT_PBR && !defined FORCE_DISABLE_WEATHER
+        uniform float isPrecipitationRain;
+
+        #include "/lib/PBR/enviroPBR.glsl"
     #endif
 
     #include "/lib/lighting/complexShadingForward.glsl"
@@ -238,8 +246,12 @@
         // Convert to linear space
         material.albedo.rgb = toLinear(material.albedo.rgb);
 
+        #if defined ENVIRONMENT_PBR && !defined FORCE_DISABLE_WEATHER
+            if(blockId != DH_BLOCK_WATER) enviroPBR(material, vertexNormal);
+        #endif
+
         // Apply simple shading
-        sceneColOut = vec4(complexShadingForward(material), 1);
+        sceneColOut = vec4(complexShadingForward(material), material.albedo.a);
     
         // Write buffer datas
         normalDataOut = material.normal;
