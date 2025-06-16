@@ -39,14 +39,14 @@ vec3 basicShadingForward(in vec3 albedo){
 			// Cave light leak fix
 			float shdFactor = shdFade;
 
-			#if defined CLOUDS || defined DH_GBUFFERS
+			#ifdef CLOUDS
 				// Apply simple diffuse for clouds
 				shdFactor *= max(0.0, vertexNLZ * 0.6 + 0.4);
 			#endif
 
 			shdCol *= shdFactor;
 		#else
-			#if defined CLOUDS || defined DH_GBUFFERS
+			#ifdef CLOUDS
 				// Apply simple diffuse for clouds
 				float shdCol = max(0.0, vertexNLZ * 0.6 + 0.4) * shdFade;
 			#else
@@ -60,7 +60,7 @@ vec3 basicShadingForward(in vec3 albedo){
 			float rainDiffuseAmount = rainStrength * 0.5;
 			shdCol *= 1.0 - rainDiffuseAmount;
 
-			#if defined CLOUDS || defined DH_GBUFFERS
+			#ifdef CLOUDS
 				shdCol += rainDiffuseAmount;
 			#else
 				shdCol += rainDiffuseAmount * skyLightSquared;

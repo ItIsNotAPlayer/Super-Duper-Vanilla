@@ -107,7 +107,7 @@
             vec2 texMinMidTexCoord = texCoord - midTexCoord;
 
             vTexCoordScale = abs(texMinMidTexCoord) * 2.0;
-            vTexCoordPos = lightMapCoord(texCoord, midTexCoord - texMinMidTexCoord);
+            vTexCoordPos = min(texCoord, midTexCoord - texMinMidTexCoord);
             vTexCoord = sign(texMinMidTexCoord) * 0.5 + 0.5;
         #endif
 

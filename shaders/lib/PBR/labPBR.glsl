@@ -145,7 +145,7 @@ void getPBR(inout dataPBR material, in int id){
     material.ss = SRPSSE.b > 0.252 ? (SRPSSE.b - 0.2509804) * 1.3350785 : 0.0;
 
     // Assign ambient occlusion
-    #if defined ENTITIES || defined HAND || defined ENTITIES_GLOWING || defined HAND_WATER
+    #if defined ENTITIES || defined HAND || defined ENTITIES_TRANSPARENT || defined HAND_WATER
         // Ambient occlusion fallback fix
         material.ambient = id <= 0 ? 1.0 : normalAOH.b;
     #elif defined BLOCK
@@ -186,7 +186,7 @@ void getPBR(inout dataPBR material, in int id){
         }
     #endif
 
-    #if defined ENTITIES || defined ENTITIES_GLOWING
+    #if defined ENTITIES || defined ENTITIES_TRANSPARENT
         // Basic whole entity emission
         if(id == 10130) material.emissive = cubed(sumOf(material.albedo.rgb) * 0.33333333);
 
