@@ -45,6 +45,8 @@
 
         gl_Position.w = -vertexViewPos.z;
 
+        gl_Position.z *= 0.9;
+
         #if ANTI_ALIASING == 2
             gl_Position.xy += jitterPos(gl_Position.w);
         #endif

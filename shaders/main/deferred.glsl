@@ -59,8 +59,18 @@
             uniform float frameFract;
         #endif
 
+        #ifdef DISTANT_HORIZONS
+            uniform float dhNearPlane;
+
+            uniform mat4 dhProjection;
+            uniform mat4 dhProjectionInverse;
+
+            uniform sampler2D dhDepthTex0;
+        #endif
+
         #include "/lib/utility/projectionFunctions.glsl"
         #include "/lib/utility/noiseFunctions.glsl"
+        #include "/lib/utility/depthTex.glsl"
 
         #include "/lib/lighting/SSAO.glsl"
     #endif
@@ -75,6 +85,14 @@
             // Declare and get positions
             float depth = texelFetch(depthtex0, screenTexelCoord, 0).x;
 
+            bool realSky = false;
+
+            // Distant Horizons apparently uses a different depth texture
+            #ifdef DISTANT_HORIZONS
+                realSky = depth == 1;
+                if(realSky) depth = texelFetch(dhDepthTex0, screenTexelCoord, 0).x;
+            #endif
+
             // If sky or player hand return immediately
             if(depth <= 0.56 || depth == 1) return;
 
@@ -85,7 +103,7 @@
             if(normal.x + normal.y + normal.z == 0) return;
 
             // Do SSAO
-            albedoDataOut.w = getSSAO(vec3(texCoord, depth), mat3(gbufferModelView) * normal);
+            albedoDataOut.w = getSSAO(vec3(texCoord, depth), mat3(gbufferModelView) * normal, realSky);
         #else
             albedoDataOut = texelFetch(colortex2, screenTexelCoord, 0).rgb;
         #endif
