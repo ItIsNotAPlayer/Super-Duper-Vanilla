@@ -111,6 +111,8 @@
 
     uniform int isEyeInWater;
 
+    uniform float far;
+
     uniform float nightVision;
     uniform float lightningFlash;
 
@@ -166,6 +168,9 @@
     #include "/lib/lighting/complexShadingForward.glsl"
 
     void main(){
+        // Prevents overdraw
+        if(far > length(vertexFeetPlayerPos)){ discard; return; }
+
         // Declare materials
 	    dataPBR material;
         material.normal = vertexNormal;

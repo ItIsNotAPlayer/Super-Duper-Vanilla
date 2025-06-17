@@ -120,6 +120,8 @@
 
     uniform int isEyeInWater;
 
+    uniform float far;
+
     uniform float nightVision;
     uniform float lightningFlash;
 
@@ -186,6 +188,9 @@
     #include "/lib/lighting/complexShadingForward.glsl"
 
     void main(){
+        // Prevents overdraw
+        if(far > length(vertexFeetPlayerPos)){ discard; return; }
+
         // Fix for Distant Horizons translucents rendering over real geometry
         if(texelFetch(depthtex0, ivec2(gl_FragCoord.xy), 0).x != 1.0){ discard; return; }
 
