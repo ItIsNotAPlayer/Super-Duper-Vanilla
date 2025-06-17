@@ -204,10 +204,6 @@
     #if OUTLINES != 0
         #if OUTLINES == 1
             uniform float near;
-
-            #ifdef DISTANT_HORIZONS
-                uniform float dhNearPlane;
-            #endif
         #endif
 
         #include "/lib/post/outline.glsl"
@@ -304,7 +300,7 @@
 
         #if OUTLINES != 0
             // Outline calculation
-            sceneColOut *= 1.0 + getOutline(screenTexelCoord, screenPos.z, realSky) * OUTLINE_BRIGHTNESS;
+            sceneColOut *= 1.0 + getOutline(screenTexelCoord, screenPos.z) * OUTLINE_BRIGHTNESS;
         #endif
 
         #ifdef SSAO
