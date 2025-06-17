@@ -331,5 +331,7 @@
 
         // Apply fog and darkness fog
         sceneColOut = ((fogSkyCol - sceneColOut) * fogFactor + sceneColOut) * getFogDarknessFactor(viewDist);
+        // Clamp scene color to prevent NaNs during post processing
+        sceneColOut = max(sceneColOut, vec3(0));
     }
 #endif
