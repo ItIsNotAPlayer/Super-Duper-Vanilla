@@ -121,7 +121,7 @@ vec3 getSkyHalf(in vec3 nEyePlayerPos, in vec3 skyPos, in vec3 currSkyCol){
         #endif
 
         if(cloudHeightFade < 0.005) return currSkyCol;
-        if(cloudHeightFade > 1.0) cloudHeightFade = 1.0;
+        if(cloudHeightFade > 1) cloudHeightFade = 1.0;
 
         float cloudTime = fragmentFrameTime * 0.125;
 
