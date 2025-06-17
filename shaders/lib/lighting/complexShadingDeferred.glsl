@@ -36,8 +36,11 @@ vec3 complexShadingDeferred(in vec3 sceneCol, in vec3 screenPos, in vec3 viewPos
 		// Get SSR screen coordinates
 		vec3 SSRCoord = rayTraceScene(screenPos, viewPos, reflectViewDir, dither.z);
 
-		if(realSky) SSRCoord.z = 0.0;
+		#ifdef DISTANT_HORIZONS
+			if(realSky) SSRCoord.z = 0.0;
+		#endif
 
+		// Fake reflections, also helps with improving reflection quality
 		if(SSRCoord.z < 0.5){
 			// Using the original ray direction, get the reflected ray and increase its length
 			vec3 reflectDirF = viewPos + reflectViewDir * borderFar;
