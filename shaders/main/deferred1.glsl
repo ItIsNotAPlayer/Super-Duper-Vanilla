@@ -204,15 +204,20 @@
         #include "/lib/utility/taaJitter.glsl"
     #endif
 
+    #include "/lib/utility/depthTex.glsl"
+
     #if OUTLINES != 0
         #if OUTLINES == 1
             uniform float near;
+
+            #ifdef DISTANT_HORIZONS
+                uniform float dhNearPlane;
+            #endif
         #endif
 
         #include "/lib/post/outline.glsl"
     #endif
 
-    #include "/lib/utility/depthTex.glsl"
     #include "/lib/utility/noiseFunctions.glsl"
 
     #include "/lib/atmospherics/skyRender.glsl"
@@ -228,13 +233,12 @@
 
         bool realSky = false;
 
+        float depth = texelFetch(depthtex0, screenTexelCoord, 0).x;
+
         // Distant Horizons apparently uses a different depth texture
         #ifdef DISTANT_HORIZONS
-            float depth = texelFetch(depthtex0, screenTexelCoord, 0).x;
             realSky = depth == 1;
             if(realSky) depth = texelFetch(dhDepthTex0, screenTexelCoord, 0).x;
-        #else
-            float depth = texelFetch(depthtex0, screenTexelCoord, 0).x;
         #endif
 
         // Get screen pos
@@ -305,7 +309,7 @@
 
         #if OUTLINES != 0
             // Outline calculation
-            sceneColOut *= 1.0 + getOutline(screenTexelCoord, screenPos.z) * OUTLINE_BRIGHTNESS;
+            sceneColOut *= 1.0 + getOutline(screenTexelCoord, screenPos.z, realSky) * OUTLINE_BRIGHTNESS;
         #endif
 
         #ifdef SSAO
