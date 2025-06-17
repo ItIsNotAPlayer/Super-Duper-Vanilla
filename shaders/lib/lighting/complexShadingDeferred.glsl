@@ -33,22 +33,21 @@ vec3 complexShadingDeferred(in vec3 sceneCol, in vec3 screenPos, in vec3 viewPos
 
 	// Calculate SSR and sky reflections
 	#ifdef SSR
-		#ifdef DISTANT_HORIZONS
-			// Get SSR screen coordinates
-			vec3 SSRCoord = vec3(0);
+		// Get SSR screen coordinates
+		vec3 SSRCoord = rayTraceScene(screenPos, viewPos, reflectViewDir, dither.z);
 
-			// Use really simple reflections for Distant Horizons chunks
-			if(realSky){
-				vec2 SSRDH = getScreenPos(gbufferProjection, viewPos + reflectViewDir * borderFar).xy;
-				if(SSRDH.x >= 0 && SSRDH.y >= 0 && SSRDH.x <= 1 && SSRDH.y <= 1) SSRCoord = vec3(SSRDH, getDepthTex(SSRDH) != 1);
-			}else{
-				SSRCoord = rayTraceScene(screenPos, viewPos, reflectViewDir, dither.z);
+		if(realSky) SSRCoord.z = 0.0;
+
+		if(SSRCoord.z < 0.5){
+			// Using the original ray direction, get the reflected ray and increase its length
+			vec3 reflectDirF = viewPos + reflectViewDir * borderFar;
+
+			// This masks only the reflections in view
+			if(reflectDirF.z < viewPos.z){
+				vec3 SSRDH = getScreenPos(gbufferProjection, reflectDirF);
+				if(SSRDH.x >= 0 && SSRDH.y >= 0 && SSRDH.x <= 1 && SSRDH.y <= 1 && getDepthTex(SSRDH.xy) != 1) SSRCoord = vec3(SSRDH.xy, 1);
 			}
-			
-		#else
-			// Get SSR screen coordinates
-			vec3 SSRCoord = rayTraceScene(screenPos, viewPos, reflectViewDir, dither.z);
-		#endif
+		}
 
 		#ifdef PREVIOUS_FRAME
 			// Get reflections and check for sky
