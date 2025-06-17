@@ -16,9 +16,7 @@
 /// -------------------------------- /// Vertex Shader /// -------------------------------- ///
 
 #ifdef VERTEX
-    flat out float vertexAlpha;
-
-    flat out vec3 vertexColor;
+    flat out vec4 vertexColor;
 
     out vec2 texCoord;
 
@@ -32,10 +30,8 @@
     #endif
 
     void main(){
-        // Get vertex alpha
-        vertexAlpha = gl_Color.a * gl_Color.a;
         // Get vertex color
-        vertexColor = gl_Color.rgb;
+        vertexColor = gl_Color;
         // Get buffer texture coordinates
         texCoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
 
@@ -61,9 +57,7 @@
     /* RENDERTARGETS: 0 */
     layout(location = 0) out vec3 sceneColOut; // gcolor
 
-    flat in float vertexAlpha;
-
-    flat in vec3 vertexColor;
+    flat in vec4 vertexColor;
 
     in vec2 texCoord;
 
@@ -77,24 +71,23 @@
     
     void main(){
         // Get albedo color
-        vec4 albedo = textureLod(tex, texCoord, 0);
+        vec4 albedo = textureLod(tex, texCoord, 0) * vertexColor;
 
         // Alpha test, discard and return immediately
         if(albedo.a < ALPHA_THRESHOLD){ discard; return; }
 
-        // Convert to linear space
-        albedo.rgb = toLinear(albedo.rgb);
-
         #if WORLD_SUN_MOON == 1 && SUN_MOON_TYPE == 2 && defined WORLD_LIGHT && !defined FORCE_DISABLE_DAY_CYCLE
             // Detect sun
             if(renderStage == MC_RENDER_STAGE_SUN){
-                sceneColOut = (sunMoonIntensitySqrd * vertexAlpha) * SUN_COL_DATA_BLOCK * albedo.rgb;
+                // Convert to linear space
+                sceneColOut = toLinear(albedo.rgb * albedo.a) * SUN_COL_DATA_BLOCK * sunMoonIntensitySqrd;
                 return;
             }
 
             // Detect moon
             if(renderStage == MC_RENDER_STAGE_MOON){
-                sceneColOut = (sunMoonIntensitySqrd * vertexAlpha) * MOON_COL_DATA_BLOCK * albedo.rgb;
+                // Convert to linear space
+                sceneColOut = toLinear(albedo.rgb * albedo.a) * MOON_COL_DATA_BLOCK * sunMoonIntensitySqrd;
                 return;
             }
         #else
@@ -104,6 +97,6 @@
         #endif
 
         // Otherwise calculate skybox
-        sceneColOut = (skyBoxBrightnessSqrd * vertexAlpha * albedo.a) * vertexColor * albedo.rgb;
+        sceneColOut = toLinear(albedo.rgb * albedo.a) * skyBoxIntensitySqrd;
     }
 #endif
