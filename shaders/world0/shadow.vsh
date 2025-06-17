@@ -8,4 +8,4 @@
 #include "/lib/utility/common.glsl"
 
 #include "world.glsl"
-#include "/main/shadow.glsl"
+#include "/main/shadow/shadow.glsl"

@@ -9,4 +9,4 @@
 #include "/lib/utility/common.glsl"
 
 #include "world.glsl"
-#include "/main/dh_generic.glsl"
+#include "/main/modded/dh_generic.glsl"

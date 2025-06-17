@@ -9,4 +9,4 @@
 #include "/lib/utility/common.glsl"
 
 #include "world.glsl"
-#include "/main/physics_ocean.glsl"
+#include "/main/modded/physics_ocean.glsl"

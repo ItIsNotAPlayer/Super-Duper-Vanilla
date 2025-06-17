@@ -9,4 +9,4 @@
 #include "/lib/utility/common.glsl"
 
 #include "world.glsl"
-#include "/main/shadow_cutout.glsl"
+#include "/main/shadow/shadow_cutout.glsl"

@@ -9,4 +9,4 @@
 #include "/lib/utility/common.glsl"
 
 #include "world.glsl"
-#include "/main/dh_terrain.glsl"
+#include "/main/modded/dh_terrain.glsl"

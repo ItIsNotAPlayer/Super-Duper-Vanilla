@@ -9,4 +9,4 @@
 #include "/lib/utility/common.glsl"
 
 #include "world.glsl"
-#include "/main/gbuffers_spidereyes.glsl"
+#include "/main/gbuffers/gbuffers_spidereyes.glsl"

@@ -9,4 +9,4 @@
 #include "/lib/utility/common.glsl"
 
 #include "world.glsl"
-#include "/main/gbuffers_armor_glint.glsl"
+#include "/main/gbuffers/gbuffers_armor_glint.glsl"

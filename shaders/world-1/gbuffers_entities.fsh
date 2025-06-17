@@ -9,4 +9,4 @@
 #include "/lib/utility/common.glsl"
 
 #include "world.glsl"
-#include "/main/gbuffers_entities.glsl"
+#include "/main/gbuffers/gbuffers_entities.glsl"
