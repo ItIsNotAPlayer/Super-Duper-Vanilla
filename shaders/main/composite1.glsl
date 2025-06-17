@@ -51,7 +51,7 @@
 
     #if ANTI_ALIASING >= 2
         uniform vec3 cameraPosition;
-        uniform vec3 previousCameraPosition;
+        uniform vec3 camPosDelta;
 
         uniform mat4 gbufferModelViewInverse;
         uniform mat4 gbufferPreviousModelView;
@@ -74,7 +74,7 @@
             sceneColOut = texelFetch(gcolor, ivec2(gl_FragCoord.xy), 0).rgb;
         #endif
 
-        #if (defined PREVIOUS_FRAME && (defined SSR || defined SSGI)) || ANTI_ALIASING >= 2
+        #if ((defined SSR || defined SSGI) && defined PREVIOUS_FRAME) || ANTI_ALIASING >= 2
             #ifdef AUTO_EXPOSURE
                 temporalDataOut = vec4(sceneColOut, texelFetch(colortex5, ivec2(0), 0).a);
             #else

@@ -43,7 +43,7 @@
     const int colortex5Format = RGBA16F;
     */
 
-    #if ANTI_ALIASING >= 2 || defined PREVIOUS_FRAME || defined AUTO_EXPOSURE
+    #if ((defined SSR || defined SSGI) && defined PREVIOUS_FRAME) || ANTI_ALIASING >= 2 || defined AUTO_EXPOSURE
         // Disable buffer clear if TAA, previous frame reflections, or auto exposure is on
         const bool colortex5Clear = false;
     #endif

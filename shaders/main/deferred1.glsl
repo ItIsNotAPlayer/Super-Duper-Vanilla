@@ -78,11 +78,6 @@
     // Sky silhoutte fix
     const vec4 gcolorClearColor = vec4(0, 0, 0, 1);
 
-    #if ANTI_ALIASING >= 2 || defined PREVIOUS_FRAME || defined AUTO_EXPOSURE
-        // Disable buffer clear if TAA, previous frame reflections, or auto exposure is on
-        const bool colortex5Clear = false;
-    #endif
-
     flat in vec3 skyCol;
 
     #ifdef WORLD_LIGHT
@@ -170,8 +165,8 @@
 
     #include "/lib/utility/projectionFunctions.glsl"
 
-    #ifdef PREVIOUS_FRAME
-        uniform vec3 previousCameraPosition;
+    #if (defined SSR || defined SSGI) && defined PREVIOUS_FRAME
+        uniform vec3 camPosDelta;
 
         uniform mat4 gbufferPreviousModelView;
         uniform mat4 gbufferPreviousProjection;

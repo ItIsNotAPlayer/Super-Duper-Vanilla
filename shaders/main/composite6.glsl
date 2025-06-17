@@ -158,12 +158,11 @@
                 bool isSky = textureLod(depthtex0, shdLightDirScreenSpace.xy, 0).x == 1;
             #endif
 
-            if(isSky)
-                #ifdef FORCE_DISABLE_WEATHER
-                    postColOut += getLensFlare(texCoord - 0.5, shdLightDirScreenSpace.xy - 0.5) * (1.0 - blindness) * (1.0 - darknessFactor);
-                #else
-                    postColOut += getLensFlare(texCoord - 0.5, shdLightDirScreenSpace.xy - 0.5) * (1.0 - blindness) * (1.0 - darknessFactor) * (1.0 - rainStrength);
-                #endif
+            #ifdef FORCE_DISABLE_WEATHER
+                if(isSky) postColOut += getLensFlare(texCoord - 0.5, shdLightDirScreenSpace.xy - 0.5) * (1.0 - blindness) * (1.0 - darknessFactor);
+            #else
+                if(isSky) postColOut += getLensFlare(texCoord - 0.5, shdLightDirScreenSpace.xy - 0.5) * (1.0 - blindness) * (1.0 - darknessFactor) * (1.0 - rainStrength);
+            #endif
         #endif
 
         #ifdef AUTO_EXPOSURE

@@ -16,11 +16,15 @@
 /// -------------------------------- /// Vertex Shader /// -------------------------------- ///
 
 #ifdef VERTEX
-    noperspective out vec2 texCoord;
+    #ifdef SSAO
+        noperspective out vec2 texCoord;
+    #endif
 
     void main(){
-        // Get buffer texture coordinates
-        texCoord = gl_MultiTexCoord0.xy;
+        #ifdef SSAO
+            // Get buffer texture coordinates
+            texCoord = gl_MultiTexCoord0.xy;
+        #endif
 
         gl_Position = vec4(gl_Vertex.xy * 2.0 - 1.0, 0, 1);
     }
@@ -39,7 +43,9 @@
     // SSAO without normals fix for beacon
     const vec4 colortex1ClearColor = vec4(0, 0, 0, 1);
 
-    noperspective in vec2 texCoord;
+    #ifdef SSAO
+        noperspective in vec2 texCoord;
+    #endif
 
     uniform sampler2D colortex2;
 
@@ -59,18 +65,8 @@
             uniform float frameFract;
         #endif
 
-        #ifdef DISTANT_HORIZONS
-            uniform float dhNearPlane;
-
-            uniform mat4 dhProjection;
-            uniform mat4 dhProjectionInverse;
-
-            uniform sampler2D dhDepthTex0;
-        #endif
-
         #include "/lib/utility/projectionFunctions.glsl"
         #include "/lib/utility/noiseFunctions.glsl"
-        #include "/lib/utility/depthTex.glsl"
 
         #include "/lib/lighting/SSAO.glsl"
     #endif
@@ -85,14 +81,6 @@
             // Declare and get positions
             float depth = texelFetch(depthtex0, screenTexelCoord, 0).x;
 
-            bool realSky = false;
-
-            // Distant Horizons apparently uses a different depth texture
-            #ifdef DISTANT_HORIZONS
-                realSky = depth == 1;
-                if(realSky) depth = texelFetch(dhDepthTex0, screenTexelCoord, 0).x;
-            #endif
-
             // If sky or player hand return immediately
             if(depth <= 0.56 || depth == 1) return;
 
@@ -103,7 +91,7 @@
             if(normal.x + normal.y + normal.z == 0) return;
 
             // Do SSAO
-            albedoDataOut.w = getSSAO(vec3(texCoord, depth), mat3(gbufferModelView) * normal, realSky);
+            albedoDataOut.w = getSSAO(vec3(texCoord, depth), mat3(gbufferModelView) * normal);
         #else
             albedoDataOut = texelFetch(colortex2, screenTexelCoord, 0).rgb;
         #endif

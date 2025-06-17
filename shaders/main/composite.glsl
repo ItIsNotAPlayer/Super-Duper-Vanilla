@@ -162,8 +162,8 @@
 
     #include "/lib/utility/projectionFunctions.glsl"
 
-    #ifdef PREVIOUS_FRAME
-        uniform vec3 previousCameraPosition;
+    #if (defined SSR || defined SSGI) && defined PREVIOUS_FRAME
+        uniform vec3 camPosDelta;
 
         uniform mat4 gbufferPreviousModelView;
         uniform mat4 gbufferPreviousProjection;
