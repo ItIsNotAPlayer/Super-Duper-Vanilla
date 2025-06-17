@@ -235,6 +235,9 @@ const float rayTracerStepsInv = 1.0 / RAYTRACER_STEPS;
 // Sun and moon intensity squared
 const float sunMoonIntensitySqrd = SUN_MOON_INTENSITY * SUN_MOON_INTENSITY;
 
+// Sky box intensity squared
+const float skyBoxIntensitySqrd = SKYBOX_BRIGHTNESS * SKYBOX_BRIGHTNESS;
+
 // Sky box brightness squared
 const float skyBoxBrightnessSqrd = SKYBOX_BRIGHTNESS * SKYBOX_BRIGHTNESS;
 
