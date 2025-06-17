@@ -281,7 +281,11 @@
 
         // If sky, do full sky render and return immediately
         if(skyMask){
+            // Calculate and output sky render
             sceneColOut = getFullSkyRender(nEyePlayerPos, skyPos, currSkyCol + sceneColOut) * exp2(-borderFar * (blindness + darknessFactor));
+            // Clamp scene color to prevent NaNs during post processing
+            sceneColOut = max(sceneColOut, vec3(0));
+            // Exit function immediately
             return;
         }
 
