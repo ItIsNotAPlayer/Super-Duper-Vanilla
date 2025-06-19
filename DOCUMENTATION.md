@@ -129,6 +129,9 @@ Notes for pending features/bug fixes to be implemented categorized by importance
 * Improve fog calculation and settings (medium priority)
 * Implement portal depth for Nether and End
 
+* Improve Distant Horizons depth
+* Improve shader menu UI
+
 ## DONE
 * Fix dragon death beam (medium priority) ?
 * Finish programming dh_generic (medium priority)

@@ -120,10 +120,6 @@
         uniform float rainStrength;
     #endif
 
-    #if defined SHADOW_FILTER && ANTI_ALIASING >= 2
-        uniform float frameFract;
-    #endif
-
     #ifndef FORCE_DISABLE_DAY_CYCLE
         uniform float dayCycle;
         uniform float twilightPhase;
@@ -165,21 +161,27 @@
         #include "/lib/PBR/enviroPBR.glsl"
     #endif
 
-    #include "/lib/lighting/complexShadingForward.glsl"
+    #include "/lib/modded/distantHorizons/complexShadingForward.glsl"
 
     void main(){
         // Prevents overdraw
         if(far > length(vertexFeetPlayerPos)){ discard; return; }
 
+        ivec2 noiseCoord = ivec2((vertexWorldPos.zy * vertexNormal.x + vertexWorldPos.xz * vertexNormal.y + vertexWorldPos.xy * vertexNormal.z) * 4.0);
+        vec2 noiseCol = texelFetch(noisetex, noiseCoord & 255, 0).xy;
+        float dhNoise = (noiseCol.x + noiseCol.y) * 0.2 + 0.8;
+
         // Declare materials
 	    dataPBR material;
         material.normal = vertexNormal;
-        material.albedo = vec4(vertexColor, 1);
+        material.albedo = vec4(min(vertexColor * dhNoise, vec3(1)), 1);
 
         #if COLOR_MODE == 1
             material.albedo.rgb = vec3(1);
         #elif COLOR_MODE == 2
             material.albedo.rgb = vec3(0);
+        #elif COLOR_MODE == 3
+            material.albedo.rgb = vertexColor;
         #endif
 
         material.smoothness = 0.0; material.emissive = 0.0;

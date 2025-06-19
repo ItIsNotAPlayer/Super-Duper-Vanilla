@@ -134,10 +134,6 @@
         uniform float rainStrength;
     #endif
 
-    #if defined SHADOW_FILTER && ANTI_ALIASING >= 2
-        uniform float frameFract;
-    #endif
-
     #if defined WATER_STYLIZE_ABSORPTION || defined WATER_FOAM
         uniform float dhNearPlane;
     #endif
@@ -158,8 +154,6 @@
         
         float eyeBrightFact = eyeSkylight;
     #endif
-
-    #include "/lib/utility/projectionFunctions.glsl"
 
     #ifdef WORLD_LIGHT
         uniform float shdFade;
@@ -185,7 +179,7 @@
         #include "/lib/PBR/enviroPBR.glsl"
     #endif
 
-    #include "/lib/lighting/complexShadingForward.glsl"
+    #include "/lib/modded/distantHorizons/complexShadingForward.glsl"
 
     void main(){
         // Prevents overdraw
@@ -194,15 +188,21 @@
         // Fix for Distant Horizons translucents rendering over real geometry
         if(texelFetch(depthtex0, ivec2(gl_FragCoord.xy), 0).x != 1.0){ discard; return; }
 
+        ivec2 noiseCoord = ivec2((vertexWorldPos.zy * vertexNormal.x + vertexWorldPos.xz * vertexNormal.y + vertexWorldPos.xy * vertexNormal.z) * 4.0);
+        vec2 noiseCol = texelFetch(noisetex, noiseCoord & 255, 0).xy;
+        float dhNoise = (noiseCol.x + noiseCol.y) * 0.2 + 0.8;
+
         // Declare materials
 	    dataPBR material;
         material.normal = vertexNormal;
-        material.albedo = vec4(vertexColor, 1);
+        material.albedo = vec4(min(vertexColor * dhNoise, vec3(1)), 1);
 
         #if COLOR_MODE == 1
             material.albedo.rgb = vec3(1);
         #elif COLOR_MODE == 2
             material.albedo.rgb = vec3(0);
+        #elif COLOR_MODE == 3
+            material.albedo.rgb = vertexColor;
         #endif
 
         material.smoothness = 0.96; material.emissive = 0.0;
