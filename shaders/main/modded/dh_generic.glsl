@@ -11,18 +11,96 @@
 ================================ /// Super Duper Vanilla v1.3.8 /// ================================
 */
 
+/// Buffer features: TAA jittering, simple shading, and world curvature
+
 /// -------------------------------- /// Vertex Shader /// -------------------------------- ///
 
 #ifdef VERTEX
+    flat out vec4 vertexColor;
+
+    out vec3 vertexFeetPlayerPos;
+
+    uniform mat4 gbufferModelViewInverse;
+
+    #ifdef WORLD_CURVATURE
+        uniform mat4 gbufferModelView;
+    #endif
+
+    #if ANTI_ALIASING == 2
+        uniform int frameMod;
+
+        uniform float pixelWidth;
+        uniform float pixelHeight;
+
+        #include "/lib/utility/taaJitter.glsl"
+    #endif
+    
     void main(){
-        gl_Position = vec4(-10);
+        // Get vertex color
+        vertexColor = gl_Color;
+
+        // Get vertex view position
+        vec3 vertexViewPos = mat3(gl_ModelViewMatrix) * gl_Vertex.xyz + gl_ModelViewMatrix[3].xyz;
+        // Get vertex feet player position
+        vertexFeetPlayerPos = mat3(gbufferModelViewInverse) * vertexViewPos + gbufferModelViewInverse[3].xyz;
+
+	    #ifdef WORLD_CURVATURE
+            // Apply curvature distortion
+            vertexFeetPlayerPos.y -= lengthSquared(vertexFeetPlayerPos.xz) * worldCurvatureInv;
+
+            // Convert back to vertex view position
+            vertexViewPos = mat3(gbufferModelView) * vertexFeetPlayerPos + gbufferModelView[3].xyz;
+        #endif
+
+        // Convert to clip position and output as final position
+        // gl_Position = gl_ProjectionMatrix * vertexViewPos;
+        gl_Position.xyz = getMatScale(mat3(gl_ProjectionMatrix)) * vertexViewPos;
+        gl_Position.z += gl_ProjectionMatrix[3].z;
+
+        gl_Position.w = -vertexViewPos.z;
+
+        #if ANTI_ALIASING == 2
+            gl_Position.xy += jitterPos(gl_Position.w);
+        #endif
     }
 #endif
 
 /// -------------------------------- /// Fragment Shader /// -------------------------------- ///
 
 #ifdef FRAGMENT
+    /* RENDERTARGETS: 0,3 */
+    layout(location = 0) out vec3 sceneColOut; // gcolor
+    layout(location = 1) out vec3 materialDataOut; // colortex3
+
+    flat in vec4 vertexColor;
+
+    in vec3 vertexFeetPlayerPos;
+
+    uniform float far;
+
     void main(){
-        discard; return;
+        // Prevents overdraw
+        if(far > length(vertexFeetPlayerPos)){ discard; return; }
+
+        // Get albedo color
+        vec4 albedo = vertexColor;
+
+        // Alpha test, discard and return immediately
+        if(albedo.a < ALPHA_THRESHOLD){ discard; return; }
+
+        #if COLOR_MODE == 1
+            albedo.rgb = vec3(1);
+        #elif COLOR_MODE == 2
+            albedo.rgb = vec3(0);
+        #endif
+
+        // Convert to linear space
+        albedo.rgb = toLinear(albedo.rgb);
+
+        // Apply simple shading
+        sceneColOut = albedo.rgb * EMISSIVE_INTENSITY;
+    
+        // Write material data
+        materialDataOut = vec3(0);
     }
 #endif
