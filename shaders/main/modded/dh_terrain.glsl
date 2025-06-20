@@ -161,7 +161,7 @@
         #include "/lib/PBR/enviroPBR.glsl"
     #endif
 
-    #include "/lib/modded/distantHorizons/complexShadingForward.glsl"
+    #include "/lib/modded/distantHorizons/complexShadingLOD.glsl"
 
     void main(){
         // Prevents overdraw
@@ -219,7 +219,7 @@
         #endif
 
         // Apply simple shading
-        sceneColOut = complexShadingForward(material);
+        sceneColOut = complexShadingLOD(material);
 
         // Write buffer datas
         normalDataOut = material.normal;
