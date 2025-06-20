@@ -24,7 +24,9 @@
         out vec3 vertexShdPos;
     #endif
 
-    uniform mat4 gbufferModelViewInverse;
+    #if defined SHADOW_MAPPING && defined WORLD_LIGHT || defined WORLD_CURVATURE
+        uniform mat4 gbufferModelViewInverse;
+    #endif
 
     #ifdef WORLD_CURVATURE
         uniform mat4 gbufferModelView;
@@ -78,6 +80,7 @@
             // Calculate shadow pos in vertex
             vertexShdPos = vec3(shadowProjection[0].x, shadowProjection[1].y, shadowProjection[2].z) * (mat3(shadowModelView) * vertexFeetPlayerPos + shadowModelView[3].xyz);
 			vertexShdPos.z += shadowProjection[3].z;
+            
             vertexShdPos.z = vertexShdPos.z * 0.1 + 0.5;
         #endif
 
@@ -157,7 +160,8 @@
         // Get albedo color
         vec4 albedo = vertexColor;
 
-        if(albedo.a < ALPHA_THRESHOLD) discard;
+        // Alpha test, discard and return immediately
+        if(albedo.a < ALPHA_THRESHOLD) { discard; return; }
 
         #if COLOR_MODE == 1
             albedo.rgb = vec3(1);

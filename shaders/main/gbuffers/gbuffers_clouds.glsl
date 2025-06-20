@@ -21,7 +21,7 @@
             gl_Position = vec4(-10);
         }
     #else
-        out vec2 texCoord;
+        flat out float vertexAlpha;
 
         #ifdef WORLD_LIGHT
             flat out float vertexNLZ;
@@ -31,10 +31,8 @@
             #endif
         #endif
 
-        uniform mat4 gbufferModelViewInverse;
-
-        #ifdef DOUBLE_LAYERED_CLOUDS
-            uniform mat4 gbufferModelView;
+        #if defined SHADOW_MAPPING && defined WORLD_LIGHT
+            uniform mat4 gbufferModelViewInverse;
         #endif
 
         #ifdef WORLD_LIGHT
@@ -54,37 +52,12 @@
             #include "/lib/utility/taaJitter.glsl"
         #endif
 
-        #ifdef DOUBLE_LAYERED_CLOUDS
-            // Set the amount of instances, we'll use 2 for now for performance
-            const int countInstances = 2;
-
-            uniform int instanceId;
-        #endif
-
         void main(){
-            // Get buffer texture coordinates
-            texCoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
+            // Get vertex alpha and emissive
+            vertexAlpha = gl_Color.a;
 
             // Get vertex view position
             vec3 vertexViewPos = mat3(gl_ModelViewMatrix) * gl_Vertex.xyz + gl_ModelViewMatrix[3].xyz;
-
-            #if defined SHADOW_MAPPING && defined WORLD_LIGHT || defined DOUBLE_LAYERED_CLOUDS
-                // Get vertex feet player position
-                vec3 vertexFeetPlayerPos = mat3(gbufferModelViewInverse) * vertexViewPos + gbufferModelViewInverse[3].xyz;
-            #endif
-
-            #ifdef DOUBLE_LAYERED_CLOUDS
-                // May need to work on this to add more than 2 clouds in the future.
-                if(instanceId == 1){
-                    // If second instance, invert texture coordinates.
-                    texCoord = -texCoord;
-                    // Increase cloud height for the second instance.
-                    vertexFeetPlayerPos.y += SECOND_CLOUD_HEIGHT;
-                }
-
-                // Convert back to vertex view position
-                vertexViewPos = mat3(gbufferModelView) * vertexFeetPlayerPos + gbufferModelView[3].xyz;
-            #endif
 
             #ifdef WORLD_LIGHT
                 vec3 vertexNormal = mat3(gbufferModelViewInverse) * fastNormalize(gl_NormalMatrix * gl_Normal);
@@ -92,9 +65,13 @@
                 vertexNLZ = dot(vertexNormal, vec3(shadowModelView[0].z, shadowModelView[1].z, shadowModelView[2].z));
 
                 #ifdef SHADOW_MAPPING
+                    // Get vertex feet player position
+                    vec3 vertexFeetPlayerPos = mat3(gbufferModelViewInverse) * vertexViewPos + gbufferModelViewInverse[3].xyz;
+
                     // Calculate shadow pos in vertex
                     vertexShdPos = vec3(shadowProjection[0].x, shadowProjection[1].y, shadowProjection[2].z) * (mat3(shadowModelView) * vertexFeetPlayerPos + shadowModelView[3].xyz);
                     vertexShdPos.z += shadowProjection[3].z;
+                    
                     vertexShdPos.z = vertexShdPos.z * 0.1 + 0.5;
                 #endif
             #endif
@@ -125,7 +102,7 @@
         layout(location = 0) out vec4 sceneColOut; // gcolor
         layout(location = 1) out vec3 materialDataOut; // colortex3
 
-        in vec2 texCoord;
+        flat in float vertexAlpha;
 
         #ifdef WORLD_LIGHT
             flat in float vertexNLZ;
@@ -137,12 +114,6 @@
 
         uniform float nightVision;
         uniform float lightningFlash;
-
-        uniform sampler2D tex;
-
-        #ifdef DYNAMIC_CLOUDS
-            uniform float fragmentFrameTime;
-        #endif
 
         #ifndef FORCE_DISABLE_WEATHER
             uniform float rainStrength;
@@ -176,27 +147,13 @@
         #include "/lib/lighting/basicShadingForward.glsl"
 
         void main(){
-            // Get albedo alpha
-            float albedoAlpha = textureLod(tex, texCoord, 0).a;
-
-            #ifdef DYNAMIC_CLOUDS
-                float fade = saturate(sin(fragmentFrameTime * FADE_SPEED) * 0.8 + 0.5);
-                float albedoAlpha2 = textureLod(tex, 0.5 - texCoord, 0).a;
-
-                #ifdef FORCE_DISABLE_WEATHER
-                    albedoAlpha = mix(albedoAlpha, albedoAlpha2, fade);
-                #else
-                    albedoAlpha = mix(mix(albedoAlpha, albedoAlpha2, fade), max(albedoAlpha, albedoAlpha2), rainStrength);
-                #endif
-            #endif
-
             // Alpha test, discard and return immediately
-            if(albedoAlpha < ALPHA_THRESHOLD){ discard; return; }
+            if(vertexAlpha < ALPHA_THRESHOLD){ discard; return; }
 
             #if COLOR_MODE == 2
-                vec4 albedo = vec4(0, 0, 0, albedoAlpha);
+                vec4 albedo = vec4(0, 0, 0, vertexAlpha);
             #else
-                vec4 albedo = vec4(1, 1, 1, albedoAlpha);
+                vec4 albedo = vec4(1, 1, 1, vertexAlpha);
             #endif
 
             // Apply simple shading
