@@ -51,8 +51,16 @@ vec3 complexShadingForward(in dataPBR material){
 
 			// If the area isn't shaded, apply shadow mapping
 			if(isShadow || isSubSurface){
+				vec3 feetPlayerPos = vertexFeetPlayerPos;
+
+				#ifdef ENTITIES
+					// Fixes boats having water shadows inside them
+					// Not the best fix for a water leak in a boat
+					if(entityId == 10133) feetPlayerPos.y += 0.2;
+				#endif
+
 				// Get shadow pos
-				vec3 shdPos = vec3(shadowProjection[0].x, shadowProjection[1].y, shadowProjection[2].z) * (mat3(shadowModelView) * vertexFeetPlayerPos + shadowModelView[3].xyz);
+				vec3 shdPos = vec3(shadowProjection[0].x, shadowProjection[1].y, shadowProjection[2].z) * (mat3(shadowModelView) * feetPlayerPos + shadowModelView[3].xyz);
 				shdPos.z += shadowProjection[3].z;
 
 				// Apply shadow distortion and transform to shadow screen space

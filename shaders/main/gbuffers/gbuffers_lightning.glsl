@@ -35,6 +35,7 @@
     void main(){
         // Get vertex color
         vertexColor = gl_Color;
+        vertexColor.a *= vertexColor.a;
         
 	    // Get vertex view position
         vec3 vertexViewPos = mat3(gl_ModelViewMatrix) * gl_Vertex.xyz + gl_ModelViewMatrix[3].xyz;
@@ -77,7 +78,7 @@
 
     void main(){
         // Write to HDR scene color
-        sceneColOut = vec4(vertexColor.rgb * EMISSIVE_INTENSITY, vertexColor.a * vertexColor.a);
+        sceneColOut = vec4(vertexColor.rgb * EMISSIVE_INTENSITY, vertexColor.a);
 
         // Write buffer datas
         materialDataOut = vec3(0, 0, 0.5);
