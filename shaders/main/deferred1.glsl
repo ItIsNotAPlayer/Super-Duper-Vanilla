@@ -98,10 +98,9 @@
 
     uniform float borderFar;
 
-    uniform float blindness;
     uniform float nightVision;
+    uniform float effectFactor;
     uniform float lightningFlash;
-    uniform float darknessFactor;
     uniform float darknessLightFactor;
 
     uniform float fragmentFrameTime;
@@ -277,7 +276,7 @@
         // If sky, do full sky render and return immediately
         if(skyMask){
             // Calculate and output sky render
-            sceneColOut = getFullSkyRender(nEyePlayerPos, skyPos, currSkyCol + sceneColOut) * exp2(-borderFar * (blindness + darknessFactor));
+            sceneColOut = getFullSkyRender(nEyePlayerPos, skyPos, currSkyCol + sceneColOut) * exp2(-borderFar * effectFactor);
             // Clamp scene color to prevent NaNs during post processing
             sceneColOut = max(sceneColOut, vec3(0));
             // Exit function immediately
@@ -321,7 +320,7 @@
         #endif
 
         // Apply fog and darkness fog
-        sceneColOut = ((fogSkyCol - sceneColOut) * fogFactor + sceneColOut) * getFogDarknessFactor(viewDist);
+        sceneColOut = ((fogSkyCol - sceneColOut) * fogFactor + sceneColOut) * getFogEffectFactor(viewDist);
         // Clamp scene color to prevent NaNs during post processing
         sceneColOut = max(sceneColOut, vec3(0));
     }

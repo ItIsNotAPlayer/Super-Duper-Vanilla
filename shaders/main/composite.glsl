@@ -96,10 +96,9 @@
 
     uniform float borderFar;
 
-    uniform float blindness;
     uniform float nightVision;
+    uniform float effectFactor;
     uniform float lightningFlash;
-    uniform float darknessFactor;
     uniform float darknessLightFactor;
 
     uniform float fragmentFrameTime;
@@ -273,7 +272,7 @@
             #endif
 
             // Apply fog and darkness fog
-            sceneColOut = ((fogSkyCol - sceneColOut) * fogFactor + sceneColOut) * getFogDarknessFactor(viewDist);
+            sceneColOut = ((fogSkyCol - sceneColOut) * fogFactor + sceneColOut) * getFogEffectFactor(viewDist);
         }
 
         // Apply darkness pulsing effect

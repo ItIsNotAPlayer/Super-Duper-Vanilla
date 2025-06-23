@@ -22,7 +22,7 @@ float getFogFactor(in float viewDist, in float nEyePlayerPosY, in float worldPos
     return min(1.0, getAtmosphericFog(nEyePlayerPosY, max(0.0, worldPosY), viewDist, totalFogDensity, verticalFogDensity)) * min(1.0, GROUND_FOG_STRENGTH + GROUND_FOG_STRENGTH * isEyeInWater);
 }
 
-float getFogDarknessFactor(in float viewDist){
+float getFogEffectFactor(in float viewDist){
     // Blindness fog
-    return exp2(-viewDist * max(blindness, darknessFactor * 0.125 + darknessLightFactor));
+    return exp2(-viewDist * effectFactor);
 }
