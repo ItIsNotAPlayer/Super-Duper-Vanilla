@@ -99,7 +99,6 @@ Notes for pending features/bug fixes to be implemented categorized by importance
 
 ## PENDING
 * Create a custom shadow model view (low priority)
-* Fix FXAA, it was broken the whole time (high priority)
 * Fix gbuffers_skytextured (medium priority)
 
 * Find a way to make translucent detection more dynamic (medium priority)
@@ -109,13 +108,10 @@ Notes for pending features/bug fixes to be implemented categorized by importance
 
 * Rebuild pipeline and include visualization (high priority)
 * Document the shader pipeline (high priority)
-* Abandon Optifine support (high priority)
 
 * Separate iPBR for all gbuffers (medium priority)
 
 * Implement cloud absorption (low priority)
-* Improve water absorption (low priority)
-* Improve tonemapping (medium priority)
 
 * Optimize alpha testing (high priority)
 * Optimize DOF calculations with noise (low priority)
@@ -126,12 +122,18 @@ Notes for pending features/bug fixes to be implemented categorized by importance
 
 ## CURRENT
 * Optimize day and night transition calculations (medium priority)
-* Improve fog calculation and settings (medium priority)
+
 * Implement portal depth for Nether and End
 
+* Abandon Optifine support (high priority)
+
+* Improve fog calculation and settings (medium priority)
+* Improve water absorption (low priority)
+* Improve tonemapping (medium priority)
 * Improve Distant Horizons depth
 * Improve shader menu UI
 
 ## DONE
 * Fix dragon death beam (medium priority) ?
 * Finish programming dh_generic (medium priority)
+* Fix FXAA, it was broken the whole time (high priority)

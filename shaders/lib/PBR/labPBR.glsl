@@ -95,7 +95,7 @@ void getPBR(inout dataPBR material, in int id){
 
     // Exclude signs and floating texts. We'll also include water and lava in the meantime.
     // This bool checks if Optifine is using the proper fallback for normal maps and ao
-    bool hasFallback = id != 11100 && id != 11102 && id != 12101 && sumOf(textureGrad(normals, texCoord, dcdx, dcdy).xy) != 0;
+    bool hasFallback = id != 11100 && id != 11102 && id != 12101;
 
     #ifdef PARALLAX_OCCLUSION
         vec3 viewDir = -vertexFeetPlayerPos.xyz * TBN;
@@ -144,19 +144,18 @@ void getPBR(inout dataPBR material, in int id){
     // Assign SS
     material.ss = SRPSSE.b > 0.252 ? (SRPSSE.b - 0.2509804) * 1.3350785 : 0.0;
 
+    // Apply no vanilla AO for water
+    material.ambient = normalAOH.b;
+
     // Assign ambient occlusion
     #if defined ENTITIES || defined ENTITIES_TRANSPARENT || defined HAND || defined HAND_WATER
         // Ambient occlusion fallback fix
         material.ambient = id <= 0 ? 1.0 : normalAOH.b;
-    #elif defined BLOCK
-        // Ambient occlusion fallback fix
-        material.ambient = id == 12001 ? 1.0 : normalAOH.b;
-    #elif defined TERRAIN
+    #endif
+
+    #ifdef TERRAIN
         // Apply vanilla AO with it in terrain
-        material.ambient = vertexAO * normalAOH.b;
-    #else
-        // Apply no AO for water
-        material.ambient = normalAOH.b;
+        material.ambient *= vertexAO;
     #endif
 
     #ifdef TERRAIN
@@ -210,19 +209,20 @@ void getPBR(inout dataPBR material, in int id){
     // Get parallax shadows
     material.parallaxShd = material.ss;
 
-    #ifdef PARALLAX_OCCLUSION
-        if(hasFallback){
-            #ifdef SLOPE_NORMALS
-                if(textureGrad(normals, texUv, dcdx, dcdy).a > currPos.z) normalMap = vec3(getSlopeNormals(-viewDir, texUv, currPos.z), 0);
-            #endif
+    // Exit early if block has no fallback, otherwise continue
+    if(!hasFallback) return;
 
-            #if defined PARALLAX_SHADOW && defined WORLD_LIGHT
-                if(dot(TBN[2], vec3(shadowModelView[0].z, shadowModelView[1].z, shadowModelView[2].z)) > 0.005 || material.ss > 0)
-                    material.parallaxShd = parallaxShadow(currPos, getParallaxOffset(vec3(shadowModelView[0].z, shadowModelView[1].z, shadowModelView[2].z) * TBN));
-            #endif
-        }
+    #ifdef PARALLAX_OCCLUSION
+        #ifdef SLOPE_NORMALS
+            if(textureGrad(normals, texUv, dcdx, dcdy).a > currPos.z) normalMap = vec3(getSlopeNormals(-viewDir, texUv, currPos.z), 0);
+        #endif
+
+        #if defined PARALLAX_SHADOW && defined WORLD_LIGHT
+            if(dot(TBN[2], vec3(shadowModelView[0].z, shadowModelView[1].z, shadowModelView[2].z)) > 0.005 || material.ss > 0)
+                material.parallaxShd = parallaxShadow(currPos, getParallaxOffset(vec3(shadowModelView[0].z, shadowModelView[1].z, shadowModelView[2].z) * TBN));
+        #endif
     #endif
 
     // Assign normal and calculate normal strength
-    if(hasFallback) material.normal = mix(TBN[2], TBN * normalMap, NORMAL_STRENGTH);
+    material.normal = mix(TBN[2], TBN * normalMap, NORMAL_STRENGTH);
 }

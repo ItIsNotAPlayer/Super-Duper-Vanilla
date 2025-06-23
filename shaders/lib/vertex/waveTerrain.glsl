@@ -6,27 +6,27 @@ vec3 getTerrainWave(in vec3 vertexEyePlayerPos, in vec2 vertexWorldPosXZ, in flo
         float windStrength = sin(-sumOf(id == 10801 ? floor(vertexWorldPosXZ) : vertexWorldPosXZ) * WIND_FREQUENCY + currTime * WIND_SPEED) * outside;
 
         // Simple blocks, horizontal movement
-        if(id >= 10000 && id <= 10499){
+        if(id >= 10000 && id <= 10099){
             vertexEyePlayerPos.xz += windStrength * 0.1;
             return vertexEyePlayerPos;
         }
 
         // Single and double grounded cutouts
-        if(id >= 10600 && id <= 10700){
-            float isUpper = id == 10700 ? midBlockY - 1.5 : midBlockY - 0.5;
+        if(id >= 10600 && id <= 10799){
+            float isUpper = midBlockY - (id >= 10700 ? 1.5 : 0.5);
             vertexEyePlayerPos.xz += isUpper * windStrength * 0.125;
             return vertexEyePlayerPos;
         }
 
         // Single hanging cutouts
-        if(id == 10800 || id == 10801){
+        if(id >= 10800 && id <= 10899){
             float isLower = midBlockY + 0.5;
             vertexEyePlayerPos.xz += isLower * windStrength * 0.0625;
             return vertexEyePlayerPos;
         }
 
         // Multi wall cutouts
-        if(id == 10900){
+        if(id >= 10900 && id <= 10999){
             vertexEyePlayerPos.xz += windStrength * 0.05;
             return vertexEyePlayerPos;
         }

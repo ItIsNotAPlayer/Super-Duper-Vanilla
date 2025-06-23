@@ -15,7 +15,7 @@ void getPBR(inout dataPBR material, in int id){
 
     // Generate bumped normals
     #if (defined TERRAIN || defined WATER || defined BLOCK || defined BLOCK_TRANSLUCENT) && defined NORMAL_GENERATION
-        if(id != 11100 && id != 11102 && id != 12001 && id != 12101){
+        if(id != 11100 && id != 11102 && id != 12101){
             const float autoGenNormPixSize = 1.0 / NORMAL_GENERATION_RESOLUTION;
             vec2 topRightCorner = fract(vTexCoord - autoGenNormPixSize) * vTexCoordScale + vTexCoordPos;
             vec2 bottomLeftCorner = fract(vTexCoord + autoGenNormPixSize) * vTexCoordScale + vTexCoordPos;
@@ -183,6 +183,14 @@ void getPBR(inout dataPBR material, in int id){
 
             // Netherack metals
             else if(id == 12701){
+                if(maxOf(material.albedo.rg) > 0.6){
+                    material.smoothness = sumOf(material.albedo.rgb) * 0.31;
+                    material.metallic = 1.0;
+                }
+            }
+
+            // Gilded
+            else if(id == 12702){
                 if(maxOf(material.albedo.rg) > 0.6){
                     material.smoothness = sumOf(material.albedo.rgb) * 0.31;
                     material.metallic = 1.0;
