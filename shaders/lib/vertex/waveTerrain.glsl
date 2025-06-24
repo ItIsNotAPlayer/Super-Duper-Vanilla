@@ -38,7 +38,7 @@ vec3 getTerrainWave(in vec3 vertexEyePlayerPos, in vec2 vertexWorldPosXZ, in flo
         float currentStrength = cos(-sumOf(vertexWorldPosXZ) * CURRENT_FREQUENCY + currTime * CURRENT_SPEED);
 
         // Simple blocks, vertical movement
-        if(id == 11100 || id == 11101){
+        if(id >= 11100 && id <= 11199){
             vertexEyePlayerPos.y += currentStrength * 0.0625;
             return vertexEyePlayerPos;
         }

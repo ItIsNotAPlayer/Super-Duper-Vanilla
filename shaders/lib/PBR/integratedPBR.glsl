@@ -73,7 +73,7 @@ void getPBR(inout dataPBR material, in int id){
         }
     #endif
 
-    #if defined ENTITIES || defined ENTITIES_TRANSPARENT
+    #if defined ENTITIES || defined ENTITIES_TRANSLUCENT
         // Basic whole entity emission
         if(id == 10130) material.emissive = cubed(sumOf(material.albedo.rgb) * 0.33333333);
 
