@@ -64,7 +64,6 @@ This list's purpose is to fully realize the shader pipeline and visualize the fl
 | BASIC                | Solid       | GBUFFER      | Basic        | Iris/Optifine    |
 | BEACON_BEAM          | Add         | GBUFFER      | Simple       | Iris/Optifine    |
 | DAMAGED_BLOCK        | Solid       | GBUFFER      | Simple       | Iris/Optifine    |
-| ENTITIES_GLOWING     | Solid       | GBUFFER      | Complex      | Optifine         |
 | ENTITIES             | Solid       | GBUFFER      | Complex      | Iris/Optifine    |
 | HAND                 | Solid       | GBUFFER      | Complex      | Iris/Optifine    |
 | LINE                 | Solid       | GBUFFER      | Disabled     | Iris/Optifine    |
@@ -78,7 +77,6 @@ This list's purpose is to fully realize the shader pipeline and visualize the fl
 | BLOCK                | Transparent | GBUFFER      | Complex      | Iris/Optifine    |
 | CLOUDS               | Transparent | GBUFFER      | Basic        | Iris/Optifine    |
 | ENTITIES_TRANSLUCENT | Transparent | GBUFFER      | Complex      | Iris             |
-| HAND_WATER           | Transparent | GBUFFER      | Complex      | Iris/Optifine    |
 | LIGHTNING            | Transparent | GBUFFER      | Complex      | Iris             |
 | TEXTURED             | Transparent | GBUFFER      | Basic        | Iris/Optifine    |
 | WATER                | Transparent | GBUFFER      | Complex      | Iris/Optifine    |
@@ -125,8 +123,6 @@ Notes for pending features/bug fixes to be implemented categorized by importance
 
 * Implement portal depth for Nether and End
 
-* Abandon Optifine support (high priority)
-
 * Improve fog calculation and settings (medium priority)
 * Improve water absorption (low priority)
 * Improve tonemapping (medium priority)
@@ -134,6 +130,7 @@ Notes for pending features/bug fixes to be implemented categorized by importance
 * Improve shader menu UI
 
 ## DONE
+* Abandon Optifine support (high priority)
 * Fix dragon death beam (medium priority) ?
 * Finish programming dh_generic (medium priority)
 * Fix FXAA, it was broken the whole time (high priority)

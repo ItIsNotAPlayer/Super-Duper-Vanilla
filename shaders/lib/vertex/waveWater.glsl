@@ -7,7 +7,7 @@ vec3 getWaterWave(in vec3 vertexEyePlayerPos, in vec2 vertexWorldPosXZ, in float
 
         // Water
         if(id >= 11100 && id <= 11199){
-            vertexEyePlayerPos.y += currentStrength * 0.0625;
+            vertexEyePlayerPos.y += currentStrength * 0.05;
 
             return vertexEyePlayerPos;
         }
