@@ -19,9 +19,6 @@ vec3 complexShadingLOD(in dataPBR material){
 	// Calculate block light
 	totalIllumination += toLinear((float(material.emissive == 0) * 0.25 + 1.0) * blockLightSquared * blockLightColor);
 
-	// Apply baked ambient occlussion
-	totalIllumination *= material.ambient;
-
 	#ifdef WORLD_LIGHT
 		// Get sRGB light color
 		vec3 sRGBLightCol = LIGHT_COLOR_DATA_BLOCK0;
@@ -36,10 +33,6 @@ vec3 complexShadingLOD(in dataPBR material){
 
 		// Calculate fake shadows
 		float shdCol = saturate(hermiteMix(0.9, 1.0, lmCoord.y)) * shdFade;
-
-		#if defined PARALLAX_OCCLUSION && defined PARALLAX_SHADOW
-			shdCol *= material.parallaxShd;
-		#endif
 
 		float dirLight = isShadow ? NLZ : 0.0;
 

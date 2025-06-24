@@ -22,6 +22,8 @@
 
     flat out vec3 vertexNormal;
 
+    out float vertexViewDist;
+
     out vec2 waterNoiseUv;
 
     out vec3 vertexColor;
@@ -69,6 +71,8 @@
         vec3 vertexViewPos = mat3(gl_ModelViewMatrix) * gl_Vertex.xyz + gl_ModelViewMatrix[3].xyz;
         // Get vertex feet player position
         vertexFeetPlayerPos = mat3(gbufferModelViewInverse) * vertexViewPos + gbufferModelViewInverse[3].xyz;
+        // Output view distance
+        vertexViewDist = length(vertexViewPos) + 8.0;
 
         // Get world position
         vertexWorldPos = vertexFeetPlayerPos + cameraPosition;
@@ -111,6 +115,8 @@
     flat in vec2 lmCoord;
 
     flat in vec3 vertexNormal;
+
+    in float vertexViewDist;
 
     in vec2 waterNoiseUv;
 
@@ -183,13 +189,13 @@
 
     void main(){
         // Prevents overdraw
-        if(far > length(vertexFeetPlayerPos)){ discard; return; }
+        if(far > vertexViewDist){ discard; return; }
 
         // Fix for Distant Horizons translucents rendering over real geometry
         if(texelFetch(depthtex0, ivec2(gl_FragCoord.xy), 0).x != 1.0){ discard; return; }
 
-        ivec2 noiseCoord = ivec2((vertexWorldPos.zy * vertexNormal.x + vertexWorldPos.xz * vertexNormal.y + vertexWorldPos.xy * vertexNormal.z) * 4.0);
-        vec2 noiseCol = texelFetch(noisetex, noiseCoord & 255, 0).xy;
+        vec2 noiseUv = vertexWorldPos.zy * vertexNormal.x + vertexWorldPos.xz * vertexNormal.y + vertexWorldPos.xy * vertexNormal.z;
+        vec2 noiseCol = texelFetch(noisetex, ivec2(noiseUv * 4.0) & 255, 0).xy;
         float dhNoise = (noiseCol.x + noiseCol.y) * 0.2 + 0.8;
 
         // Declare materials
@@ -207,7 +213,10 @@
 
         material.smoothness = 0.96; material.emissive = 0.0;
         material.metallic = 0.04; material.porosity = 0.0;
-        material.ss = 0.0; material.parallaxShd = 1.0;
+        material.ss = 0.0;
+        
+        // Currently unused
+        material.parallaxShd = 1.0;
         material.ambient = 1.0;
 
         // If water

@@ -18,7 +18,7 @@
 #ifdef VERTEX
     flat out vec4 vertexColor;
 
-    out vec3 vertexFeetPlayerPos;
+    out float vertexViewDist;
 
     uniform mat4 gbufferModelViewInverse;
 
@@ -41,10 +41,13 @@
 
         // Get vertex view position
         vec3 vertexViewPos = mat3(gl_ModelViewMatrix) * gl_Vertex.xyz + gl_ModelViewMatrix[3].xyz;
-        // Get vertex feet player position
-        vertexFeetPlayerPos = mat3(gbufferModelViewInverse) * vertexViewPos + gbufferModelViewInverse[3].xyz;
+        // Output view distance
+        vertexViewDist = length(vertexViewPos);
 
 	    #ifdef WORLD_CURVATURE
+            // Get vertex feet player position
+            vec3 vertexFeetPlayerPos = mat3(gbufferModelViewInverse) * vertexViewPos + gbufferModelViewInverse[3].xyz;
+
             // Apply curvature distortion
             vertexFeetPlayerPos.y -= lengthSquared(vertexFeetPlayerPos.xz) * worldCurvatureInv;
 
@@ -74,13 +77,13 @@
 
     flat in vec4 vertexColor;
 
-    in vec3 vertexFeetPlayerPos;
+    in float vertexViewDist;
 
     uniform float far;
 
     void main(){
         // Prevents overdraw
-        if(far > length(vertexFeetPlayerPos)){ discard; return; }
+        if(far > vertexViewDist){ discard; return; }
 
         // Get albedo color
         vec4 albedo = vertexColor;
@@ -101,6 +104,6 @@
         sceneColOut = albedo.rgb * EMISSIVE_INTENSITY;
     
         // Write material data
-        materialDataOut = vec3(0);
+        materialDataOut = vec3(0, 0, 0.5);
     }
 #endif

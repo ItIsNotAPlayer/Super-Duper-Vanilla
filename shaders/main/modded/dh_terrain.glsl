@@ -20,6 +20,8 @@
 
     flat out vec3 vertexNormal;
 
+    out float vertexViewDist;
+
     out vec3 vertexColor;
     out vec3 vertexFeetPlayerPos;
     out vec3 vertexWorldPos;
@@ -65,6 +67,8 @@
         vec3 vertexViewPos = mat3(gl_ModelViewMatrix) * gl_Vertex.xyz + gl_ModelViewMatrix[3].xyz;
         // Get vertex feet player position
         vertexFeetPlayerPos = mat3(gbufferModelViewInverse) * vertexViewPos + gbufferModelViewInverse[3].xyz;
+        // Output view distance
+        vertexViewDist = length(vertexViewPos) + 8.0;
 
         // Get world position
         vertexWorldPos = vertexFeetPlayerPos + cameraPosition;
@@ -104,6 +108,8 @@
     flat in vec2 lmCoord;
 
     flat in vec3 vertexNormal;
+
+    in float vertexViewDist;
 
     in vec3 vertexColor;
     in vec3 vertexFeetPlayerPos;
@@ -165,10 +171,10 @@
 
     void main(){
         // Prevents overdraw
-        if(far > length(vertexFeetPlayerPos)){ discard; return; }
+        if(far > vertexViewDist){ discard; return; }
 
-        ivec2 noiseCoord = ivec2((vertexWorldPos.zy * vertexNormal.x + vertexWorldPos.xz * vertexNormal.y + vertexWorldPos.xy * vertexNormal.z) * 4.0);
-        vec2 noiseCol = texelFetch(noisetex, noiseCoord & 255, 0).xy;
+        vec2 noiseUv = vertexWorldPos.zy * vertexNormal.x + vertexWorldPos.xz * vertexNormal.y + vertexWorldPos.xy * vertexNormal.z;
+        vec2 noiseCol = texelFetch(noisetex, ivec2(noiseUv * 4.0) & 255, 0).xy;
         float dhNoise = (noiseCol.x + noiseCol.y) * 0.2 + 0.8;
 
         // Declare materials
@@ -186,7 +192,10 @@
 
         material.smoothness = 0.0; material.emissive = 0.0;
         material.metallic = 0.04; material.porosity = 0.0;
-        material.ss = 0.0; material.parallaxShd = 1.0;
+        material.ss = 0.0;
+        
+        // Currently unused
+        material.parallaxShd = 1.0;
         material.ambient = 1.0;
 
         // If illuminated block
@@ -198,8 +207,7 @@
                 // Lava tile size inverse
                 const float lavaTileSizeInv = 1.0 / LAVA_TILE_SIZE;
 
-                vec2 lavaUv = vertexWorldPos.zy * vertexNormal.x + vertexWorldPos.xz * vertexNormal.y + vertexWorldPos.xy * vertexNormal.z;
-                float lavaNoise = saturate(max(getLavaNoise(lavaUv * lavaTileSizeInv) * 3.0, sumOf(material.albedo.rgb)) - 1.0);
+                float lavaNoise = saturate(max(getLavaNoise(noiseUv * lavaTileSizeInv) * 3.0, sumOf(material.albedo.rgb)) - 1.0);
                 material.albedo.rgb = floor(material.albedo.rgb * lavaNoise * LAVA_BRIGHTNESS * 32.0) * 0.03125;
             #else
                 material.albedo.rgb = material.albedo.rgb * LAVA_BRIGHTNESS;
