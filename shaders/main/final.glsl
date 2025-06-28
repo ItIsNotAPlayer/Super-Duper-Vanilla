@@ -33,7 +33,7 @@
     layout(location = 0) out vec3 finalColOut;
 
     /*
-    Buffer settings
+    Buffer settings, the compiler will attempt to read the commented lines:
 
     const int gcolorFormat = R11F_G11F_B10F;
     const int colortex1Format = RGB16_SNORM;

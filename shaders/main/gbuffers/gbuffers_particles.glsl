@@ -105,7 +105,7 @@
 
 #ifdef FRAGMENT
     /* RENDERTARGETS: 0,3 */
-    layout(location = 0) out vec3 sceneColOut; // gcolor
+    layout(location = 0) out vec3 sceneColOut; // colortex0
     layout(location = 1) out vec3 materialDataOut; // colortex3
 
     flat in vec2 lmCoord;
@@ -125,7 +125,7 @@
 
     uniform ivec2 atlasSize;
 
-    uniform sampler2D tex;
+    uniform sampler2D gtexture;
 
     #ifndef FORCE_DISABLE_WEATHER
         uniform float rainStrength;
@@ -168,7 +168,7 @@
 
     void main(){
         // Get albedo
-        vec4 albedo = textureLod(tex, texCoord, 0);
+        vec4 albedo = textureLod(gtexture, texCoord, 0);
 
         // Alpha test, discard and return immediately
         if(albedo.a < ALPHA_THRESHOLD){ discard; return; }

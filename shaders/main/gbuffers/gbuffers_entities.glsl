@@ -115,7 +115,7 @@
 
 #ifdef FRAGMENT
     /* RENDERTARGETS: 0,1,2,3 */
-    layout(location = 0) out vec3 sceneColOut; // gcolor
+    layout(location = 0) out vec3 sceneColOut; // colortex0
     layout(location = 1) out vec3 normalDataOut; // colortex1
     layout(location = 2) out vec3 albedoDataOut; // colortex2
     layout(location = 3) out vec3 materialDataOut; // colortex3
@@ -146,7 +146,7 @@
 
     uniform vec4 entityColor;
 
-    uniform sampler2D tex;
+    uniform sampler2D gtexture;
 
     #ifndef FORCE_DISABLE_WEATHER
         uniform float rainStrength;

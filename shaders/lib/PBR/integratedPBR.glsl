@@ -5,7 +5,7 @@ vec2 dcdy = dFdy(texCoord);
 // The Integrated PBR calculation
 void getPBR(inout dataPBR material, in int id){
     // Assign albedo
-    material.albedo = textureGrad(tex, texCoord, dcdx, dcdy);
+    material.albedo = textureGrad(gtexture, texCoord, dcdx, dcdy);
 
     // Alpha test, discard and return immediately
     if(material.albedo.a < ALPHA_THRESHOLD){ discard; return; }
@@ -20,9 +20,9 @@ void getPBR(inout dataPBR material, in int id){
             vec2 topRightCorner = fract(vTexCoord - autoGenNormPixSize) * vTexCoordScale + vTexCoordPos;
             vec2 bottomLeftCorner = fract(vTexCoord + autoGenNormPixSize) * vTexCoordScale + vTexCoordPos;
 
-            float d0 = sumOf(textureGrad(tex, topRightCorner, dcdx, dcdy).rgb);
-            float d1 = sumOf(textureGrad(tex, vec2(bottomLeftCorner.x, topRightCorner.y), dcdx, dcdy).rgb);
-            float d2 = sumOf(textureGrad(tex, vec2(topRightCorner.x, bottomLeftCorner.y), dcdx, dcdy).rgb);
+            float d0 = sumOf(textureGrad(gtexture, topRightCorner, dcdx, dcdy).rgb);
+            float d1 = sumOf(textureGrad(gtexture, vec2(bottomLeftCorner.x, topRightCorner.y), dcdx, dcdy).rgb);
+            float d2 = sumOf(textureGrad(gtexture, vec2(topRightCorner.x, bottomLeftCorner.y), dcdx, dcdy).rgb);
 
             vec2 slopeNormal = d0 - vec2(d1, d2);
             // TBN * fastNormalize(vec3(slopeNormal, 1))
@@ -42,17 +42,15 @@ void getPBR(inout dataPBR material, in int id){
     #ifdef TERRAIN
         // Apply vanilla AO with it in terrain
         material.ambient = vertexAO;
-    #else
-        // For others, don't use vanilla AO
-        material.ambient = 1.0;
-    #endif
 
-    #ifdef TERRAIN
         // If lava and fire
         if(id == 11100 || id == 12101) material.emissive = 1.0;
 
         // Foliage and corals
         else if((id >= 10000 && id <= 10800) || (id >= 11600 && id <= 11799) || id == 10900 || id == 11101 || id == 12200) material.ss = 0.75;
+    #else
+        // For others, don't use vanilla AO
+        material.ambient = 1.0;
     #endif
 
     #ifdef WATER

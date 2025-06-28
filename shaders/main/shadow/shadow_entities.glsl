@@ -75,7 +75,7 @@
 #ifdef FRAGMENT
     #ifdef WORLD_LIGHT
         /* RENDERTARGETS: 0 */
-        layout(location = 0) out vec3 shadowColOut; // gcolor
+        layout(location = 0) out vec3 shadowColOut; // colortex0
 
         flat in int blockId;
 
@@ -83,11 +83,11 @@
 
         in vec2 texCoord;
 
-        uniform sampler2D tex;
+        uniform sampler2D gtexture;
 
         void main(){
             #ifdef SHADOW_COLOR
-                vec4 shdAlbedo = textureLod(tex, texCoord, 0);
+                vec4 shdAlbedo = textureLod(gtexture, texCoord, 0);
 
                 // Alpha test, discard and return immediately
                 if(shdAlbedo.a < ALPHA_THRESHOLD){ discard; return; }
@@ -107,7 +107,7 @@
                 shadowColOut = toLinear(shdAlbedo.rgb * vertexColor);
             #else
                 // Alpha test, discard and return immediately
-                if(textureLod(tex, texCoord, 0).a < ALPHA_THRESHOLD){ discard; return; }
+                if(textureLod(gtexture, texCoord, 0).a < ALPHA_THRESHOLD){ discard; return; }
 
                 shadowColOut = vec3(0);
             #endif

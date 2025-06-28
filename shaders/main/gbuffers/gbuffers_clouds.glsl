@@ -99,7 +99,7 @@
         }
     #else
         /* RENDERTARGETS: 0,3 */
-        layout(location = 0) out vec4 sceneColOut; // gcolor
+        layout(location = 0) out vec4 sceneColOut; // colortex0
         layout(location = 1) out vec3 materialDataOut; // colortex3
 
         flat in float vertexAlpha;

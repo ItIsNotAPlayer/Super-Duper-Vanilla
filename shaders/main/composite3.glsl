@@ -40,9 +40,9 @@
 
 #ifdef FRAGMENT
     /* RENDERTARGETS: 0 */
-    layout(location = 0) out vec3 sceneColOut; // gcolor
+    layout(location = 0) out vec3 sceneColOut; // colortex0
 
-    uniform sampler2D gcolor;
+    uniform sampler2D colortex0;
 
     #ifdef DOF
         // Needs to be enabled by force to be able to use LOD fully even with textureLod
@@ -83,7 +83,7 @@
         ivec2 screenTexelCoord = ivec2(gl_FragCoord.xy);
 
         // Get scene color
-        sceneColOut = texelFetch(gcolor, screenTexelCoord, 0).rgb;
+        sceneColOut = texelFetch(colortex0, screenTexelCoord, 0).rgb;
 
         #ifdef DOF
             // Declare and get positions
@@ -102,10 +102,10 @@
             vec2 blurRes = blurRadius / vec2(viewWidth, viewHeight);
 
             // Get center pixel color with LOD
-            vec3 dofColor = textureLod(gcolor, texCoord, currDofLOD).rgb;
-            for(int i = 0; i < 15; i++){
+            vec3 dofColor = textureLod(colortex0, texCoord, currDofLOD).rgb;
+            for(uint i = 0u; i < 15u; i++){
                 // Rotate offsets and sample
-                dofColor += textureLod(gcolor, texCoord - dofOffSets[i] * blurRes, currDofLOD).rgb;
+                dofColor += textureLod(colortex0, texCoord - dofOffSets[i] * blurRes, currDofLOD).rgb;
             }
 
             // 15 offsetted samples + 1 sample (1 / 16)

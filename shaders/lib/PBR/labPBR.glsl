@@ -106,7 +106,7 @@ void getPBR(inout dataPBR material, in int id){
     #endif
 
     // Assign albedo
-    material.albedo = textureGrad(tex, texUv, dcdx, dcdy);
+    material.albedo = textureGrad(gtexture, texUv, dcdx, dcdy);
 
     // Alpha test, discard and return immediately
     if(material.albedo.a < ALPHA_THRESHOLD){ discard; return; }
@@ -150,7 +150,7 @@ void getPBR(inout dataPBR material, in int id){
     // Assign ambient occlusion
     #if defined ENTITIES || defined ENTITIES_TRANSLUCENT || defined HAND || defined HAND_WATER
         // Ambient occlusion fallback fix
-        material.ambient = id <= 0 ? 1.0 : normalAOH.b;
+        if(id <= 0) material.ambient = 1.0;
     #endif
 
     #ifdef TERRAIN

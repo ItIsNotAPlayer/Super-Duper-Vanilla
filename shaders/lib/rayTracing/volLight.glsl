@@ -1,4 +1,4 @@
-#define VOLUMETRIC_STEPS 7
+#define VOLUMETRIC_STEPS 7u
 
 const float volumetricStepsInverse = 1.0 / VOLUMETRIC_STEPS;
 
@@ -55,7 +55,7 @@ vec3 getVolumetricLight(in vec3 feetPlayerPos, in float fogFactor, in float bord
 
 		vec3 volumeData = vec3(0);
 
-		for(int i = 0; i < VOLUMETRIC_STEPS; i++){
+		for(uint i = 0u; i < VOLUMETRIC_STEPS; i++){
 			// No need to do anymore fancy matrix multiplications during the loop
 			volumeData += getShdCol(vec3(startPos.xy / (length(startPos.xy) * 2.0 + 0.2), startPos.z * 0.1) + 0.5);
 			// We continue tracing!
@@ -68,7 +68,7 @@ vec3 getVolumetricLight(in vec3 feetPlayerPos, in float fogFactor, in float bord
 		#ifdef WORLD_CUSTOM_SKYLIGHT
 			else return lightCol * (volumetricFogDensity * VOLUMETRIC_LIGHTING_STRENGTH);
 		#else
-			else return lightCol * (volumetricFogDensity * eyeBrightFact * VOLUMETRIC_LIGHTING_STRENGTH);
+			else return lightCol * (squared(eyeBrightFact) * volumetricFogDensity * VOLUMETRIC_LIGHTING_STRENGTH);
 		#endif
 	#endif
 }

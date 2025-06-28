@@ -44,7 +44,7 @@
 
         uniform float pixelWidth;
 
-        uniform sampler2D gcolor;
+        uniform sampler2D colortex0;
 
         vec3 bloomTile(in vec3 bloomCol, in vec2 bloomPos, in int scale, in int LOD){
             vec2 bloomUv = bloomPos * scale;
@@ -55,11 +55,11 @@
             // Get pixel size based on bloom tile scale
             float pixSize = scale * pixelWidth;
 
-            vec3 sample0 = textureLod(gcolor, vec2(bloomUv.x - pixSize * 2.0, bloomUv.y), LOD).rgb +
-                textureLod(gcolor, vec2(bloomUv.x + pixSize * 2.0, bloomUv.y), LOD).rgb;
-            vec3 sample1 = textureLod(gcolor, vec2(bloomUv.x - pixSize, bloomUv.y), LOD).rgb +
-                textureLod(gcolor, vec2(bloomUv.x + pixSize, bloomUv.y), LOD).rgb;
-            vec3 sample2 = textureLod(gcolor, bloomUv, LOD).rgb;
+            vec3 sample0 = textureLod(colortex0, vec2(bloomUv.x - pixSize * 2.0, bloomUv.y), LOD).rgb +
+                textureLod(colortex0, vec2(bloomUv.x + pixSize * 2.0, bloomUv.y), LOD).rgb;
+            vec3 sample1 = textureLod(colortex0, vec2(bloomUv.x - pixSize, bloomUv.y), LOD).rgb +
+                textureLod(colortex0, vec2(bloomUv.x + pixSize, bloomUv.y), LOD).rgb;
+            vec3 sample2 = textureLod(colortex0, bloomUv, LOD).rgb;
 
             return sample0 * 0.0625 + sample1 * 0.25 + sample2 * 0.375;
         }

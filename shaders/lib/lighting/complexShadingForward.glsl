@@ -30,9 +30,6 @@ vec3 complexShadingForward(in dataPBR material){
 	// Apply baked ambient occlussion
 	totalIllumination *= material.ambient;
 
-	// Apply emissives
-	totalIllumination += material.emissive * EMISSIVE_INTENSITY;
-
 	#ifdef WORLD_LIGHT
 		// Get sRGB light color
 		vec3 sRGBLightCol = LIGHT_COLOR_DATA_BLOCK0;
@@ -137,12 +134,28 @@ vec3 complexShadingForward(in dataPBR material){
 		totalIllumination += toLinear(sRGBLightCol) * shdCol;
 	#endif
 
+	// Get view direction
+	vec3 viewDir = -fastNormalize(vertexFeetPlayerPos);
+
+	// Modified version of BSL's reflection PBR calculation
+	// vec3 fresnel = (F0 + (1.0 - F0) * cosTheta) * smoothness
+	// Fresnel calculation derived and optimized from this equation
+	float NV = dot(material.normal, viewDir);
+	float smoothCosTheta = NV > 0 ? exp2(-9.28 * NV) * material.smoothness : material.smoothness;
+	float oneMinusCosTheta = material.smoothness - smoothCosTheta;
+
+	if(material.metallic <= 0.9) totalIllumination *= 1.0 - (smoothCosTheta + material.metallic * oneMinusCosTheta);
+	else totalIllumination *= 1.0 - material.smoothness;
+
+	// Apply emissives
+	totalIllumination += material.emissive * EMISSIVE_INTENSITY;
+
 	vec3 totalLighting = material.albedo.rgb * totalIllumination;
 
 	#if defined WORLD_LIGHT && defined SPECULAR_HIGHLIGHTS
 		if(isShadow){
 			// Get specular GGX
-			vec3 specCol = getSpecularBRDF(-fastNormalize(vertexFeetPlayerPos), material.normal, material.albedo.rgb, NLZ, material.metallic, material.smoothness);
+			vec3 specCol = getSpecularBRDF(viewDir, material.normal, material.albedo.rgb, NLZ, NV, material.metallic, material.smoothness);
 			totalLighting += specCol * shdCol * sRGBLightCol;
 		}
 	#endif

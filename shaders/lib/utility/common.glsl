@@ -33,6 +33,11 @@ vec2 saturate(in vec2 x){ return clamp(x, vec2(0), vec2(1)); }
 vec3 saturate(in vec3 x){ return clamp(x, vec3(0), vec3(1)); }
 vec4 saturate(in vec4 x){ return clamp(x, vec4(0), vec4(1)); }
 
+// Sum functions
+float sumOf(in vec2 x){ return x.x + x.y; }
+float sumOf(in vec3 x){ return x.x + x.y + x.z; }
+float sumOf(in vec4 x){ return x.x + x.y + x.z + x.w; }
+
 // Squared functions x ^ 2
 float squared(in float x){ return x * x; }
 vec2 squared(in vec2 x){ return x * x; }
@@ -60,15 +65,20 @@ float minOf(in vec2 x){ return min(x.x, x.y); }
 float minOf(in vec3 x){ return min(x.x, min(x.y, x.z)); }
 float minOf(in vec4 x){ return min(min(x.x, x.y), min(x.z, x.w)); }
 
+// Unsigned min functions
+uint minOf(in uvec2 x){ return min(x.x, x.y); }
+uint minOf(in uvec3 x){ return min(x.x, min(x.y, x.z)); }
+uint minOf(in uvec4 x){ return min(min(x.x, x.y), min(x.z, x.w)); }
+
 // Max functions
 float maxOf(in vec2 x){ return max(x.x, x.y); }
 float maxOf(in vec3 x){ return max(x.x, max(x.y, x.z)); }
 float maxOf(in vec4 x){ return max(max(x.x, x.y), max(x.z, x.w)); }
 
-// Sum functions
-float sumOf(in vec2 x){ return x.x + x.y; }
-float sumOf(in vec3 x){ return x.x + x.y + x.z; }
-float sumOf(in vec4 x){ return x.x + x.y + x.z + x.w; }
+// Unsigned max functions
+uint maxOf(in uvec2 x){ return max(x.x, x.y); }
+uint maxOf(in uvec3 x){ return max(x.x, max(x.y, x.z)); }
+uint maxOf(in uvec4 x){ return max(max(x.x, x.y), max(x.z, x.w)); }
 
 // Linear interpolation functions
 float lerp(float a, float b, float c, float d){

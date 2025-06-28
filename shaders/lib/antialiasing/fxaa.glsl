@@ -1,7 +1,7 @@
 #define EDGE_THRESHOLD_MIN 0.03125
 #define EDGE_THRESHOLD_MAX 0.125
 
-#define ITERATIONS 12
+#define ITERATIONS 12u
 
 #define SUBPIXEL_QUALITY 0.75
 
@@ -114,7 +114,7 @@ vec3 textureFXAA(in ivec2 screenTexelCoord){
 
     // If both sides have not been reached, continue to explore.
     if(!reachedBoth){
-        for(int i = 2; i < ITERATIONS; i++){
+        for(uint i = 2u; i < ITERATIONS; i++){
             // If needed, read luma in 1st direction, compute delta.
             if(!reached1) lumaEnd1 = sumOf(textureLod(colortex3, uv1, 0).rgb) - lumaLocalAverage;
 

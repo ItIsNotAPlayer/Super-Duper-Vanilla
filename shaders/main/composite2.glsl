@@ -34,9 +34,9 @@
 
 #ifdef FRAGMENT
     /* RENDERTARGETS: 0 */
-    layout(location = 0) out vec3 sceneColOut; // gcolor
+    layout(location = 0) out vec3 sceneColOut; // colortex0
 
-    uniform sampler2D gcolor;
+    uniform sampler2D colortex0;
 
     #ifdef MOTION_BLUR
         noperspective in vec2 texCoord;
@@ -65,7 +65,7 @@
         ivec2 screenTexelCoord = ivec2(gl_FragCoord.xy);
 
         // Get scene color
-        sceneColOut = texelFetch(gcolor, screenTexelCoord, 0).rgb;
+        sceneColOut = texelFetch(colortex0, screenTexelCoord, 0).rgb;
 
         #ifdef MOTION_BLUR
             // Declare and get positions

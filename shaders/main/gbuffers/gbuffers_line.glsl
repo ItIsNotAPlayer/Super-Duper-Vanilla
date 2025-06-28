@@ -88,7 +88,7 @@
 
 #ifdef FRAGMENT
     /* RENDERTARGETS: 0 */
-    layout(location = 0) out vec3 sceneColOut; // gcolor
+    layout(location = 0) out vec3 sceneColOut; // colortex0
 
     flat in vec3 vertexColor;
 

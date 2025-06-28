@@ -95,7 +95,7 @@
         }
     #else
         /* RENDERTARGETS: 0 */
-        layout(location = 0) out vec4 sceneColOut; // gcolor
+        layout(location = 0) out vec4 sceneColOut; // colortex0
 
         flat in float lmCoordX;
 
@@ -104,7 +104,7 @@
         uniform float nightVision;
         uniform float lightningFlash;
 
-        uniform sampler2D tex;
+        uniform sampler2D gtexture;
 
         #ifndef FORCE_DISABLE_DAY_CYCLE
             uniform float dayCycle;
@@ -116,7 +116,7 @@
         
         void main(){
             // Get albedo color
-            vec4 albedo = textureLod(tex, texCoord, 0);
+            vec4 albedo = textureLod(gtexture, texCoord, 0);
 
             // Alpha test, discard and return immediately
             if(albedo.a < ALPHA_THRESHOLD){ discard; return; }

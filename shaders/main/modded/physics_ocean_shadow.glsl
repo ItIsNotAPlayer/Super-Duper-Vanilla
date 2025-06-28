@@ -104,14 +104,14 @@
 #ifdef FRAGMENT
     #ifdef WORLD_LIGHT
         /* RENDERTARGETS: 0 */
-        layout(location = 0) out vec3 shadowColOut; // gcolor
+        layout(location = 0) out vec3 shadowColOut; // colortex0
 
         flat in vec3 vertexColor;
 
         in vec2 texCoord;
         in vec2 waterNoiseUv;
 
-        uniform sampler2D tex;
+        uniform sampler2D gtexture;
         
         #if UNDERWATER_CAUSTICS != 0 && defined SHADOW_COLOR
             uniform float fragmentFrameTime;
@@ -126,7 +126,7 @@
 
         void main(){
             #ifdef SHADOW_COLOR
-                vec4 shdAlbedo = textureLod(tex, texCoord, 0);
+                vec4 shdAlbedo = textureLod(gtexture, texCoord, 0);
 
                 // Alpha test, discard and return immediately
                 if(shdAlbedo.a < ALPHA_THRESHOLD){ discard; return; }
@@ -159,7 +159,7 @@
                 shadowColOut = toLinear(shadowColOut * vertexColor);
             #else
                 // Alpha test, discard and return immediately
-                if(textureLod(tex, texCoord, 0).a < ALPHA_THRESHOLD){ discard; return; }
+                if(textureLod(gtexture, texCoord, 0).a < ALPHA_THRESHOLD){ discard; return; }
 
                 shadowColOut = vec3(0);
             #endif

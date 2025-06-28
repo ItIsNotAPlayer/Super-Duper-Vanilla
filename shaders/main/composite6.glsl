@@ -75,7 +75,7 @@
 
     noperspective in vec2 texCoord;
 
-    uniform sampler2D gcolor;
+    uniform sampler2D colortex0;
 
     #ifdef AUTO_EXPOSURE
         uniform float frameTime;
@@ -133,7 +133,7 @@
         ivec2 screenTexelCoord = ivec2(gl_FragCoord.xy);
 
         // Get scene color
-        postColOut = texelFetch(gcolor, screenTexelCoord, 0).rgb;
+        postColOut = texelFetch(colortex0, screenTexelCoord, 0).rgb;
 
         #ifdef BLOOM
             // Uncompress the HDR colors and upscale
@@ -167,7 +167,7 @@
 
         #ifdef AUTO_EXPOSURE
             // Get center pixel current average scene luminance and mix previous and current pixel...
-            float centerPixLuminance = sumOf(textureLod(gcolor, vec2(0.5), 8).rgb);
+            float centerPixLuminance = sumOf(textureLod(colortex0, vec2(0.5), 8).rgb);
 
             // Accumulate current luminance
             float frameTimeExposure = AUTO_EXPOSURE_SPEED * frameTime;

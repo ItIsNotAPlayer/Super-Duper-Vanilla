@@ -86,15 +86,15 @@
 #ifdef FRAGMENT
     #ifdef WORLD_LIGHT
         /* RENDERTARGETS: 0 */
-        layout(location = 0) out vec3 shadowColOut; // gcolor
+        layout(location = 0) out vec3 shadowColOut; // colortex0
 
         in vec2 texCoord;
 
-        uniform sampler2D tex;
+        uniform sampler2D gtexture;
 
         void main(){
             // Alpha test, discard and return immediately
-            if(textureLod(tex, texCoord, 0).a < ALPHA_THRESHOLD){ discard; return; }
+            if(textureLod(gtexture, texCoord, 0).a < ALPHA_THRESHOLD){ discard; return; }
 
             shadowColOut = vec3(0);
         }

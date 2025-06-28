@@ -70,16 +70,16 @@
 
 #ifdef FRAGMENT
     /* RENDERTARGETS: 0 */
-    layout(location = 0) out vec4 sceneColOut; // gcolor
+    layout(location = 0) out vec4 sceneColOut; // colortex0
 
     in vec2 texCoord;
 
     // Get albedo texture
-    uniform sampler2D tex;
+    uniform sampler2D gtexture;
 
     void main(){
         // Get albedo color
-        vec4 albedo = textureLod(tex, texCoord, 0);
+        vec4 albedo = textureLod(gtexture, texCoord, 0);
 
         // Alpha test, discard and return immediately
         if(albedo.a < ALPHA_THRESHOLD){ discard; return; }

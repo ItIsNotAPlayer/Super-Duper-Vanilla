@@ -30,7 +30,7 @@
 
 #ifdef FRAGMENT
     /* RENDERTARGETS: 0 */
-    layout(location = 0) out vec3 sceneColOut; // gcolor
+    layout(location = 0) out vec3 sceneColOut; // colortex0
 
     #if (defined PREVIOUS_FRAME && (defined SSR || defined SSGI)) || ANTI_ALIASING >= 2
         /* RENDERTARGETS: 0,5 */
@@ -43,7 +43,7 @@
 
     noperspective in vec2 texCoord;
 
-    uniform sampler2D gcolor;
+    uniform sampler2D colortex0;
 
     #if (defined PREVIOUS_FRAME && (defined SSR || defined SSGI)) || ANTI_ALIASING >= 2
         uniform sampler2D colortex5;
@@ -71,7 +71,7 @@
         #if ANTI_ALIASING >= 2
             sceneColOut = textureTAA(ivec2(gl_FragCoord.xy));
         #else
-            sceneColOut = texelFetch(gcolor, ivec2(gl_FragCoord.xy), 0).rgb;
+            sceneColOut = texelFetch(colortex0, ivec2(gl_FragCoord.xy), 0).rgb;
         #endif
 
         #if ((defined SSR || defined SSGI) && defined PREVIOUS_FRAME) || ANTI_ALIASING >= 2

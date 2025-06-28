@@ -74,18 +74,18 @@
 
 #ifdef FRAGMENT
     /* RENDERTARGETS: 0,3 */
-    layout(location = 0) out vec4 sceneColOut; // gcolor
+    layout(location = 0) out vec4 sceneColOut; // colortex0
     layout(location = 1) out vec3 materialDataOut; // colortex3
 
     flat in vec4 vertexColor;
 
     in vec2 texCoord;
 
-    uniform sampler2D tex;
+    uniform sampler2D gtexture;
 
     void main(){
         // Get albedo
-        vec4 albedo = textureLod(tex, texCoord, 0);
+        vec4 albedo = textureLod(gtexture, texCoord, 0);
         albedo.a *= vertexColor.a;
 
         // Alpha test, discard and return immediately

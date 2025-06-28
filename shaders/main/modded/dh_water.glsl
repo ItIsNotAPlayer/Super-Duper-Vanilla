@@ -105,7 +105,7 @@
 
 #ifdef FRAGMENT
     /* RENDERTARGETS: 0,1,2,3 */
-    layout(location = 0) out vec4 sceneColOut; // gcolor
+    layout(location = 0) out vec4 sceneColOut; // colortex0
     layout(location = 1) out vec3 normalDataOut; // colortex1
     layout(location = 2) out vec3 albedoDataOut; // colortex2
     layout(location = 3) out vec3 materialDataOut; // colortex3

@@ -103,7 +103,7 @@
 
 #ifdef FRAGMENT
     /* RENDERTARGETS: 0,1,2,3 */
-    layout(location = 0) out vec4 sceneColOut; // gcolor
+    layout(location = 0) out vec4 sceneColOut; // colortex0
     layout(location = 1) out vec3 normalDataOut; // colortex1
     layout(location = 2) out vec3 albedoDataOut; // colortex2
     layout(location = 3) out vec3 materialDataOut; // colortex3
@@ -125,8 +125,6 @@
         in vec2 vTexCoord;
     #endif
 
-    uniform int entityId;
-
     uniform int isEyeInWater;
 
     uniform float nightVision;
@@ -134,7 +132,7 @@
 
     uniform vec4 entityColor;
 
-    uniform sampler2D tex;
+    uniform sampler2D gtexture;
 
     #ifndef FORCE_DISABLE_WEATHER
         uniform float rainStrength;
@@ -192,7 +190,7 @@
     void main(){
         // Declare materials
 	    dataPBR material;
-        getPBR(material, entityId);
+        getPBR(material, 0);
 
         // Apply entity color tint
         material.albedo.rgb = mix(material.albedo.rgb, entityColor.rgb, entityColor.a);

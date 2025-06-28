@@ -21,7 +21,7 @@ float getSSAO(in vec3 screenPos, in vec3 viewNormal){
     // Pre calculate base position
     vec3 basePos = getViewPos(gbufferProjectionInverse, screenPos) + viewNormal * 0.5;
 
-    for(int i = 0; i < 4; i++){
+    for(uint i = 0u; i < 4u; i++){
         // Add new offsets to origin
         vec3 samplePos = getScreenPos(gbufferProjection, basePos + ditherSwizzle[i]);
         // Sample new depth and linearize

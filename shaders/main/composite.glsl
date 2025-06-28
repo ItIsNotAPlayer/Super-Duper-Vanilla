@@ -74,7 +74,7 @@
 
 #ifdef FRAGMENT
     /* RENDERTARGETS: 0 */
-    layout(location = 0) out vec3 sceneColOut; // gcolor
+    layout(location = 0) out vec3 sceneColOut; // colortex0
 
     flat in vec3 skyCol;
 
@@ -116,7 +116,7 @@
     uniform mat4 shadowModelView;
 
     // Main HDR buffer
-    uniform sampler2D gcolor;
+    uniform sampler2D colortex0;
     uniform sampler2D colortex1;
     // For SSAO and material masks
     uniform sampler2D colortex2;
@@ -225,7 +225,7 @@
         vec3 feetPlayerPos = eyePlayerPos + gbufferModelViewInverse[3].xyz;
 
         // Get scene color
-        sceneColOut = texelFetch(gcolor, screenTexelCoord, 0).rgb;
+        sceneColOut = texelFetch(colortex0, screenTexelCoord, 0).rgb;
 
         #if ANTI_ALIASING >= 2
             vec3 dither = fract(getRng3(screenTexelCoord & 255) + frameFract);

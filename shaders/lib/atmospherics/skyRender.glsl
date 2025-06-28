@@ -11,20 +11,21 @@ float getSunMoonShape(in vec2 skyPos){
     return min(1.0, exp2((WORLD_SUN_MOON_SIZE - pow(abs(skyPos.x * skyPos.x * skyPos.x) + abs(skyPos.y * skyPos.y * skyPos.y), 0.33333333)) * 256.0));
 }
 
-// Depth size / cloud steps
-const float cloudStepSize = 1.0 / CLOUD_STEPS;
-const float depthSize = CLOUD_DEPTH * cloudStepSize;
-
 #if defined STORY_MODE_CLOUDS && !defined FORCE_DISABLE_CLOUDS
-    int cloudParallax(in vec2 start, in float time){
+    // Depth size / cloud steps
+    const uint cloudSteps = uint(CLOUD_STEPS);
+    const float cloudStepSize = 1.0 / cloudSteps;
+    const float depthSize = CLOUD_DEPTH * cloudStepSize;
+
+    uint cloudParallax(in vec2 start, in float time){
         // Apply depth size
         vec2 end = start * depthSize;
 
         // Move towards west
         start.x += time;
 
-        int cloudData = 0;
-        for(int i = 1; i <= CLOUD_STEPS; i++){
+        uint cloudData = 0u;
+        for(uint i = 1u; i <= cloudSteps; i++){
             if(texelFetch(colortex4, ivec2(start) & 255, 0).x < 0.5) cloudData = i;
             start -= end;
         }
@@ -32,22 +33,22 @@ const float depthSize = CLOUD_DEPTH * cloudStepSize;
         return cloudData;
     }
 
-    vec3 cloudParallaxDynamic(in vec2 start, in float time){
+    uvec3 cloudParallaxDynamic(in vec2 start, in float time){
         // Apply depth size
         vec2 end = start * depthSize;
 
         // Move towards west
         start.x += time;
 
-        vec2 cloudData = vec2(0);
-        for(int i = 1; i <= CLOUD_STEPS; i++){
+        uvec2 cloudData = uvec2(0u);
+        for(uint i = 1u; i <= cloudSteps; i++){
             vec2 cloudMap = texelFetch(colortex4, ivec2(start) & 255, 0).xy;
             if(cloudMap.x < 0.5) cloudData.x = i;
             if(cloudMap.y < 0.5) cloudData.y = i;
             start -= end;
         }
 
-        return vec3(cloudData, maxOf(cloudData));
+        return uvec3(cloudData, maxOf(cloudData));
     }
 #endif
 
@@ -110,7 +111,7 @@ vec3 getSkyHalf(in vec3 nEyePlayerPos, in vec3 skyPos, in vec3 currSkyCol){
         #endif
     #endif
 
-    #if defined STORY_MODE_CLOUDS && defined WORLD_LIGHT && !defined FORCE_DISABLE_CLOUDS
+    #if defined STORY_MODE_CLOUDS && !defined FORCE_DISABLE_CLOUDS && defined WORLD_LIGHT
         float cloudHeightFade = nEyePlayerPos.y - 0.1;
 
         #ifdef FORCE_DISABLE_WEATHER
@@ -120,7 +121,7 @@ vec3 getSkyHalf(in vec3 nEyePlayerPos, in vec3 skyPos, in vec3 currSkyCol){
             cloudHeightFade *= 6.0 - rainStrength * 5.0;
         #endif
 
-        if(cloudHeightFade < 0.005) return currSkyCol;
+        if(cloudHeightFade < 0) return currSkyCol;
         if(cloudHeightFade > 1) cloudHeightFade = 1.0;
 
         float cloudTime = fragmentFrameTime * 0.125;
@@ -130,17 +131,17 @@ vec3 getSkyHalf(in vec3 nEyePlayerPos, in vec3 skyPos, in vec3 currSkyCol){
         #ifdef DYNAMIC_CLOUDS
             float fadeTime = saturate(sin(fragmentFrameTime * FADE_SPEED) * 0.8 + 0.5);
 
-            vec3 cloudData0 = cloudParallaxDynamic(planeUv, cloudTime);
-            float clouds = mix(mix(cloudData0.x, cloudData0.y, fadeTime), cloudData0.z, rainStrength) * cloudHeightFade * cloudStepSize;
+            uvec3 cloudData0 = cloudParallaxDynamic(planeUv, cloudTime);
+            float clouds = mix(mix(cloudData0.x, cloudData0.y, fadeTime), cloudData0.z, rainStrength) * cloudStepSize;
 
             #ifdef DOUBLE_LAYERED_CLOUDS
                 const float cloudLayerAlpha = cloudStepSize * 0.25;
 
-                vec3 cloudData1 = cloudParallaxDynamic(-planeUv * 2.0, -cloudTime);
-                clouds += mix(mix(cloudData1.x, cloudData1.y, fadeTime), cloudData1.z, rainStrength) * (1.0 - clouds) * cloudHeightFade * cloudLayerAlpha;
+                uvec3 cloudData1 = cloudParallaxDynamic(-planeUv * 2.0, -cloudTime);
+                clouds += mix(mix(cloudData1.x, cloudData1.y, fadeTime), cloudData1.z, rainStrength) * (1.0 - clouds) * cloudLayerAlpha;
             #endif
         #else
-            float clouds = cloudParallax(planeUv, cloudTime) * cloudHeightFade * cloudStepSize;
+            float clouds = cloudParallax(planeUv, cloudTime) * cloudStepSize;
 
             #ifdef DOUBLE_LAYERED_CLOUDS
                 const float cloudLayerAlpha = cloudStepSize * 0.25;
@@ -148,6 +149,8 @@ vec3 getSkyHalf(in vec3 nEyePlayerPos, in vec3 skyPos, in vec3 currSkyCol){
                 clouds += cloudParallax(-planeUv * 2.0, -cloudTime) * (1.0 - clouds) * cloudLayerAlpha;
             #endif
         #endif
+
+        clouds *= cloudHeightFade;
 
         #ifdef FORCE_DISABLE_DAY_CYCLE
             currSkyCol += lightCol * clouds;

@@ -4,9 +4,9 @@ vec3 motionBlur(in vec3 currColor, in float depth, in float dither){
     // Apply dithering
     vec2 currScreenPos = texCoord + prevPosition * dither;
     
-    for(int i = 0; i < 4; i++){
+    for(uint i = 0u; i < 4u; i++){
         currScreenPos += prevPosition;
-        currColor += textureLod(gcolor, currScreenPos, 0).rgb;
+        currColor += textureLod(colortex0, currScreenPos, 0).rgb;
     }
 
     return currColor * 0.2;
