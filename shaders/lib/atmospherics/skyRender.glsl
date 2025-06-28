@@ -26,7 +26,7 @@ float getSunMoonShape(in vec2 skyPos){
 
         uint cloudData = 0u;
         for(uint i = 1u; i <= cloudSteps; i++){
-            if(texelFetch(colortex4, ivec2(start) & 255, 0).x < 0.5) cloudData = i;
+            if(texelFetch(colortex0, ivec2(start) & 255, 0).x < 0.5) cloudData = i;
             start -= end;
         }
 
@@ -42,7 +42,7 @@ float getSunMoonShape(in vec2 skyPos){
 
         uvec2 cloudData = uvec2(0u);
         for(uint i = 1u; i <= cloudSteps; i++){
-            vec2 cloudMap = texelFetch(colortex4, ivec2(start) & 255, 0).xy;
+            vec2 cloudMap = texelFetch(colortex0, ivec2(start) & 255, 0).xy;
             if(cloudMap.x < 0.5) cloudData.x = i;
             if(cloudMap.y < 0.5) cloudData.y = i;
             start -= end;

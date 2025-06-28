@@ -6,7 +6,7 @@ vec3 motionBlur(in vec3 currColor, in float depth, in float dither){
     
     for(uint i = 0u; i < 4u; i++){
         currScreenPos += prevPosition;
-        currColor += textureLod(colortex0, currScreenPos, 0).rgb;
+        currColor += textureLod(colortex4, currScreenPos, 0).rgb;
     }
 
     return currColor * 0.2;

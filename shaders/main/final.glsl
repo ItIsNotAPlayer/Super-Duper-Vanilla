@@ -35,7 +35,7 @@
     /*
     Buffer settings, the compiler will attempt to read the commented lines:
 
-    const int gcolorFormat = R11F_G11F_B10F;
+    const int colortex0Format = R11F_G11F_B10F;
     const int colortex1Format = RGB16_SNORM;
     const int colortex2Format = RGBA8;
     const int colortex3Format = RGB8;

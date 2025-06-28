@@ -72,8 +72,8 @@
 /// -------------------------------- /// Fragment Shader /// -------------------------------- ///
 
 #ifdef FRAGMENT
-    /* RENDERTARGETS: 0 */
-    layout(location = 0) out vec3 sceneColOut; // colortex0
+    /* RENDERTARGETS: 4 */
+    layout(location = 0) out vec3 sceneColOut; // colortex4
 
     // Sky silhoutte fix
     const vec4 gcolorClearColor = vec4(0, 0, 0, 1);
@@ -118,7 +118,7 @@
     uniform mat4 shadowModelView;
 
     // Main HDR buffer
-    uniform sampler2D colortex0;
+    uniform sampler2D colortex4;
     uniform sampler2D colortex1;
     // For SSAO and material masks
     uniform sampler2D colortex2;
@@ -144,7 +144,7 @@
     #endif
 
     #if defined STORY_MODE_CLOUDS && !defined FORCE_DISABLE_CLOUDS
-        uniform sampler2D colortex4;
+        uniform sampler2D colortex0;
     #endif
 
     #ifdef DISTANT_HORIZONS
@@ -260,7 +260,7 @@
         vec3 nEyePlayerPos = eyePlayerPos * viewDotInvSqrt;
 
         // Get scene color
-        sceneColOut = texelFetch(colortex0, screenTexelCoord, 0).rgb;
+        sceneColOut = texelFetch(colortex4, screenTexelCoord, 0).rgb;
 
         // Get sky pos by shadow model view
         vec3 skyPos = mat3(shadowModelView) * nEyePlayerPos;

@@ -75,7 +75,7 @@
 
     noperspective in vec2 texCoord;
 
-    uniform sampler2D colortex0;
+    uniform sampler2D colortex4;
 
     #ifdef AUTO_EXPOSURE
         uniform float frameTime;
@@ -87,7 +87,7 @@
         uniform float pixelWidth;
         uniform float pixelHeight;
 
-        uniform sampler2D colortex4;
+        uniform sampler2D colortex0;
 
         vec3 getBloomTile(in vec2 coords, in float invScale){
             // Remap to bloom tile texture coordinates
@@ -100,8 +100,8 @@
             vec2 bottomLeftCorner = baseCoord - pixelSize;
 
             // Apply box blur all tiles
-            return textureLod(colortex4, bottomLeftCorner, 0).rgb + textureLod(colortex4, topRightCorner, 0).rgb +
-                textureLod(colortex4, vec2(bottomLeftCorner.x, topRightCorner.y), 0).rgb + textureLod(colortex4, vec2(topRightCorner.x, bottomLeftCorner.y), 0).rgb;
+            return textureLod(colortex0, bottomLeftCorner, 0).rgb + textureLod(colortex0, topRightCorner, 0).rgb +
+                textureLod(colortex0, vec2(bottomLeftCorner.x, topRightCorner.y), 0).rgb + textureLod(colortex0, vec2(topRightCorner.x, bottomLeftCorner.y), 0).rgb;
         }
     #endif
 
@@ -133,7 +133,7 @@
         ivec2 screenTexelCoord = ivec2(gl_FragCoord.xy);
 
         // Get scene color
-        postColOut = texelFetch(colortex0, screenTexelCoord, 0).rgb;
+        postColOut = texelFetch(colortex4, screenTexelCoord, 0).rgb;
 
         #ifdef BLOOM
             // Uncompress the HDR colors and upscale
@@ -167,7 +167,7 @@
 
         #ifdef AUTO_EXPOSURE
             // Get center pixel current average scene luminance and mix previous and current pixel...
-            float centerPixLuminance = sumOf(textureLod(colortex0, vec2(0.5), 8).rgb);
+            float centerPixLuminance = sumOf(textureLod(colortex4, vec2(0.5), 8).rgb);
 
             // Accumulate current luminance
             float frameTimeExposure = AUTO_EXPOSURE_SPEED * frameTime;

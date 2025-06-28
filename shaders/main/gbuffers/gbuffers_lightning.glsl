@@ -70,8 +70,8 @@
 /// -------------------------------- /// Fragment Shader /// -------------------------------- ///
 
 #ifdef FRAGMENT
-    /* RENDERTARGETS: 0,3 */
-    layout(location = 0) out vec4 sceneColOut; // colortex0
+    /* RENDERTARGETS: 4,3 */
+    layout(location = 0) out vec4 sceneColOut; // colortex4
     layout(location = 3) out vec3 materialDataOut; // colortex3
 
     in vec4 vertexColor;

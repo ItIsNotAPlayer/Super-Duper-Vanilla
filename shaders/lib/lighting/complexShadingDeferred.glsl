@@ -12,7 +12,7 @@ vec3 complexShadingDeferred(in vec3 sceneCol, in vec3 screenPos, in vec3 viewPos
 		#ifdef PREVIOUS_FRAME
 			if(SSGIcoord.z > 0.5) sceneCol += albedo * textureLod(colortex5, getPrevScreenCoord(SSGIcoord.xy), 0).rgb;
 		#else
-			if(SSGIcoord.z > 0.5) sceneCol += albedo * textureLod(colortex0, SSGIcoord.xy, 0).rgb;
+			if(SSGIcoord.z > 0.5) sceneCol += albedo * textureLod(colortex4, SSGIcoord.xy, 0).rgb;
 		#endif
 	#endif
 
@@ -57,7 +57,7 @@ vec3 complexShadingDeferred(in vec3 sceneCol, in vec3 screenPos, in vec3 viewPos
 			vec3 reflectCol = SSRCoord.z < 0.5 ? getSkyReflection(reflectViewDir) : textureLod(colortex5, getPrevScreenCoord(SSRCoord.xy), 0).rgb;
 		#else
 			// Get reflections and check for sky
-			vec3 reflectCol = SSRCoord.z < 0.5 ? getSkyReflection(reflectViewDir) : textureLod(colortex0, SSRCoord.xy, 0).rgb;
+			vec3 reflectCol = SSRCoord.z < 0.5 ? getSkyReflection(reflectViewDir) : textureLod(colortex4, SSRCoord.xy, 0).rgb;
 		#endif
 	#else
 		vec3 reflectCol = getSkyReflection(reflectViewDir);
