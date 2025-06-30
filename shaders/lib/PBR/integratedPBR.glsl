@@ -67,7 +67,7 @@ void getPBR(inout dataPBR material, in int id){
         // Nether portal
         else if(id == 12100){
             material.smoothness = 0.96;
-            material.emissive = maxOf(material.albedo.rgb);
+            material.emissive = sumOf(material.albedo.rgb) * 0.33333333;
         }
     #endif
 

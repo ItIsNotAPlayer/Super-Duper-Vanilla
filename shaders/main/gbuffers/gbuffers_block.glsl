@@ -206,7 +206,7 @@
         // End portal
         if(blockEntityId == 12000){
             // Get portal depth
-            float portalDepth = near / (1.0 - gl_FragCoord.z) - near / (1.0 - texelFetch(depthtex0, ivec2(gl_FragCoord.xy), 0).x);
+            float blockDepth = near / (1.0 - gl_FragCoord.z) - near / (1.0 - texelFetch(depthtex0, ivec2(gl_FragCoord.xy), 0).x);
 
             // Get portal uv
             vec2 portalUv = (vertexFeetPlayerPos.zy * TBN[2].x + vertexFeetPlayerPos.xz * TBN[2].y + vertexFeetPlayerPos.xy * TBN[2].z) * 0.125;
@@ -226,11 +226,11 @@
             endStarField += (textureLod(gtexture, portalUv2, 0).r + textureLod(gtexture, vec2(portalUv2.x - portalUv2.y, portalUv2.y + portalUv2.x), 0).r) * 0.25;
 
             // Get the depth outline for the end portal
-            float depthBrightness = exp2((portalDepth + 0.0625) * 8.0);
+            float edgeBrightness = exp2((blockDepth + 0.0625) * 8.0);
 
             // Get noise color to variate the end portal color
             vec3 noiseCol = getRng3(ivec2(portalUv0 * 128.0) & 255) * 0.5 + 0.5;
-            vec3 finalCol = (noiseCol * endStarField + depthBrightness) * EMISSIVE_INTENSITY * vertexColor.rgb;
+            vec3 finalCol = (noiseCol * endStarField + edgeBrightness) * EMISSIVE_INTENSITY * vertexColor.rgb;
 
             sceneColOut = vec4(toLinear(finalCol), 1);
 

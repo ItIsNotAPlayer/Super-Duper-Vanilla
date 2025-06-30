@@ -244,8 +244,14 @@
 	    // Declare materials
 	    dataPBR material;
         getPBR(material, blockId);
-        
-        // If water
+
+        // Fast depth linearization by DrDesten
+        // Not great, but plausible for most scenarios
+        float blockDepth = near / (1.0 - gl_FragCoord.z) - near / (1.0 - texelFetch(depthtex1, ivec2(gl_FragCoord.xy), 0).x);
+        // Get the depth outline for the end portal
+        float edgeBrightness = exp2((blockDepth + 0.0625) * 8.0);
+
+        // Water
         if(blockId == 11102){
             float waterNoise = WATER_BRIGHTNESS;
 
@@ -262,15 +268,9 @@
                 waterNoise *= squared(0.128 + waterData * 0.5);
             #endif
 
-            #if defined WATER_STYLIZE_ABSORPTION || defined WATER_FOAM
-                // Water color and foam. Fast depth linearization by DrDesten
-                // Not great, but plausible for most scenarios
-                float waterDepth = near / (1.0 - gl_FragCoord.z) - near / (1.0 - texelFetch(depthtex1, ivec2(gl_FragCoord.xy), 0).x);
-            #endif
-
             #ifdef WATER_STYLIZE_ABSORPTION
                 if(isEyeInWater == 0){
-                    float depthBrightness = exp2(waterDepth * 0.25);
+                    float depthBrightness = exp2(blockDepth * 0.25);
                     material.albedo.rgb = material.albedo.rgb * (waterNoise * (1.0 - depthBrightness) + depthBrightness);
                     material.albedo.a = fastSqrt(material.albedo.a) * (1.0 - depthBrightness);
                 }
@@ -280,9 +280,12 @@
             #endif
 
             #ifdef WATER_FOAM
-                material.albedo = min(vec4(1), material.albedo + exp2((waterDepth + 0.0625) * 8.0));
+                material.albedo = min(vec4(1), material.albedo + edgeBrightness);
             #endif
         }
+
+        // Nether portal
+        else if(blockId == 12100) material.albedo.rgb = min(vec3(1), material.albedo.rgb * (0.5 + edgeBrightness * 2.0));
 
         material.albedo.rgb = toLinear(material.albedo.rgb);
 
