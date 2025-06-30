@@ -35,7 +35,6 @@
     void main(){
         // Get vertex color
         vertexColor = gl_Color;
-        vertexColor.a *= vertexColor.a;
         
 	    // Get vertex view position
         vec3 vertexViewPos = mat3(gl_ModelViewMatrix) * gl_Vertex.xyz + gl_ModelViewMatrix[3].xyz;
@@ -70,17 +69,18 @@
 /// -------------------------------- /// Fragment Shader /// -------------------------------- ///
 
 #ifdef FRAGMENT
-    /* RENDERTARGETS: 4,3 */
-    layout(location = 0) out vec4 sceneColOut; // colortex4
-    layout(location = 3) out vec3 materialDataOut; // colortex3
+    /* RENDERTARGETS: 4 */
+    layout(location = 0) out vec3 sceneColOut; // colortex4
 
     in vec4 vertexColor;
 
-    void main(){
-        // Write to HDR scene color
-        sceneColOut = vec4(vertexColor.rgb * EMISSIVE_INTENSITY, vertexColor.a);
+    uniform int entityId;
 
-        // Write buffer datas
-        materialDataOut = vec3(0, 0, 0.5);
+    void main(){
+        const vec3 lightingCol = vec3(0.25 * EMISSIVE_INTENSITY, 0.5 * EMISSIVE_INTENSITY, EMISSIVE_INTENSITY);
+
+        // Write to HDR scene color
+        if(entityId == 10129) sceneColOut = vertexColor.rgb * lightingCol;
+        else sceneColOut = toLinear(vertexColor.rgb * vertexColor.a) * EMISSIVE_INTENSITY;
     }
 #endif
