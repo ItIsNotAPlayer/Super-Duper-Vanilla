@@ -55,52 +55,52 @@ This along with the `GBUFFERS` macro, are used to identify the quirks in the cur
 This list's purpose is to fully realize the shader pipeline and visualize the flow of data across programs and their purpose.
 
 ### Before Gbuffers
-| Program Macros        | Blend Type  | Program Type | Shading Type | Usage            |
-| --------------------- | ----------- | ------------ | ------------ | ---------------- |
-| PHYSICS_OCEAN_SHADOW  | Solid       | SHADOW       | Shadow       | Physics Mod      |
-| SHADOW_BLOCK          | Solid       | SHADOW       | Shadow       | Iris             |
-| SHADOW_CUTOUT         | Solid       | SHADOW       | Shadow       | Iris/Optifine    |
-| SHADOW_ENTITIES       | Solid       | SHADOW       | Shadow       | Iris             |
-| SHADOW_LIGHTNING      | Solid       | SHADOW       | Disabled     | Iris             |
-| SHADOW_SOLID          | Solid       | SHADOW       | Shadow       | Iris/Optifine    |
-| SHADOW_WATER          | Solid       | SHADOW       | Shadow       | Iris             |
-| SHADOW                | Solid       | SHADOW       | Shadow       | Iris/Optifine    |
+| Program Macros        | Blend Type  | Program Type     | Shading Type | Usage            |
+| --------------------- | ----------- | ---------------- | ------------ | ---------------- |
+| PHYSICS_OCEAN_SHADOW  | Solid       | PHYSICS_SHADOW   | Shadow       | Physics Mod      |
+| SHADOW_BLOCK          | Solid       | SHADOW           | Shadow       | Iris             |
+| SHADOW_CUTOUT         | Solid       | SHADOW           | Shadow       | Iris/Optifine    |
+| SHADOW_ENTITIES       | Solid       | SHADOW           | Shadow       | Iris             |
+| SHADOW_LIGHTNING      | Solid       | SHADOW           | Disabled     | Iris             |
+| SHADOW_SOLID          | Solid       | SHADOW           | Shadow       | Iris/Optifine    |
+| SHADOW_WATER          | Solid       | SHADOW           | Shadow       | Iris             |
+| SHADOW                | Solid       | SHADOW           | Shadow       | Iris/Optifine    |
 
 ### Before Deferred
-| Program Macros        | Blend Type  | Program Type | Shading Type | Usage            |
-| --------------------- | ----------- | ------------ | ------------ | ---------------- |
-| DH_TERRAIN            | Solid       | GBUFFER      | Complex      | Distant Horizons |
-| DH_GENERIC            | Solid       | GBUFFER      | Basic        | Distant Horizons |
-| ARMOR_GLINT           | Add         | GBUFFER      | Simple       | Iris/Optifine    |
-| BASIC                 | Solid       | GBUFFER      | Basic        | Iris/Optifine    |
-| BEACON_BEAM           | Add         | GBUFFER      | Simple       | Iris/Optifine    |
-| DAMAGED_BLOCK         | Solid       | GBUFFER      | Simple       | Iris/Optifine    |
-| LINE                  | Solid       | GBUFFER      | Basic        | Iris/Optifine    |
-| SKY_BASIC             | Solid       | GBUFFER      | Disabled     | Iris/Optifine    |
-| SKY_TEXTURED          | Solid       | GBUFFER      | Simple       | Iris/Optifine    |
-| TERRAIN               | Solid       | GBUFFER      | Complex      | Iris/Optifine    |
-| DEFERRED(0-99)        | None        | DEFERRED     | Post         | Iris/Optifine    |
+| Program Macros        | Blend Type  | Program Type     | Shading Type | Usage            |
+| --------------------- | ----------- | ---------------- | ------------ | ---------------- |
+| DH_TERRAIN            | Solid       | DH_GBUFFERS      | Complex      | Distant Horizons |
+| DH_GENERIC            | Solid       | DH_GBUFFERS      | Basic        | Distant Horizons |
+| ARMOR_GLINT           | Add         | GBUFFER          | Simple       | Iris/Optifine    |
+| BASIC                 | Solid       | GBUFFER          | Basic        | Iris/Optifine    |
+| BEACON_BEAM           | Add         | GBUFFER          | Simple       | Iris/Optifine    |
+| DAMAGED_BLOCK         | Solid       | GBUFFER          | Simple       | Iris/Optifine    |
+| LINE                  | Solid       | GBUFFER          | Basic        | Iris/Optifine    |
+| SKY_BASIC             | Solid       | GBUFFER          | Disabled     | Iris/Optifine    |
+| SKY_TEXTURED          | Solid       | GBUFFER          | Simple       | Iris/Optifine    |
+| TERRAIN               | Solid       | GBUFFER          | Complex      | Iris/Optifine    |
+| DEFERRED(0-99)        | None        | DEFERRED         | Post         | Iris/Optifine    |
 
 ## Mixed
-| Program Macros        | Blend Type  | Program Type | Shading Type | Usage            |
-| --------------------- | ----------- | ------------ | ------------ | ---------------- |
-| PARTICLES             | Transparent | GBUFFER      | Basic        | Iris             |
-| ENTITIES              | Transparent | GBUFFER      | Complex      | Iris/Optifine    |
-| BLOCK                 | Transparent | GBUFFER      | Complex      | Iris/Optifine    |
-| HAND                  | Transparent | GBUFFER      | Complex      | Iris/Optifine    |
+| Program Macros        | Blend Type  | Program Type     | Shading Type | Usage            |
+| --------------------- | ----------- | ---------------- | ------------ | ---------------- |
+| PARTICLES             | Transparent | GBUFFER          | Basic        | Iris             |
+| ENTITIES              | Transparent | GBUFFER          | Complex      | Iris/Optifine    |
+| BLOCK                 | Transparent | GBUFFER          | Complex      | Iris/Optifine    |
+| HAND                  | Transparent | GBUFFER          | Complex      | Iris/Optifine    |
 
 ### Before Composite
-| Program Macros        | Blend Type  | Program Type | Shading Type | Usage            |
-| --------------------- | ----------- | ------------ | ------------ | ---------------- |
-| PHYSICS_OCEAN         | Solid       | GBUFFER      | Complex      | Physics Mod      |
-| DH_WATER              | Transparent | GBUFFER      | Complex      | Distant Horizons |
-| CLOUDS                | Transparent | GBUFFER      | Basic        | Iris/Optifine    |
-| LIGHTNING             | Add         | GBUFFER      | Basic        | Iris             |
-| TEXTURED              | Transparent | GBUFFER      | Basic        | Iris/Optifine    |
-| SPIDER_EYES           | Add         | GBUFFER      | Simple       | Iris/Optifine    |
-| WATER                 | Transparent | GBUFFER      | Complex      | Iris/Optifine    |
-| WEATHER               | Transparent | GBUFFER      | Simple       | Iris/Optifine    |
-| COMPOSITE(0-99)       | None        | COMPOSITE    | Post         | Iris/Optifine    |
+| Program Macros        | Blend Type  | Program Type     | Shading Type | Usage            |
+| --------------------- | ----------- | ---------------- | ------------ | ---------------- |
+| PHYSICS_OCEAN         | Solid       | PHYSICS_GBUFFERS | Complex      | Physics Mod      |
+| DH_WATER              | Transparent | DH_GBUFFERS      | Complex      | Distant Horizons |
+| CLOUDS                | Transparent | GBUFFER          | Basic        | Iris/Optifine    |
+| LIGHTNING             | Add         | GBUFFER          | Basic        | Iris             |
+| TEXTURED              | Transparent | GBUFFER          | Basic        | Iris/Optifine    |
+| SPIDER_EYES           | Add         | GBUFFER          | Simple       | Iris/Optifine    |
+| WATER                 | Transparent | GBUFFER          | Complex      | Iris/Optifine    |
+| WEATHER               | Transparent | GBUFFER          | Simple       | Iris/Optifine    |
+| COMPOSITE(0-99)       | None        | COMPOSITE        | Post         | Iris/Optifine    |
 
 Note to Eldeston: Clarify program names with its purpose.
 
