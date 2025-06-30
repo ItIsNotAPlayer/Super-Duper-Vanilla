@@ -84,7 +84,7 @@
             // Calculate shadow pos in vertex
             vertexShdPos = vec3(shadowProjection[0].x, shadowProjection[1].y, shadowProjection[2].z) * (mat3(shadowModelView) * vertexFeetPlayerPos + shadowModelView[3].xyz);
 			vertexShdPos.z += shadowProjection[3].z;
-
+            
             vertexShdPos.z = vertexShdPos.z * 0.1 + 0.5;
         #endif
 
@@ -105,7 +105,7 @@
 
 #ifdef FRAGMENT
     /* RENDERTARGETS: 4,3 */
-    layout(location = 0) out vec3 sceneColOut; // colortex4
+    layout(location = 0) out vec4 sceneColOut; // colortex4
     layout(location = 1) out vec3 materialDataOut; // colortex3
 
     flat in vec2 lmCoord;
@@ -175,7 +175,7 @@
 
         // Particle emissives
         if((vertexColor.r * 0.5 > vertexColor.g + vertexColor.b || (vertexColor.r + vertexColor.b > vertexColor.g * 2.0 && abs(vertexColor.r - vertexColor.b) < 0.2) || ((albedo.r + albedo.g + albedo.b > 1.6 || (vertexColor.r != vertexColor.g && vertexColor.g != vertexColor.b)) && lmCoord.x == 1)) && atlasSize.x <= 1024 && atlasSize.x > 0){
-            sceneColOut = toLinear(albedo.rgb * vertexColor) * EMISSIVE_INTENSITY;
+            sceneColOut = vec4(toLinear(albedo.rgb * vertexColor) * EMISSIVE_INTENSITY, albedo.a);
             return; // Return immediately, no need for lighting calculation
         }
 
@@ -193,9 +193,9 @@
         albedo.rgb = toLinear(albedo.rgb);
 
         // Apply simple shading
-        sceneColOut = basicShadingForward(albedo.rgb);
+        sceneColOut = vec4(basicShadingForward(albedo.rgb), albedo.a);
 
         // Write material data
-        materialDataOut = vec3(0, 0, 0);
+        materialDataOut = vec3(0, 0, 0.5);
     }
 #endif

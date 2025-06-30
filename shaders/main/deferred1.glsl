@@ -323,5 +323,7 @@
         sceneColOut = ((fogSkyCol - sceneColOut) * fogFactor + sceneColOut) * getFogEffectFactor(viewDist);
         // Clamp scene color to prevent NaNs during post processing
         sceneColOut = max(sceneColOut, vec3(0));
+
+        // sceneColOut = vec3(0);
     }
 #endif

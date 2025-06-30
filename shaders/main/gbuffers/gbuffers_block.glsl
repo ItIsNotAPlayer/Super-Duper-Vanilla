@@ -16,13 +16,12 @@
 /// -------------------------------- /// Vertex Shader /// -------------------------------- ///
 
 #ifdef VERTEX
-    flat out vec3 vertexColor;
-
     flat out mat3 TBN;
 
     out vec2 lmCoord;
     out vec2 texCoord;
 
+    out vec3 vertexColor;
     out vec3 vertexFeetPlayerPos;
 
     #if defined NORMAL_GENERATION || defined PARALLAX_OCCLUSION
@@ -113,18 +112,17 @@
 
 #ifdef FRAGMENT
     /* RENDERTARGETS: 4,1,2,3 */
-    layout(location = 0) out vec3 sceneColOut; // colortex4
+    layout(location = 0) out vec4 sceneColOut; // colortex4
     layout(location = 1) out vec3 normalDataOut; // colortex1
     layout(location = 2) out vec3 albedoDataOut; // colortex2
     layout(location = 3) out vec3 materialDataOut; // colortex3
-
-    flat in vec3 vertexColor;
     
     flat in mat3 TBN;
 
     in vec2 lmCoord;
     in vec2 texCoord;
 
+    in vec3 vertexColor;
     in vec3 vertexFeetPlayerPos;
 
     #if defined NORMAL_GENERATION || defined PARALLAX_OCCLUSION
@@ -215,7 +213,7 @@
             endStarField += textureLod(gtexture, vec2(endStarCoord1.x, endStarCoord1.y + starSpeed), 0).r;
             endStarField += textureLod(gtexture, vec2(-endStarCoord1.x, starSpeed - endStarCoord1.y) * 2.0, 0).r;
 
-            sceneColOut = toLinear((getRng3(ivec2(screenPos * 128.0) & 255) * 0.5 + 0.5) * ((endStarField + 0.0625) * EMISSIVE_INTENSITY) * vertexColor.rgb);
+            sceneColOut = vec4(toLinear((getRng3(ivec2(screenPos * 128.0) & 255) * 0.5 + 0.5) * ((endStarField + 0.0625) * EMISSIVE_INTENSITY) * vertexColor.rgb), 1);
 
             // End portal fix
             normalDataOut = TBN[2];
@@ -232,7 +230,7 @@
         material.albedo.rgb = toLinear(material.albedo.rgb);
 
         // Write to HDR scene color
-        sceneColOut = complexShadingForward(material);
+        sceneColOut = vec4(complexShadingForward(material), material.albedo.a);
 
         // Write buffer datas
         normalDataOut = material.normal;
