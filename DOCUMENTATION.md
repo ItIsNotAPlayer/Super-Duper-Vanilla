@@ -141,7 +141,6 @@ Notes for pending features/bug fixes to be implemented categorized by importance
 ## CURRENT
 * Optimize day and night transition calculations (medium priority)
 
-* Implement portal depth for Nether and End
 * Implement bit packing for optimization
 
 * Improve fog calculation and settings (medium priority)
@@ -153,6 +152,10 @@ Notes for pending features/bug fixes to be implemented categorized by importance
 
 ## DONE
 * Abandon Optifine support (high priority)
-* Fix dragon death beam (medium priority) ?
+
 * Finish programming dh_generic (medium priority)
+
+* Fix dragon death beam (medium priority) ?
 * Fix FXAA, it was broken the whole time (high priority)
+
+* Implement portal depth for Nether and End

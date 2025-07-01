@@ -160,5 +160,7 @@ vec3 complexShadingForward(in dataPBR material){
 		}
 	#endif
 
+	//return vec3(material.emissive * EMISSIVE_INTENSITY);
+
 	return totalLighting;
 }

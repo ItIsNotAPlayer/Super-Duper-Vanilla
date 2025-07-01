@@ -116,8 +116,8 @@ void getPBR(inout dataPBR material, in int id){
 
             // Redstone block
             else if(id == 12303){
-                material.emissive = 0.45;
-                material.smoothness = 0.93 * material.albedo.r;
+                material.emissive = 0.1 * material.albedo.r;
+                material.smoothness = 0.9 * fastSqrt(material.albedo.r);
                 material.metallic = 1.0;
             }
 
@@ -133,6 +133,17 @@ void getPBR(inout dataPBR material, in int id){
             else if(id == 12401){
                 material.smoothness = albedoSum * 0.3 + 0.06;
                 material.metallic = 1.0;
+            }
+
+            // Copper blocks
+            else if(id == 12402 || id == 12403){
+                material.smoothness = maxOf(material.albedo.rg) * 0.96;
+                material.metallic = 1.0;
+
+                if(id == 12403){
+                    // material.emissive = min(1.0, squared(max(0.0, squared(material.albedo.r * material.albedo.g) * (squared(material.albedo.b) * 0.5 + 0.5) - 0.1) * 2.0));
+                    material.emissive = max(0.0, hermiteMix(0.45, 1.0, material.albedo.r * material.albedo.g));
+                }
             }
 
             /// -------------------------------- /// Smooth blocks /// -------------------------------- ///
@@ -202,20 +213,28 @@ void getPBR(inout dataPBR material, in int id){
 
             /// -------------------------------- /// Redstone emissives /// -------------------------------- ///
 
-            else if(id == 12900 || id == 12901){
+            // Redstone components
+            else if(id == 12900){
                 // Redstone stuff
                 if(material.albedo.r > material.albedo.b * 2.4){
                     material.emissive = float(material.albedo.r > 0.5);
-                    material.smoothness = 0.93;
+                    material.smoothness = 0.9;
                     material.metallic = 1.0;
                 }
+            }
 
-                // Rails
-                if(id == 12901){
-                    if(material.albedo.r < material.albedo.g * 1.6 && material.albedo.r < material.albedo.b * 1.6){
-                        material.smoothness = albedoSum * 0.32;
-                        material.metallic = 1.0;
-                    }
+            // Redstone wire
+            else if(id == 12901){
+                material.smoothness = vertexColor.r * 0.45;
+                material.emissive = vertexColor.r * 0.1;
+                material.metallic = 1.0;
+            }
+
+            // Rails
+            else if(id == 12902){
+                if(material.albedo.r < material.albedo.g * 1.6 && material.albedo.r < material.albedo.b * 1.6){
+                    material.smoothness = albedoSum * 0.32;
+                    material.metallic = 1.0;
                 }
             }
 
