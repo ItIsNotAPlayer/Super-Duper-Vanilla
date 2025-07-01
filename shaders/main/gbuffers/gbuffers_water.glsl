@@ -169,6 +169,9 @@
     uniform float nightVision;
     uniform float lightningFlash;
 
+    uniform float near;
+
+    uniform sampler2D depthtex1;
     uniform sampler2D gtexture;
 
     #ifndef FORCE_DISABLE_WEATHER
@@ -177,12 +180,6 @@
 
     #if defined SHADOW_FILTER && ANTI_ALIASING >= 2
         uniform float frameFract;
-    #endif
-
-    #if defined WATER_STYLIZE_ABSORPTION || defined WATER_FOAM
-        uniform float near;
-
-        uniform sampler2D depthtex1;
     #endif
 
     #ifndef FORCE_DISABLE_DAY_CYCLE
@@ -245,47 +242,49 @@
 	    dataPBR material;
         getPBR(material, blockId);
 
-        // Fast depth linearization by DrDesten
-        // Not great, but plausible for most scenarios
-        float blockDepth = near / (1.0 - gl_FragCoord.z) - near / (1.0 - texelFetch(depthtex1, ivec2(gl_FragCoord.xy), 0).x);
-        // Get the depth outline for the end portal
-        float edgeBrightness = exp2((blockDepth + 0.0625) * 8.0);
+        if(blockId == 11102 || blockId == 12100){
+            // Fast depth linearization by DrDesten
+            // Not great, but plausible for most scenarios
+            float blockDepth = near / (1.0 - gl_FragCoord.z) - near / (1.0 - texelFetch(depthtex1, ivec2(gl_FragCoord.xy), 0).x);
+            // Get the depth outline for the end portal
+            float edgeBrightness = exp2((blockDepth + 0.0625) * 8.0);
 
-        // Water
-        if(blockId == 11102){
-            float waterNoise = WATER_BRIGHTNESS;
+            // Water
+            if(blockId == 11102){
+                float waterNoise = WATER_BRIGHTNESS;
 
-            #if defined WATER_NORMAL
-                vec4 waterData = H2NWater(waterNoiseUv).xzyw;
-                material.normal = fastNormalize(waterData.yxz * TBN[2].x + waterData.xyz * TBN[2].y + waterData.xzy * TBN[2].z);
+                #if defined WATER_NORMAL
+                    vec4 waterData = H2NWater(waterNoiseUv).xzyw;
+                    material.normal = fastNormalize(waterData.yxz * TBN[2].x + waterData.xyz * TBN[2].y + waterData.xzy * TBN[2].z);
 
-                #ifdef WATER_NOISE
-                    waterNoise *= squared(0.128 + waterData.w * 0.5);
+                    #ifdef WATER_NOISE
+                        waterNoise *= squared(0.128 + waterData.w * 0.5);
+                    #endif
+                #elif defined WATER_NOISE
+                    float waterData = getCellNoise(waterNoiseUv);
+
+                    waterNoise *= squared(0.128 + waterData * 0.5);
                 #endif
-            #elif defined WATER_NOISE
-                float waterData = getCellNoise(waterNoiseUv);
 
-                waterNoise *= squared(0.128 + waterData * 0.5);
-            #endif
+                #ifdef WATER_STYLIZE_ABSORPTION
+                    if(isEyeInWater == 0){
+                        float depthBrightness = exp2(blockDepth * 0.25);
+                        material.albedo.rgb = material.albedo.rgb * (waterNoise * (1.0 - depthBrightness) + depthBrightness);
+                        material.albedo.a = fastSqrt(material.albedo.a) * (1.0 - depthBrightness);
+                    }
+                    else material.albedo.rgb *= waterNoise;
+                #else
+                    material.albedo.rgb *= waterNoise;
+                #endif
 
-            #ifdef WATER_STYLIZE_ABSORPTION
-                if(isEyeInWater == 0){
-                    float depthBrightness = exp2(blockDepth * 0.25);
-                    material.albedo.rgb = material.albedo.rgb * (waterNoise * (1.0 - depthBrightness) + depthBrightness);
-                    material.albedo.a = fastSqrt(material.albedo.a) * (1.0 - depthBrightness);
-                }
-                else material.albedo.rgb *= waterNoise;
-            #else
-                material.albedo.rgb *= waterNoise;
-            #endif
+                #ifdef WATER_FOAM
+                    material.albedo = min(vec4(1), material.albedo + edgeBrightness);
+                #endif
+            }
 
-            #ifdef WATER_FOAM
-                material.albedo = min(vec4(1), material.albedo + edgeBrightness);
-            #endif
+            // Nether portal
+            else material.albedo.rgb = min(vec3(1), material.albedo.rgb * (0.5 + edgeBrightness * 2.0));
         }
-
-        // Nether portal
-        else if(blockId == 12100) material.albedo.rgb = min(vec3(1), material.albedo.rgb * (0.5 + edgeBrightness * 2.0));
 
         material.albedo.rgb = toLinear(material.albedo.rgb);
 

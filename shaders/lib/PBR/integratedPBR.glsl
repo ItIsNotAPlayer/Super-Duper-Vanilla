@@ -116,7 +116,7 @@ void getPBR(inout dataPBR material, in int id){
 
             // Redstone block
             else if(id == 12303){
-                material.emissive = 0.1 * material.albedo.r;
+                material.emissive = material.albedo.r * 0.25;
                 material.smoothness = 0.9 * fastSqrt(material.albedo.r);
                 material.metallic = 1.0;
             }
@@ -158,7 +158,7 @@ void getPBR(inout dataPBR material, in int id){
             }
 
             // Polished blocks
-            else if(id == 12503) material.smoothness = albedoSum * 0.1998 + 0.4;
+            else if(id == 12503) material.smoothness = maxOf(material.albedo.rgb) * 0.9;
 
             /// -------------------------------- /// Ores /// -------------------------------- ///
 
@@ -217,7 +217,7 @@ void getPBR(inout dataPBR material, in int id){
             else if(id == 12900){
                 // Redstone stuff
                 if(material.albedo.r > material.albedo.b * 2.4){
-                    material.emissive = float(material.albedo.r > 0.5);
+                    material.emissive = float(material.albedo.r > 0.5) * 0.5;
                     material.smoothness = 0.9;
                     material.metallic = 1.0;
                 }
@@ -226,7 +226,7 @@ void getPBR(inout dataPBR material, in int id){
             // Redstone wire
             else if(id == 12901){
                 material.smoothness = vertexColor.r * 0.45;
-                material.emissive = vertexColor.r * 0.1;
+                material.emissive = squared(vertexColor.r) * 0.25;
                 material.metallic = 1.0;
             }
 
