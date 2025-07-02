@@ -16,7 +16,7 @@
 /// -------------------------------- /// Vertex Shader /// -------------------------------- ///
 
 #ifdef VERTEX
-    #if defined FORCE_DISABLE_CLOUDS || defined STORY_MODE_CLOUDS
+    #if defined FORCE_DISABLE_CLOUDS || CLOUD_MODE != 0
         void main(){
             gl_Position = vec4(-10);
         }
@@ -93,7 +93,7 @@
 /// -------------------------------- /// Fragment Shader /// -------------------------------- ///
 
 #ifdef FRAGMENT
-    #if defined FORCE_DISABLE_CLOUDS || defined STORY_MODE_CLOUDS
+    #if defined FORCE_DISABLE_CLOUDS || CLOUD_MODE != 0
         void main(){
             discard; return;
         }

@@ -137,8 +137,14 @@
         uniform float dayCycleAdjust;
     #endif
 
-    #if defined STORY_MODE_CLOUDS && !defined FORCE_DISABLE_CLOUDS
+    #if CLOUD_MODE != 0 && !defined FORCE_DISABLE_CLOUDS
         uniform sampler2D colortex0;
+
+        #if CLOUD_MODE == 2
+            uniform float far;
+
+            #include "/lib/atmospherics/clouds.glsl"
+        #endif
     #endif
 
     #ifdef DISTANT_HORIZONS
@@ -282,6 +288,28 @@
             // Apply volumetric light
             if(VOLUMETRIC_LIGHTING_STRENGTH != 0 && isEyeInWater != 2)
                 sceneColOut += getVolumetricLight(feetPlayerPos, fogFactor, borderFog, screenPos.z, dither.x);
+        #endif
+
+        #if CLOUD_MODE == 2 && !defined FORCE_DISABLE_CLOUDS
+            vec3 cloudStartPos = vec3(cameraPosition.x - fragmentFrameTime, cameraPosition.y - cloudHeight0, cameraPosition.z);
+
+            vec2 cloudData = volumetricClouds(feetPlayerPos, cloudStartPos, dither.x, depth == 1.0);
+
+            #ifdef DYNAMIC_CLOUDS
+                float fadeTime = saturate(sin(fragmentFrameTime * FADE_SPEED) * 0.8 + 0.5);
+
+                float cloudFinal = mix(mix(cloudData.x, cloudData.y, fadeTime), max(cloudData.x, cloudData.y), rainStrength);
+            #else
+                float cloudFinal = mix(cloudData.x, max(cloudData.x, cloudData.y), rainStrength);
+            #endif
+
+            sceneColOut *= 1.0 - cloudFinal;
+
+            #ifdef FORCE_DISABLE_DAY_CYCLE
+                sceneColOut += (lightCol + skyCol) * cloudFinal;
+            #else
+                sceneColOut += (mix(moonCol, sunCol, dayCycleAdjust) + skyCol) * cloudFinal;
+            #endif
         #endif
 
         // Clamp scene color to prevent NaNs during post processing

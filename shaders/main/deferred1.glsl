@@ -143,8 +143,14 @@
         uniform float dayCycleAdjust;
     #endif
 
-    #if defined STORY_MODE_CLOUDS && !defined FORCE_DISABLE_CLOUDS
+    #if CLOUD_MODE != 0 && !defined FORCE_DISABLE_CLOUDS
         uniform sampler2D colortex0;
+
+        #if CLOUD_MODE == 2
+            uniform float far;
+
+            #include "/lib/atmospherics/clouds.glsl"
+        #endif
     #endif
 
     #ifdef DISTANT_HORIZONS

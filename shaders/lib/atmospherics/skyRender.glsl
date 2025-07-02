@@ -11,7 +11,7 @@ float getSunMoonShape(in vec2 skyPos){
     return min(1.0, exp2((WORLD_SUN_MOON_SIZE - pow(abs(skyPos.x * skyPos.x * skyPos.x) + abs(skyPos.y * skyPos.y * skyPos.y), 0.33333333)) * 256.0));
 }
 
-#if defined STORY_MODE_CLOUDS && !defined FORCE_DISABLE_CLOUDS
+#if CLOUD_MODE == 1 && !defined FORCE_DISABLE_CLOUDS
     // Depth size / cloud steps
     const uint cloudSteps = uint(CLOUD_STEPS);
     const float cloudStepSize = 1.0 / cloudSteps;
@@ -111,7 +111,7 @@ vec3 getSkyHalf(in vec3 nEyePlayerPos, in vec3 skyPos, in vec3 currSkyCol){
         #endif
     #endif
 
-    #if defined STORY_MODE_CLOUDS && !defined FORCE_DISABLE_CLOUDS && defined WORLD_LIGHT
+    #if CLOUD_MODE == 1 && !defined FORCE_DISABLE_CLOUDS && defined WORLD_LIGHT
         float cloudHeightFade = nEyePlayerPos.y - 0.1;
 
         #ifdef FORCE_DISABLE_WEATHER
