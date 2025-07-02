@@ -1,4 +1,4 @@
-## Language format v1.0.5
+## Language format v1.0.6
 ## All other .lang files must update to the latest language format version on this main .lang file
 
 ## Profiles
@@ -95,13 +95,17 @@ screen.ATMOSPHERICS = Atmospherics
         value.SUN_MOON_TYPE.0 = Default
         value.SUN_MOON_TYPE.1 = Round
         value.SUN_MOON_TYPE.2 = Vanilla
+    
+    option.CLOUD_MODE = Cloud mode
+        value.CLOUD_MODE.0 = Vanilla
+        value.CLOUD_MODE.1 = Skybox
+        value.CLOUD_MODE.2 = Volumetric
 
     option.SUN_MOON_INTENSITY = Sun/moon intensity
     option.VOLUMETRIC_LIGHTING = Volumetric lighting
     option.VOLUMETRIC_LIGHTING_STRENGTH = Volumetric lighting strength
     option.BORDER_FOG = Border fog
     option.GROUND_FOG_STRENGTH = Ground fog strength
-    option.STORY_MODE_CLOUDS = Story mode clouds
     option.DOUBLE_LAYERED_CLOUDS = Double layered clouds
     option.DYNAMIC_CLOUDS = Dynamic clouds
     option.FADE_SPEED = Fade speed
