@@ -1,3 +1,5 @@
+const uint cloudSteps = uint(CLOUD_STEPS);
+
 const float cloudHeight0 = 195.0;
 
 #ifdef DOUBLE_LAYERED_CLOUDS
@@ -29,7 +31,7 @@ vec2 volumetricClouds(in vec3 feetPlayerPos, in vec3 cameraPos, in float dither,
     if(furthestPlane < 0) return vec2(0);
 
     // Calculate cloud steps that dynamically increase with distance
-    uint volumetricCloudSteps = min(uint(furthestPlane - nearestPlane), 64u);
+    uint volumetricCloudSteps = min(uint(furthestPlane - nearestPlane), cloudSteps);
     float volumetricCloudStepsInverse = 1.0 / volumetricCloudSteps;
 
     vec3 lowerPlane = cameraPos + nFeetPlayerPos * nearestPlane;
