@@ -143,7 +143,7 @@
         #if CLOUD_MODE == 2
             uniform float far;
 
-            #include "/lib/atmospherics/clouds.glsl"
+            #include "/lib/rayTracing/volumetricClouds.glsl"
         #endif
     #endif
 
@@ -187,7 +187,7 @@
             #include "/lib/lighting/shdMapping.glsl"
         #endif
 
-        #include "/lib/rayTracing/volLight.glsl"
+        #include "/lib/rayTracing/volumetricLight.glsl"
     #endif
 
     #include "/lib/utility/depthTex.glsl"
@@ -248,7 +248,7 @@
         vec3 nEyePlayerPos = eyePlayerPos * viewDotInvSqrt;
 
         // Get fog factor
-        float fogFactor = getFogFactor(viewDist, nEyePlayerPos.y, eyePlayerPos.y + gbufferModelViewInverse[3].y + cameraPosition.y);
+        float fogFactor = getFogFactor(viewDist, nEyePlayerPos.y, feetPlayerPos.y + cameraPosition.y);
 
         // Border fog
         #ifdef BORDER_FOG
@@ -284,16 +284,26 @@
         // Apply darkness pulsing effect
         sceneColOut *= 1.0 - darknessLightFactor;
 
+        #if defined WORLD_LIGHT || !defined FORCE_DISABLE_CLOUDS && CLOUD_MODE == 2
+            bool isSky = depth == 1.0;
+
+            float feetPlayerDot = lengthSquared(feetPlayerPos);
+            float feetPlayerDotInvSqrt = inversesqrt(feetPlayerDot);
+            float feetPlayerDist = feetPlayerDot * feetPlayerDotInvSqrt;
+
+            vec3 nFeetPlayerPos = feetPlayerPos * feetPlayerDotInvSqrt;
+        #endif
+
         #ifdef WORLD_LIGHT
             // Apply volumetric light
             if(VOLUMETRIC_LIGHTING_STRENGTH != 0 && isEyeInWater != 2)
-                sceneColOut += getVolumetricLight(feetPlayerPos, fogFactor, borderFog, screenPos.z, dither.x);
+                sceneColOut += getVolumetricLight(nFeetPlayerPos, feetPlayerDist, fogFactor, borderFog, dither.x, isSky);
         #endif
 
-        #if CLOUD_MODE == 2 && !defined FORCE_DISABLE_CLOUDS
+        #if !defined FORCE_DISABLE_CLOUDS && CLOUD_MODE == 2
             vec3 cloudStartPos = vec3(cameraPosition.x - fragmentFrameTime, cameraPosition.y - cloudHeight0, cameraPosition.z);
 
-            vec2 cloudData = volumetricClouds(feetPlayerPos, cloudStartPos, dither.x, depth == 1.0);
+            vec2 cloudData = volumetricClouds(nFeetPlayerPos, cloudStartPos, feetPlayerDist, dither.x, isSky);
 
             #ifdef DYNAMIC_CLOUDS
                 float fadeTime = saturate(sin(fragmentFrameTime * FADE_SPEED) * 0.8 + 0.5);

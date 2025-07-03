@@ -2,13 +2,7 @@
 
 const float volumetricStepsInverse = 1.0 / VOLUMETRIC_LIGHT_STEPS;
 
-vec3 getVolumetricLight(in vec3 feetPlayerPos, in float fogFactor, in float borderFog, in float depth, in float dither){
-	float feetPlayerDot = lengthSquared(feetPlayerPos);
-	float feetPlayerDotInvSqrt = inversesqrt(feetPlayerDot);
-	float feetPlayerDist = feetPlayerDot * feetPlayerDotInvSqrt;
-
-	vec3 nFeetPlayerPos = feetPlayerPos * feetPlayerDotInvSqrt;
-
+vec3 getVolumetricLight(in vec3 nFeetPlayerPos, in float feetPlayerDist, in float fogFactor, in float borderFog, in float dither, in bool isSky){
 	float totalFogDensity = FOG_TOTAL_DENSITY;
 
 	#ifdef FORCE_DISABLE_WEATHER
@@ -22,7 +16,7 @@ vec3 getVolumetricLight(in vec3 feetPlayerPos, in float fogFactor, in float bord
 	// Fade VL, but do not apply to underwater VL
 	if(isEyeInWater == 0 && nFeetPlayerPos.y > 0){
 		heightFade = squared(squared(1.0 - squared(nFeetPlayerPos.y)));
-		if(depth == 1) heightFade *= heightFade;
+		if(isSky) heightFade *= heightFade;
 
 		#ifndef WORLD_CUSTOM_SKYLIGHT
 			#ifndef FORCE_DISABLE_WEATHER
