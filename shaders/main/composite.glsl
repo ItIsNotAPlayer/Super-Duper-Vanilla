@@ -318,7 +318,7 @@
             #ifdef FORCE_DISABLE_DAY_CYCLE
                 sceneColOut += (lightCol + skyCol) * cloudFinal;
             #else
-                sceneColOut += (mix(moonCol, sunCol, dayCycleAdjust) + skyCol) * cloudFinal;
+                sceneColOut += ((toLinear(nightVision * 0.5 + AMBIENT_LIGHTING) + lightningFlash) + mix(moonCol, sunCol, dayCycleAdjust) + skyCol) * cloudFinal;
             #endif
         #endif
 
