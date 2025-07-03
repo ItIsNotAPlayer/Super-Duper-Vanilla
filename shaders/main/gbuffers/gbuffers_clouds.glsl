@@ -21,27 +21,11 @@
             gl_Position = vec4(-10);
         }
     #else
-        flat out float vertexAlpha;
+        out float cloudGradient;
 
-        #ifdef WORLD_LIGHT
-            flat out float vertexNLZ;
+        uniform vec3 cameraPosition;
 
-            #ifdef SHADOW_MAPPING
-                out vec3 vertexShdPos;
-            #endif
-        #endif
-
-        #if defined SHADOW_MAPPING && defined WORLD_LIGHT
-            uniform mat4 gbufferModelViewInverse;
-        #endif
-
-        #ifdef WORLD_LIGHT
-            uniform mat4 shadowModelView;
-
-            #ifdef SHADOW_MAPPING
-                uniform mat4 shadowProjection;
-            #endif
-        #endif
+        uniform mat4 gbufferModelViewInverse;
 
         #if ANTI_ALIASING == 2
             uniform int frameMod;
@@ -53,28 +37,13 @@
         #endif
 
         void main(){
-            // Get vertex alpha and emissive
-            vertexAlpha = gl_Color.a;
-
             // Get vertex view position
             vec3 vertexViewPos = mat3(gl_ModelViewMatrix) * gl_Vertex.xyz + gl_ModelViewMatrix[3].xyz;
+            // Get vertex feet player position
+            vec3 vertexFeetPlayerPos = mat3(gbufferModelViewInverse) * vertexViewPos + gbufferModelViewInverse[3].xyz;
 
-            #ifdef WORLD_LIGHT
-                vec3 vertexNormal = mat3(gbufferModelViewInverse) * fastNormalize(gl_NormalMatrix * gl_Normal);
-
-                vertexNLZ = dot(vertexNormal, vec3(shadowModelView[0].z, shadowModelView[1].z, shadowModelView[2].z));
-
-                #ifdef SHADOW_MAPPING
-                    // Get vertex feet player position
-                    vec3 vertexFeetPlayerPos = mat3(gbufferModelViewInverse) * vertexViewPos + gbufferModelViewInverse[3].xyz;
-
-                    // Calculate shadow pos in vertex
-                    vertexShdPos = vec3(shadowProjection[0].x, shadowProjection[1].y, shadowProjection[2].z) * (mat3(shadowModelView) * vertexFeetPlayerPos + shadowModelView[3].xyz);
-                    vertexShdPos.z += shadowProjection[3].z;
-                    
-                    vertexShdPos.z = vertexShdPos.z * 0.1 + 0.5;
-                #endif
-            #endif
+            // Cloud gradiante' *spanish accent*
+            cloudGradient = saturate((196.5 - vertexFeetPlayerPos.y - cameraPosition.y) * 0.25);
 
             // Convert to clip position and output as final position
             // gl_Position = gl_ProjectionMatrix * vertexViewPos;
@@ -98,30 +67,13 @@
             discard; return;
         }
     #else
-        /* RENDERTARGETS: 4,3 */
-        layout(location = 0) out vec4 sceneColOut; // colortex4
-        layout(location = 1) out vec3 materialDataOut; // colortex3
+        /* RENDERTARGETS: 4 */
+        layout(location = 0) out vec3 sceneColOut; // colortex4
 
-        flat in float vertexAlpha;
-
-        #ifdef WORLD_LIGHT
-            flat in float vertexNLZ;
-
-            #ifdef SHADOW_MAPPING
-                in vec3 vertexShdPos;
-            #endif
-        #endif
+        in float cloudGradient;
 
         uniform float nightVision;
         uniform float lightningFlash;
-
-        #ifndef FORCE_DISABLE_WEATHER
-            uniform float rainStrength;
-        #endif
-
-        #if defined SHADOW_FILTER && ANTI_ALIASING >= 2
-            uniform float frameFract;
-        #endif
 
         #ifndef FORCE_DISABLE_DAY_CYCLE
             uniform float dayCycle;
@@ -132,35 +84,9 @@
             uniform vec3 fogColor;
         #endif
 
-        #ifdef WORLD_LIGHT
-            uniform float shdFade;
-
-            #ifdef SHADOW_MAPPING
-                #ifdef SHADOW_FILTER
-                    #include "/lib/utility/noiseFunctions.glsl"
-                #endif
-
-                #include "/lib/lighting/shdMapping.glsl"
-            #endif
-        #endif
-
-        #include "/lib/lighting/basicShadingForward.glsl"
-
         void main(){
-            // Alpha test, discard and return immediately
-            if(vertexAlpha < ALPHA_THRESHOLD){ discard; return; }
-
-            #if COLOR_MODE == 2
-                vec4 albedo = vec4(0, 0, 0, vertexAlpha);
-            #else
-                vec4 albedo = vec4(1, 1, 1, vertexAlpha);
-            #endif
-
             // Apply simple shading
-            sceneColOut = vec4(basicShadingForward(albedo.rgb), albedo.a);
-
-            // Write material data
-            materialDataOut = vec3(0, 0, 0.5);
+            sceneColOut = (toLinear(nightVision * 0.5 + AMBIENT_LIGHTING) + lightningFlash) + toLinear(SKY_COLOR_DATA_BLOCK) + toLinear(LIGHT_COLOR_DATA_BLOCK0) * squared(cloudGradient);
         }
     #endif
 #endif

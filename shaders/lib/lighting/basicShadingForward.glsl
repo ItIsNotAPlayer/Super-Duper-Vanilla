@@ -5,15 +5,13 @@ vec3 basicShadingForward(in vec3 albedo){
 	// Calculate thunder flash
 	totalDiffuse += lightningFlash;
 
-	#ifndef CLOUDS
-		// Get sky light squared
-		float skyLightSquared = squared(lmCoord.y);
-		// Occlude the appled sky and thunder flash calculation by sky light amount
-		totalDiffuse *= skyLightSquared;
+	// Get sky light squared
+	float skyLightSquared = squared(lmCoord.y);
+	// Occlude the appled sky and thunder flash calculation by sky light amount
+	totalDiffuse *= skyLightSquared;
 
-		// Calculate block light
-		totalDiffuse += toLinear(squared(lmCoord.x) * blockLightColor * 1.25);
-	#endif
+	// Calculate block light
+	totalDiffuse += toLinear(squared(lmCoord.x) * blockLightColor * 1.25);
 
 	// Lastly, calculate ambient lightning
 	totalDiffuse += toLinear(nightVision * 0.5 + AMBIENT_LIGHTING);
@@ -36,35 +34,18 @@ vec3 basicShadingForward(in vec3 albedo){
 				vec3 shdCol = getShdCol(shdPos);
 			#endif
 
-			// Cave light leak fix
-			float shdFactor = shdFade;
-
-			#ifdef CLOUDS
-				// Apply simple diffuse for clouds
-				shdFactor *= max(0.0, vertexNLZ * 0.6 + 0.4);
-			#endif
-
-			shdCol *= shdFactor;
+			shdCol *= shdFade;
 		#else
-			#ifdef CLOUDS
-				// Apply simple diffuse for clouds
-				float shdCol = max(0.0, vertexNLZ * 0.6 + 0.4) * shdFade;
-			#else
-				// Sample fake shadows
-				float shdCol = saturate(hermiteMix(0.9, 1.0, lmCoord.y)) * shdFade;
-			#endif
+			// Sample fake shadows
+			float shdCol = saturate(hermiteMix(0.9, 1.0, lmCoord.y)) * shdFade;
 		#endif
 
 		#ifndef FORCE_DISABLE_WEATHER
 			// Approximate rain diffusing light shadow
 			float rainDiffuseAmount = rainStrength * 0.5;
-			shdCol *= 1.0 - rainDiffuseAmount;
 
-			#ifdef CLOUDS
-				shdCol += rainDiffuseAmount;
-			#else
-				shdCol += rainDiffuseAmount * skyLightSquared;
-			#endif
+			shdCol *= 1.0 - rainDiffuseAmount;
+			shdCol += rainDiffuseAmount * skyLightSquared;
 		#endif
 
 		// Calculate and add shadow diffuse
