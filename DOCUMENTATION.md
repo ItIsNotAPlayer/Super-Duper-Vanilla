@@ -94,7 +94,7 @@ This list's purpose is to fully realize the shader pipeline and visualize the fl
 | --------------------- | ----------- | ---------------- | ------------ | ---------------- |
 | PHYSICS_OCEAN         | Solid       | PHYSICS_GBUFFERS | Complex      | Physics Mod      |
 | DH_WATER              | Transparent | DH_GBUFFERS      | Complex      | Distant Horizons |
-| CLOUDS                | Transparent | GBUFFER          | Basic        | Iris/Optifine    |
+| CLOUDS                | Transparent | GBUFFER          | Simple       | Iris/Optifine    |
 | LIGHTNING             | Add         | GBUFFER          | Basic        | Iris             |
 | TEXTURED              | Transparent | GBUFFER          | Basic        | Iris/Optifine    |
 | SPIDER_EYES           | Add         | GBUFFER          | Simple       | Iris/Optifine    |

@@ -1,14 +1,7 @@
 const uint cloudSteps = uint(VOLUMETRIC_CLOUD_STEPS);
 
-const float cloudHeight0 = 195.0;
-
-#ifdef DOUBLE_LAYERED_CLOUDS
-    const float cloudHeight1 = SECOND_CLOUD_HEIGHT;
-#else
-    const float cloudHeight1 = 0.0;
-#endif
-
-const float cloudThickness0 = VOLUMETRIC_CLOUD_DEPTH;
+const float volumetricCenterDepth = VOLUMETRIC_CLOUD_DEPTH * 0.5;
+const float volumetricCloudHeight = 195.0 + volumetricCenterDepth;
 
 // This took me a while to finally understand how this all works
 vec2 volumetricClouds(in vec3 nFeetPlayerPos, in vec3 cameraPos, in float feetPlayerDist, in float dither, in bool isSky){
@@ -18,8 +11,8 @@ vec2 volumetricClouds(in vec3 nFeetPlayerPos, in vec3 cameraPos, in float feetPl
     // If terrain, caps distance to the minimum cloud distance
     if(!isSky) cloudFar = min(cloudFar, feetPlayerDist);
 
-    float lowerBoundDist = (-cloudThickness0 - cameraPos.y) / nFeetPlayerPos.y;
-    float higherBoundDist = (cloudHeight1 - cameraPos.y) / nFeetPlayerPos.y;
+    float lowerBoundDist = (-VOLUMETRIC_CLOUD_DEPTH - cameraPos.y) / nFeetPlayerPos.y;
+    float higherBoundDist = -cameraPos.y / nFeetPlayerPos.y;
 
     float nearestPlane = max(min(lowerBoundDist, higherBoundDist), 0.0);
 	float furthestPlane = min(cloudFar, max(lowerBoundDist, higherBoundDist));
@@ -27,18 +20,18 @@ vec2 volumetricClouds(in vec3 nFeetPlayerPos, in vec3 cameraPos, in float feetPl
     // If the clouds are outside the bounding box, return nothing
     if(furthestPlane < 0) return vec2(0);
 
+    // Get distance inside the cloud
+    float distInsideCloud = furthestPlane - nearestPlane;
+
     // Calculate cloud steps that dynamically increase with distance
-    uint volumetricCloudSteps = min(uint(furthestPlane - nearestPlane), cloudSteps);
+    uint volumetricCloudSteps = min(uint(distInsideCloud), cloudSteps);
     float volumetricCloudStepsInverse = 1.0 / volumetricCloudSteps;
 
-    vec3 lowerPlane = cameraPos + nFeetPlayerPos * nearestPlane;
-    vec3 upperPlane = cameraPos + nFeetPlayerPos * furthestPlane;
-
-    // Multiply by volumetricCloudStepsInverse to get the step size
-    vec3 endPos = (upperPlane - lowerPlane) * volumetricCloudStepsInverse;
+    // Multiply by volumetricCloudStepsInverse to get the step size and scale with distance
+    vec3 endPos = nFeetPlayerPos * (distInsideCloud * volumetricCloudStepsInverse);
 
     // Camera position as its start position
-    vec3 startPos = lowerPlane + endPos * dither;
+    vec3 startPos = (cameraPos + nFeetPlayerPos * nearestPlane) + endPos * dither;
 
     // To store the cloud data for 2 cloud layers
     vec2 clouds = vec2(0);
@@ -51,26 +44,12 @@ vec2 volumetricClouds(in vec3 nFeetPlayerPos, in vec3 cameraPos, in float feetPl
         // Get cloud texture
         vec2 cloudData = texelFetch(colortex0, ivec2(startPos.xz * 0.0625) & 255, 0).xy;
 
-        // First cloud layer
-        if(startPos.y <= cloudThickness0){
-            float cloudFade = -startPos.y * 0.125;
-            // Check if ray is inside a cloud
-            if(cloudData.x < 0.5) clouds.x = max(clouds.x, cloudFade * cloudFog);
-            if(cloudData.y < 0.5) clouds.y = max(clouds.y, cloudFade * cloudFog);
-        }
+        // Cloud gradiante'
+        float cloudFade = -startPos.y * 0.125;
 
-        #ifdef DOUBLE_LAYERED_CLOUDS
-            // Get second cloud height
-            float doubleCloudHeightY = startPos.y - cloudHeight1;
-
-            // Second cloud layer
-            if(doubleCloudHeightY >= -cloudThickness0){
-                float cloudFade = -doubleCloudHeightY * 0.125;
-                // Swap to to variate
-                if(cloudData.x < 0.5) clouds.y = max(clouds.y, cloudFade * cloudFog);
-                if(cloudData.y < 0.5) clouds.x = max(clouds.x, cloudFade * cloudFog);
-            }
-        #endif
+        // Check if ray is inside a cloud
+        if(cloudData.x < 0.5) clouds.x = max(clouds.x, cloudFade * cloudFog);
+        if(cloudData.y < 0.5) clouds.y = max(clouds.y, cloudFade * cloudFog);
 
         // Continue tracing
         startPos += endPos;

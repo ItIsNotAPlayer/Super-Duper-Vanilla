@@ -301,9 +301,20 @@
         #endif
 
         #if !defined FORCE_DISABLE_CLOUDS && CLOUD_MODE == 2
-            vec3 cloudStartPos = vec3(cameraPosition.x - fragmentFrameTime, cameraPosition.y - cloudHeight0, cameraPosition.z);
+            // Get the 1st layer of volumetric clouds position
+            // Note that the clouds needs to move westward just as in vanilla
+            vec3 cloudStartPos0 = vec3(cameraPosition.x + fragmentFrameTime, cameraPosition.y - volumetricCloudHeight, cameraPosition.z);
 
-            vec2 cloudData = volumetricClouds(nFeetPlayerPos, cloudStartPos, feetPlayerDist, dither.x, isSky);
+            // Get the volumetric clouds
+            vec2 cloudData = volumetricClouds(nFeetPlayerPos, cloudStartPos0, feetPlayerDist, dither.x, isSky);
+
+            #ifdef DOUBLE_LAYERED_CLOUDS
+                // Get the 2nd layer of volumetric clouds position by reusing the 1st layer's position
+                vec3 cloudStartPos1 = vec3(cloudStartPos0.x, cloudStartPos0.y - SECOND_CLOUD_HEIGHT, cloudStartPos0.z);
+
+                // Variate by swizzling the 2 cloud channels
+                cloudData = max(volumetricClouds(nFeetPlayerPos, cloudStartPos1, feetPlayerDist, dither.x, isSky).yx, cloudData);
+            #endif
 
             #ifdef DYNAMIC_CLOUDS
                 float fadeTime = saturate(sin(fragmentFrameTime * FADE_SPEED) * 0.8 + 0.5);
@@ -316,7 +327,7 @@
             sceneColOut *= 1.0 - cloudFinal;
 
             #ifdef FORCE_DISABLE_DAY_CYCLE
-                sceneColOut += (lightCol + skyCol) * cloudFinal;
+                sceneColOut += ((toLinear(nightVision * 0.5 + AMBIENT_LIGHTING) + lightningFlash) + lightCol + skyCol) * cloudFinal;
             #else
                 sceneColOut += ((toLinear(nightVision * 0.5 + AMBIENT_LIGHTING) + lightningFlash) + mix(moonCol, sunCol, dayCycleAdjust) + skyCol) * cloudFinal;
             #endif
