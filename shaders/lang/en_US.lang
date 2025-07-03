@@ -1,4 +1,4 @@
-## Language format v1.0.6
+## Language format v1.0.7
 ## All other .lang files must update to the latest language format version on this main .lang file
 
 ## Profiles
@@ -106,12 +106,18 @@ screen.ATMOSPHERICS = Atmospherics
     option.VOLUMETRIC_LIGHTING_STRENGTH = Volumetric lighting strength
     option.BORDER_FOG = Border fog
     option.GROUND_FOG_STRENGTH = Ground fog strength
-    option.DOUBLE_LAYERED_CLOUDS = Double layered clouds
-    option.DYNAMIC_CLOUDS = Dynamic clouds
-    option.FADE_SPEED = Fade speed
-    option.CLOUD_STEPS = Cloud steps
-    option.CLOUD_DEPTH = Cloud depth
-    option.SECOND_CLOUD_HEIGHT = 2nd cloud height
+
+    screen.CLOUD_SETTINGS = Cloud settings
+        option.DOUBLE_LAYERED_CLOUDS = Double layered clouds
+        option.DYNAMIC_CLOUDS = Dynamic clouds
+        option.FADE_SPEED = Fade speed
+        option.SECOND_CLOUD_HEIGHT = 2nd cloud height
+
+        option.VOLUMETRIC_CLOUD_STEPS = Volumetric steps
+        option.VOLUMETRIC_CLOUD_DEPTH = Volumetric depth
+        option.SKYBOX_CLOUD_STEPS = Skybox steps
+        option.SKYBOX_CLOUD_DEPTH = Skybox depth
+    
     option.SKYBOX_BRIGHTNESS = Skybox brightness
 
 screen.WORLD = World
