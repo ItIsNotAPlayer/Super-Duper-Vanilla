@@ -15,7 +15,7 @@ float getSunMoonShape(in vec2 skyPos){
     // Depth size / cloud steps
     const uint cloudSteps = uint(SKYBOX_CLOUD_STEPS);
     const float cloudStepSize = 1.0 / cloudSteps;
-    const float depthSize = VOLUMETRIC_DEPTH * cloudStepSize;
+    const float depthSize = SKYBOX_CLOUD_DEPTH * cloudStepSize;
 
     uint cloudParallax(in vec2 start, in float time){
         // Apply depth size
