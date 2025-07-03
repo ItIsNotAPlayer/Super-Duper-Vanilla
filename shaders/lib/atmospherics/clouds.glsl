@@ -1,4 +1,4 @@
-const uint cloudSteps = uint(CLOUD_STEPS);
+const uint cloudSteps = uint(VOLUMETRIC_CLOUD_STEPS);
 
 const float cloudHeight0 = 195.0;
 
@@ -8,7 +8,7 @@ const float cloudHeight0 = 195.0;
     const float cloudHeight1 = 0.0;
 #endif
 
-const float cloudThickness0 = 8.0;
+const float cloudThickness0 = VOLUMETRIC_CLOUD_DEPTH;
 
 // This took me a while to finally understand how this all works
 vec2 volumetricClouds(in vec3 feetPlayerPos, in vec3 cameraPos, in float dither, in bool isSky){
@@ -65,7 +65,7 @@ vec2 volumetricClouds(in vec3 feetPlayerPos, in vec3 cameraPos, in float dither,
 
         #ifdef DOUBLE_LAYERED_CLOUDS
             // Get second cloud height
-            float doubleCloudHeightY = startPos.y - 128.0;
+            float doubleCloudHeightY = startPos.y - cloudHeight1;
 
             // Second cloud layer
             if(doubleCloudHeightY >= -cloudThickness0){
