@@ -98,8 +98,6 @@
         if(albedo.a < ALPHA_THRESHOLD){ discard; return; }
 
         // Convert to linear space
-        albedo.rgb = toLinear(albedo.rgb);
-
-        sceneColOut = albedo.rgb * vertexAlpha;
+        sceneColOut = toLinear(albedo.rgb * albedo.a * vertexAlpha);
     }
 #endif
