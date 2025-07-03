@@ -141,7 +141,7 @@
         uniform sampler2D colortex0;
 
         #if CLOUD_MODE == 2
-            uniform float far;
+            uniform float volumetricCloudFar;
 
             #include "/lib/rayTracing/volumetricClouds.glsl"
         #endif

@@ -5,11 +5,8 @@ const float volumetricCloudHeight = 195.0 + volumetricCenterDepth;
 
 // This took me a while to finally understand how this all works
 vec2 volumetricClouds(in vec3 nFeetPlayerPos, in vec3 cameraPos, in float feetPlayerDist, in float dither, in bool isSky){
-    // Minimum cloud distance
-    float cloudFar = far * 8.0;
-
-    // If terrain, caps distance to the minimum cloud distance
-    if(!isSky) cloudFar = min(cloudFar, feetPlayerDist);
+    // Minimum cloud distance, if terrain, caps distance to the minimum cloud distance
+    float cloudFar = isSky ? volumetricCloudFar : min(volumetricCloudFar, feetPlayerDist);
 
     float lowerBoundDist = (-VOLUMETRIC_CLOUD_DEPTH - cameraPos.y) / nFeetPlayerPos.y;
     float higherBoundDist = -cameraPos.y / nFeetPlayerPos.y;
@@ -39,7 +36,7 @@ vec2 volumetricClouds(in vec3 nFeetPlayerPos, in vec3 cameraPos, in float feetPl
     // LESSS GOOOOO RAT RACING!!!11!!11!!11!!
     for(uint i = 0u; i < uint(volumetricCloudSteps); i++){
         // Get cloud fog
-        float cloudFog = exp2(-exp2(length(startPos - cameraPos) / cloudFar * 21.0 - 18.0));
+        float cloudFog = 1.0 - lengthSquared(startPos - cameraPos) / squared(cloudFar);
 
         // Get cloud texture
         vec2 cloudData = texelFetch(colortex0, ivec2(startPos.xz * 0.0625) & 255, 0).xy;
