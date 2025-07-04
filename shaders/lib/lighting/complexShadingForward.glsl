@@ -81,12 +81,12 @@ vec3 complexShadingForward(in dataPBR material){
 				// Sample shadows
 				#ifdef SHADOW_FILTER
 					#if ANTI_ALIASING >= 2
-						float blueNoise = fract(texelFetch(noisetex, ivec2(gl_FragCoord.xy) & 255, 0).x + frameFract);
+						float dither = fract(texelFetch(noisetex, ivec2(gl_FragCoord.xy) & 255, 0).x + frameFract);
 					#else
-						float blueNoise = texelFetch(noisetex, ivec2(gl_FragCoord.xy) & 255, 0).x;
+						float dither = texelFetch(noisetex, ivec2(gl_FragCoord.xy) & 255, 0).x;
 					#endif
 
-					shdCol = getShdCol(shdPos, blueNoise * TAU);
+					shdCol = getShdCol(shdPos, dither * TAU);
 				#else
 					shdCol = getShdCol(shdPos);
 				#endif

@@ -1,4 +1,4 @@
-const uint cloudSteps = uint(VOLUMETRIC_CLOUD_STEPS);
+const uint volumetricCloudSteps = uint(VOLUMETRIC_CLOUD_STEPS);
 
 const float volumetricCenterDepth = VOLUMETRIC_CLOUD_DEPTH * 0.5;
 const float volumetricCloudHeight = 195.0 + volumetricCenterDepth;
@@ -21,7 +21,7 @@ vec2 volumetricClouds(in vec3 nFeetPlayerPos, in vec3 cameraPos, in float feetPl
     float distInsideCloud = furthestPlane - nearestPlane;
 
     // Calculate cloud steps that dynamically increase with distance
-    uint volumetricCloudSteps = min(uint(distInsideCloud), cloudSteps);
+    uint volumetricCloudSteps = min(uint(distInsideCloud), volumetricCloudSteps);
     float volumetricCloudStepsInverse = 1.0 / volumetricCloudSteps;
 
     // Multiply by volumetricCloudStepsInverse to get the step size and scale with distance

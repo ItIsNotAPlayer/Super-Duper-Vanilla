@@ -24,12 +24,12 @@ vec3 basicShadingForward(in vec3 albedo){
 			// Sample shadows
 			#ifdef SHADOW_FILTER
 				#if ANTI_ALIASING >= 2
-					float blueNoise = fract(texelFetch(noisetex, ivec2(gl_FragCoord.xy) & 255, 0).x + frameFract);
+					float dither = fract(texelFetch(noisetex, ivec2(gl_FragCoord.xy) & 255, 0).x + frameFract);
 				#else
-					float blueNoise = texelFetch(noisetex, ivec2(gl_FragCoord.xy) & 255, 0).x;
+					float dither = texelFetch(noisetex, ivec2(gl_FragCoord.xy) & 255, 0).x;
 				#endif
 
-				vec3 shdCol = getShdCol(shdPos, blueNoise * TAU);
+				vec3 shdCol = getShdCol(shdPos, dither * TAU);
 			#else
 				vec3 shdCol = getShdCol(shdPos);
 			#endif
