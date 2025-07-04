@@ -11,7 +11,7 @@ float getSunMoonShape(in vec2 skyPos){
     return min(1.0, exp2((WORLD_SUN_MOON_SIZE - pow(abs(skyPos.x * skyPos.x * skyPos.x) + abs(skyPos.y * skyPos.y * skyPos.y), 0.33333333)) * 256.0));
 }
 
-#if CLOUD_MODE != 1 && !defined FORCE_DISABLE_CLOUDS && defined WORLD_LIGHT
+#if CLOUD_MODE != 0 && !defined FORCE_DISABLE_CLOUDS && defined WORLD_LIGHT
     // Depth size / cloud steps
     const uint skyBoxCloudSteps = uint(SKYBOX_CLOUD_STEPS);
     const float cloudStepSize = 1.0 / skyBoxCloudSteps;
@@ -300,7 +300,7 @@ vec3 getFullSkyRender(in vec3 nEyePlayerPos, in vec3 skyPos, in vec3 currSkyCol)
     currSkyCol = getSkyHalf(nEyePlayerPos, skyPos, currSkyCol);
 
     #if CLOUD_MODE == 1 && !defined FORCE_DISABLE_CLOUDS && defined WORLD_LIGHT
-        finalCol = getSkyClouds(reflectPlayerDir, finalCol);
+        currSkyCol = getSkyClouds(nEyePlayerPos, currSkyCol);
     #endif
 
     // Do a simple void gradient calculation when underwater
