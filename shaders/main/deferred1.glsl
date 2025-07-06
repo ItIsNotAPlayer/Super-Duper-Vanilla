@@ -237,8 +237,6 @@
         // Get sky mask
         bool skyMask = screenPos.z == 1;
 
-        skyMask = false;
-
         // Jitter the sky only
         #if ANTI_ALIASING == 2
             if(skyMask) screenPos.xy += jitterPos(-0.5);
@@ -279,8 +277,6 @@
         if(skyMask){
             // Calculate and output sky render
             sceneColOut = getFullSkyRender(nEyePlayerPos, skyPos, currSkyCol + sceneColOut) * exp2(-borderFar * effectFactor);
-            // Clamp scene color to prevent NaNs during post processing
-            sceneColOut = max(sceneColOut, vec3(0));
             // Exit function immediately
             return;
         }

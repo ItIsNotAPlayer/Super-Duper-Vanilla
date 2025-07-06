@@ -319,9 +319,9 @@
             #ifdef DYNAMIC_CLOUDS
                 float fadeTime = saturate(sin(fragmentFrameTime * FADE_SPEED) * 0.8 + 0.5);
 
-                float cloudFinal = mix(mix(cloudData.x, cloudData.y, fadeTime), max(cloudData.x, cloudData.y), rainStrength);
+                float cloudFinal = mix(mix(cloudData.x, cloudData.y, fadeTime), max(cloudData.x, cloudData.y), rainStrength) * 0.125;
             #else
-                float cloudFinal = mix(cloudData.x, max(cloudData.x, cloudData.y), rainStrength);
+                float cloudFinal = mix(cloudData.x, max(cloudData.x, cloudData.y), rainStrength) * 0.125;
             #endif
 
             sceneColOut *= 1.0 - cloudFinal;
