@@ -23,6 +23,7 @@
 
     out vec3 vertexColor;
     out vec3 vertexFeetPlayerPos;
+    out vec3 vertexWorldPos;
 
     #if defined NORMAL_GENERATION || defined PARALLAX_OCCLUSION
         flat out vec2 vTexCoordScale;
@@ -30,6 +31,8 @@
 
         out vec2 vTexCoord;
     #endif
+
+    uniform vec3 cameraPosition;
 
     uniform mat4 gbufferModelViewInverse;
 
@@ -74,6 +77,9 @@
         vec3 vertexViewPos = mat3(gl_ModelViewMatrix) * gl_Vertex.xyz + gl_ModelViewMatrix[3].xyz;
         // Get vertex feet player position
         vertexFeetPlayerPos = mat3(gbufferModelViewInverse) * vertexViewPos + gbufferModelViewInverse[3].xyz;
+
+        // Get world position
+        vertexWorldPos = vertexFeetPlayerPos + cameraPosition;
 
         // Calculate TBN matrix
 	    TBN = mat3(gbufferModelViewInverse) * (gl_NormalMatrix * mat3(vertexTangent, cross(vertexTangent, vertexNormal) * sign(at_tangent.w), vertexNormal));
@@ -124,6 +130,7 @@
 
     in vec3 vertexColor;
     in vec3 vertexFeetPlayerPos;
+    in vec3 vertexWorldPos;
 
     #if defined NORMAL_GENERATION || defined PARALLAX_OCCLUSION
         flat in vec2 vTexCoordScale;
@@ -139,14 +146,9 @@
     uniform float nightVision;
     uniform float lightningFlash;
 
-    uniform float pixelWidth;
-    uniform float pixelHeight;
-
     uniform float fragmentFrameTime;
 
     uniform float near;
-
-    uniform vec3 cameraPosition;
 
     uniform sampler2D depthtex0;
     uniform sampler2D gtexture;
@@ -202,40 +204,41 @@
 
     #include "/lib/lighting/complexShadingForward.glsl"
 
+    float getEndStarField(in vec2 uv, in float time){
+        return textureLod(gtexture, vec2(uv.x, uv.y + time) * 0.125, 0).r + textureLod(gtexture, vec2(uv.x - uv.y, uv.y + uv.x + time) * 0.125, 0).r;
+    }
+
     void main(){
         // End portal
         if(blockEntityId == 12000){
             // Get portal depth
             float blockDepth = near / (1.0 - gl_FragCoord.z) - near / (1.0 - texelFetch(depthtex0, ivec2(gl_FragCoord.xy), 0).x);
 
-            // Get portal uv
-            vec2 portalUv = (vertexFeetPlayerPos.zy * TBN[2].x + vertexFeetPlayerPos.xz * TBN[2].y + vertexFeetPlayerPos.xy * TBN[2].z) * 0.125;
-            // Get scaled camera position
-            vec2 scaledCameraPos = (cameraPosition.zy * TBN[2].x + cameraPosition.xz * TBN[2].y + cameraPosition.xy * TBN[2].z) * 0.125;
+            // Get start pos
+            vec2 startPos = vertexWorldPos.zy * TBN[2].x + vertexWorldPos.xz * TBN[2].y + vertexWorldPos.xy * TBN[2].z;
+
+            // Get end pos
+            vec3 endPos = vertexFeetPlayerPos.zyx * TBN[2].x + vertexFeetPlayerPos.xzy * TBN[2].y + vertexFeetPlayerPos.xyz * TBN[2].z;
+            endPos.xy /= endPos.z;
             
             // End star uv
-            float starSpeed = fragmentFrameTime * 0.0078125;
+            float starSpeed = fragmentFrameTime * 0.0625;
 
-            vec2 portalUv0 = vec2(portalUv.y, portalUv.x + starSpeed) + scaledCameraPos.yx;
-            float endStarField = textureLod(gtexture, portalUv0, 0).r + textureLod(gtexture, vec2(portalUv0.x - portalUv0.y, portalUv0.y + portalUv0.x), 0).r;
-
-            vec2 portalUv1 = vec2(portalUv.x, portalUv.y + starSpeed) * 2.0 + scaledCameraPos * 0.5;
-            endStarField += (textureLod(gtexture, portalUv1, 0).r + textureLod(gtexture, vec2(portalUv1.x - portalUv1.y, portalUv1.y + portalUv1.x), 0).r) * 0.5;
-
-            vec2 portalUv2 = vec2(-portalUv.x, starSpeed - portalUv.y) * 4.0 - scaledCameraPos * 0.25;
-            endStarField += (textureLod(gtexture, portalUv2, 0).r + textureLod(gtexture, vec2(portalUv2.x - portalUv2.y, portalUv2.y + portalUv2.x), 0).r) * 0.25;
+            float endStarField = getEndStarField(startPos, starSpeed);
+            endStarField += getEndStarField(startPos.yx - endPos.yx * 0.5, starSpeed) * 0.66666667;
+            endStarField += getEndStarField(endPos.xy - startPos, starSpeed) * 0.33333333;
 
             // Get the depth outline for the end portal
             float edgeBrightness = exp2((blockDepth + 0.0625) * 8.0);
 
             // Get noise color to variate the end portal color
-            vec3 noiseCol = getRng3(ivec2(portalUv0 * 128.0) & 255) * 0.5 + 0.5;
+            vec3 noiseCol = getRng3(ivec2(startPos * 16.0) & 255) * 0.5 + 0.5;
             vec3 finalCol = (noiseCol * endStarField + edgeBrightness) * EMISSIVE_INTENSITY * vertexColor.rgb;
 
             sceneColOut = vec4(toLinear(finalCol), 1);
 
             // End portal fix
-            normalDataOut = TBN[2];
+            normalDataOut = vec3(0);
             materialDataOut = vec3(0, 0, 0.5);
 
             return; // Return immediately, no need for lighting calculation
