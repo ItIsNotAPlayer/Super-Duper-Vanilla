@@ -7,6 +7,7 @@ const float volumetricCloudHeight = 195.0 + volumetricCenterDepth;
 vec2 volumetricClouds(in vec3 nFeetPlayerPos, in vec3 cameraPos, in float feetPlayerDist, in float dither, in bool isSky){
     // Minimum cloud distance, if terrain, caps distance to the minimum cloud distance
     float cloudFar = isSky ? volumetricCloudFar : min(volumetricCloudFar, feetPlayerDist);
+    float invCloudFarSqrd = 1.0 / squared(cloudFar);
 
     float lowerBoundDist = (-VOLUMETRIC_CLOUD_DEPTH - cameraPos.y) / nFeetPlayerPos.y;
     float higherBoundDist = -cameraPos.y / nFeetPlayerPos.y;
@@ -36,17 +37,15 @@ vec2 volumetricClouds(in vec3 nFeetPlayerPos, in vec3 cameraPos, in float feetPl
     // LESSS GOOOOO RAT RACING!!!11!!11!!11!!
     for(uint i = 0u; i < uint(volumetricCloudSteps); i++){
         // Get cloud fog
-        float cloudFog = 1.0 - lengthSquared(startPos - cameraPos) / squared(cloudFar);
+        float cloudFog = 1.0 - lengthSquared(startPos - cameraPos) * invCloudFarSqrd;
 
         // Get cloud texture
         vec2 cloudData = texelFetch(colortex0, ivec2(startPos.xz * 0.0625) & 255, 0).xy;
 
-        // Cloud gradiante'
-        float cloudFade = -startPos.y * 0.125;
-
+        // Apply cloud gradiante'
         // Check if ray is inside a cloud
-        if(cloudData.x < 0.5) clouds.x = max(clouds.x, cloudFade * cloudFog);
-        if(cloudData.y < 0.5) clouds.y = max(clouds.y, cloudFade * cloudFog);
+        if(cloudData.x < 0.5) clouds.x = max(clouds.x, -startPos.y * cloudFog);
+        if(cloudData.y < 0.5) clouds.y = max(clouds.y, -startPos.y * cloudFog);
 
         // Continue tracing
         startPos += endPos;
