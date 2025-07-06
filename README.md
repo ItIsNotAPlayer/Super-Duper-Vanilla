@@ -45,6 +45,11 @@
 | 1.14.2+  | Supported                           | Not supported |
 | 1.13.2-  | Not supported                       | Not supported |
 
+| Iris    | Windows, Linux (Intel, AMD, NVidia) | Apple (M1)    |
+| ------- | ----------------------------------- | ------------- |
+| 1.18.2+ | Supported                           | Supported     |
+| 1.17.1- | Not supported                       | Not supported |
+
 ## Releases
    See all available releases [here](https://github.com/Eldeston/Super-Duper-Vanilla/releases). More recent builds are found in their corresponding branches, to download simply switch to the latest version branch, go to code (green button) and download as zip.
 

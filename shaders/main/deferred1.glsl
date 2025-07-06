@@ -273,6 +273,7 @@
         // Get basic sky simple color
         vec3 currSkyCol = getSkyBasic(nEyePlayerPos.y, skyPos.z);
 
+        /*
         // If sky, do full sky render and return immediately
         if(skyMask){
             // Calculate and output sky render
@@ -282,6 +283,7 @@
             // Exit function immediately
             return;
         }
+        */
 
         #if ANTI_ALIASING >= 2
             vec3 dither = fract(getRng3(screenTexelCoord & 255) + frameFract);

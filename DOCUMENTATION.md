@@ -140,6 +140,7 @@ Notes for pending features/bug fixes to be implemented categorized by importance
 
 ## CURRENT
 * Optimize day and night transition calculations (medium priority)
+* Bring back Optifine support for the last time until 1.4.0
 
 * Implement bit packing for optimization
 
@@ -148,10 +149,11 @@ Notes for pending features/bug fixes to be implemented categorized by importance
 * Improve tonemapping (medium priority)
 * Improve Distant Horizons depth
 * Improve subsurface scattering
+* Improve shadow filtering
 * Improve shader menu UI
 
 ## DONE
-* Abandon Optifine support (high priority)
+* ~~Abandon Optifine support (high priority)~~
 
 * Finish programming dh_generic (medium priority)
 
