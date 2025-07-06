@@ -237,6 +237,8 @@
         // Get sky mask
         bool skyMask = screenPos.z == 1;
 
+        skyMask = false;
+
         // Jitter the sky only
         #if ANTI_ALIASING == 2
             if(skyMask) screenPos.xy += jitterPos(-0.5);
@@ -273,7 +275,6 @@
         // Get basic sky simple color
         vec3 currSkyCol = getSkyBasic(nEyePlayerPos.y, skyPos.z);
 
-        /*
         // If sky, do full sky render and return immediately
         if(skyMask){
             // Calculate and output sky render
@@ -283,7 +284,6 @@
             // Exit function immediately
             return;
         }
-        */
 
         #if ANTI_ALIASING >= 2
             vec3 dither = fract(getRng3(screenTexelCoord & 255) + frameFract);
