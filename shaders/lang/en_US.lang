@@ -1,4 +1,4 @@
-## Language format v1.0.7
+## Language format v1.0.8
 ## All other .lang files must update to the latest language format version on this main .lang file
 
 ## Profiles
@@ -145,12 +145,11 @@ screen.PBR = PBR
 
     option.SPECULAR_HIGHLIGHTS = Specular highlights
     option.ENVIRONMENT_PBR = Enviro PBR materials
-    option.NORMAL_GENERATION = Auto gen normals
-    option.NORMAL_GENERATION_RESOLUTION = Auto gen normal resolution
     option.SUBSURFACE_SCATTERING = Subsurface scattering
     option.EMISSIVE_INTENSITY = Emissive intensity
-    option.SLOPE_NORMALS = Slope normals
     option.NORMAL_STRENGTH = Normal strength
+
+    option.SLOPE_NORMALS = Slope normals
     option.DIRECTIONAL_LIGHTMAPS = Directional lightmaps
     option.DIRECTIONAL_LIGHTMAP_STRENGTH = Directional lightmaps strength
 
@@ -161,21 +160,30 @@ screen.PBR = PBR
         option.PARALLAX_SHADOW = Parallax shadows
         option.PARALLAX_SHADOW_STEPS = Parallax shadow steps
 
-    screen.WATER_SETTINGS = Water material settings
-        option.WATER_NOISE = Water noise
-        option.WATER_BRIGHTNESS = Water brightness
-        option.WATER_NORMAL = Water normalmap
-        option.WATER_BLUR_SIZE = Water normalmap blur size
-        option.WATER_DEPTH_SIZE = Water normalmap depth size
-        option.WATER_TILE_SIZE = Water tile size
-        option.WATER_STYLIZE_ABSORPTION = Water absorption
-        option.WATER_FOAM = Water foam
-        option.WATER_FLAT = Flat water albedo
+    screen.IPBR_SETTINGS = iPBR settings
+        screen.WATER_SETTINGS = Water material settings
+            option.WATER_NOISE = Water noise
+            option.WATER_BRIGHTNESS = Water brightness
+            option.WATER_NORMAL = Water normalmap
+            option.WATER_BLUR_SIZE = Water normalmap blur size
+            option.WATER_DEPTH_SIZE = Water normalmap depth size
+            option.WATER_TILE_SIZE = Water tile size
+            option.WATER_STYLIZE_ABSORPTION = Water absorption
+            option.WATER_FOAM = Water foam
+            option.WATER_FLAT = Flat water albedo
 
-    screen.LAVA_SETTINGS = Lava material settings
-        option.LAVA_BRIGHTNESS = Lava brightness
-        option.LAVA_NOISE = Lava noise
-        option.LAVA_TILE_SIZE = Lava tile size
+        screen.LAVA_SETTINGS = Lava material settings
+            option.LAVA_BRIGHTNESS = Lava brightness
+            option.LAVA_NOISE = Lava noise
+            option.LAVA_TILE_SIZE = Lava tile size
+
+        screen.SCULK_SETTINGS = Sculk material settings
+            option.SCULK_BRIGHTNESS = Sculk brightness
+            option.SCULK_NOISE = Sculk noise
+            option.SCULK_TILE_SIZE = Sculk tile size
+
+        option.NORMAL_GENERATION = Auto gen normals
+        option.NORMAL_GENERATION_RESOLUTION = Auto gen normal resolution
 
 screen.CONFIGURATION = Configuration
     screen.OVERWORLD_SETTINGS = Overworld settings

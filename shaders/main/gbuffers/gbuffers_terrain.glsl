@@ -257,15 +257,18 @@
                     float lavaNoise = saturate(max(getLavaNoise(blockUv * lavaTileSizeInv) * 3.0, sumOf(material.albedo.rgb)) - 1.0);
                     material.albedo.rgb = floor(material.albedo.rgb * lavaNoise * LAVA_BRIGHTNESS * 32.0) * 0.03125;
                 #else
-                    material.albedo.rgb = material.albedo.rgb * LAVA_BRIGHTNESS;
+                    material.albedo.rgb *= LAVA_BRIGHTNESS;
                 #endif
             }
 
             // Sculk noise
             else if(blockId == 13005){
-                float sculkNoise = texelFetch(noisetex, ivec2((blockUv + fragmentFrameTime) * 8.0) & 255, 0).z;
-
-                material.emissive = min(1.0, material.emissive * squared(squared(sculkNoise) * 4.0));
+                #ifdef SCULK_NOISE
+                    float sculkNoise = texelFetch(noisetex, ivec2((blockUv + fragmentFrameTime) * SCULK_TILE_SIZE) & 255, 0).z;
+                    material.emissive = min(1.0, material.emissive * squared(squared(sculkNoise) * 4.0) * SCULK_BRIGHTNESS);
+                #else
+                    material.emissive *= SCULK_BRIGHTNESS;
+                #endif
             }
         }
 
