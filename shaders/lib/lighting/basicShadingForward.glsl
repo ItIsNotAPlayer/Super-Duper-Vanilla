@@ -1,19 +1,15 @@
 vec3 basicShadingForward(in vec3 albedo){
-	// Calculate sky diffusion first, begining with the sky itself
-	vec3 totalDiffuse = toLinear(SKY_COLOR_DATA_BLOCK);
-
-	// Calculate thunder flash
-	totalDiffuse += lightningFlash;
-
 	// Get sky light squared
 	float skyLightSquared = squared(lmCoord.y);
+
+	// Calculate sky diffusion first, begining with the sky itself
 	// Occlude the appled sky and thunder flash calculation by sky light amount
-	totalDiffuse *= skyLightSquared;
+	vec3 totalDiffuse = (toLinear(SKY_COLOR_DATA_BLOCK) + lightningFlash) * skyLightSquared;
 
 	// Calculate block light
 	totalDiffuse += toLinear(squared(lmCoord.x) * blockLightColor * 1.25);
 
-	// Lastly, calculate ambient lightning
+	// Calculate ambient lightning
 	totalDiffuse += toLinear(nightVision * 0.5 + AMBIENT_LIGHTING);
 
 	#ifdef WORLD_LIGHT

@@ -1,19 +1,14 @@
 vec3 complexShadingForward(in dataPBR material){
-	// Calculate sky diffusion first, begining with the sky itself
-	vec3 totalIllumination = toLinear(SKY_COLOR_DATA_BLOCK);
-
-	// Calculate thunder flash
-	totalIllumination += lightningFlash;
-
 	// Get block light squared
 	float blockLightSquared = squared(lmCoord.x);
 	// Get sky light squared
 	float skyLightSquared = squared(lmCoord.y);
 
+	// Calculate sky diffusion first, begining with the sky itself
 	// Occlude the appled sky and thunder flash calculation by sky light amount
-	totalIllumination *= skyLightSquared;
+	vec3 totalIllumination = (toLinear(SKY_COLOR_DATA_BLOCK) + lightningFlash) * skyLightSquared;
 
-	// Lastly, calculate ambient lightning
+	// Calculate ambient lightning
 	totalIllumination += toLinear(AMBIENT_LIGHTING + nightVision * 0.5);
 
 	#if defined DIRECTIONAL_LIGHTMAPS && (defined TERRAIN || defined WATER)

@@ -140,8 +140,6 @@ Notes for pending features/bug fixes to be implemented categorized by importance
 * Format the goodness knows how much nesting I used in my code because BROTHA EWWHH (maximum priority)
 
 ## CURRENT
-* Bring back Optifine support for the last time until 1.4.0
-
 * Implement bit packing for optimization
 
 * Improve fog calculation and settings (medium priority)
@@ -153,7 +151,7 @@ Notes for pending features/bug fixes to be implemented categorized by importance
 * Improve shader menu UI
 
 ## DONE
-* ~~Abandon Optifine support (high priority)~~
+* Abandon Optifine support (high priority)
 
 * Finish programming dh_generic (medium priority)
 
