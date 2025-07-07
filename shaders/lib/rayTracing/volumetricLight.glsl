@@ -35,9 +35,6 @@ vec3 getVolumetricLight(in vec3 nFeetPlayerPos, in float feetPlayerDist, in floa
 		volumetricFogDensity = (volumetricFogDensity - 1.0) * borderFog + 1.0;
 	#endif
 
-	// Apply adjustments
-	volumetricFogDensity *= heightFade * shdFade;
-
 	#if defined VOLUMETRIC_LIGHTING && defined SHADOW_MAPPING
 		// Normalize then unormalize with feetPlayerDist and clamping it at minimum distance between far and current shadowDistance
 		vec3 endPos = vec3(shadowProjection[0].x, shadowProjection[1].y, shadowProjection[2].z) * (mat3(shadowModelView) * nFeetPlayerPos);
@@ -55,8 +52,8 @@ vec3 getVolumetricLight(in vec3 nFeetPlayerPos, in float feetPlayerDist, in floa
 			// We continue tracing!
 			startPos += endPos;
 		}
-
-		return volumeData * lightCol * (min(1.0, VOLUMETRIC_LIGHTING_STRENGTH + VOLUMETRIC_LIGHTING_STRENGTH * isEyeInWater) * volumetricFogDensity * volumetricStepsInverse);
+		
+		return volumeData * lightCol * (min(1.0, VOLUMETRIC_LIGHTING_STRENGTH + VOLUMETRIC_LIGHTING_STRENGTH * isEyeInWater) * squared(heightFade) * volumetricFogDensity * volumetricStepsInverse);
 	#else
 		if(isEyeInWater == 1) return lightCol * toLinear(fogColor) * (min(1.0, VOLUMETRIC_LIGHTING_STRENGTH * 2.0) * volumetricFogDensity);
 		#ifdef WORLD_CUSTOM_SKYLIGHT

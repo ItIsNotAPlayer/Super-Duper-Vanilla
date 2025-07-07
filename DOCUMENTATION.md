@@ -134,12 +134,12 @@ Notes for pending features/bug fixes to be implemented categorized by importance
 * Optimize alpha testing (high priority)
 * Optimize DOF calculations with noise (low priority)
 * Optimize block ids in block.properties (medium priority)
+* Optimize day and night transition calculations (medium priority)
 
 * Refactor uniform usage and remove unecessary ones (medium priority)
 * Format the goodness knows how much nesting I used in my code because BROTHA EWWHH (maximum priority)
 
 ## CURRENT
-* Optimize day and night transition calculations (medium priority)
 * Bring back Optifine support for the last time until 1.4.0
 
 * Implement bit packing for optimization

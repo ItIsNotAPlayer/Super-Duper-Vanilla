@@ -7,11 +7,13 @@ const float volumetricCloudHeight = 195.0 + volumetricCenterDepth;
 vec2 volumetricClouds(in vec3 nFeetPlayerPos, in vec3 cameraPos, in float feetPlayerDist, in float dither, in bool isSky){
     // Minimum cloud distance, if terrain, caps distance to the minimum cloud distance
     float cloudFar = isSky ? volumetricCloudFar : min(volumetricCloudFar, feetPlayerDist);
-    float invCloudFarSqrd = 1.0 / squared(cloudFar);
+    float invCloudFarSqrd = 1.0 / squared(volumetricCloudFar);
 
+    // Sets the bounding box vertically
     float lowerBoundDist = (-VOLUMETRIC_CLOUD_DEPTH - cameraPos.y) / nFeetPlayerPos.y;
     float higherBoundDist = -cameraPos.y / nFeetPlayerPos.y;
 
+    // Finds the nearest and furthest plane
     float nearestPlane = max(min(lowerBoundDist, higherBoundDist), 0.0);
 	float furthestPlane = min(cloudFar, max(lowerBoundDist, higherBoundDist));
 
@@ -29,7 +31,7 @@ vec2 volumetricClouds(in vec3 nFeetPlayerPos, in vec3 cameraPos, in float feetPl
     vec3 endPos = nFeetPlayerPos * (distInsideCloud * volumetricCloudStepsInverse);
 
     // Camera position as its start position
-    vec3 startPos = (cameraPos + nFeetPlayerPos * nearestPlane) + endPos * dither;
+    vec3 startPos = cameraPos + nFeetPlayerPos * nearestPlane + endPos * dither;
 
     // To store the cloud data for 2 cloud layers
     vec2 clouds = vec2(0);

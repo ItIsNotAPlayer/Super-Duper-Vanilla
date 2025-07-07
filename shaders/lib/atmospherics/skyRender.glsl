@@ -46,7 +46,7 @@ float getSunMoonShape(in vec2 skyPos){
             cloudHeightFade *= 6.0 - rainStrength * 5.0;
         #endif
 
-        if(cloudHeightFade < 0) return currSkyCol;
+        if(cloudHeightFade <= 0) return currSkyCol;
         if(cloudHeightFade > 1) cloudHeightFade = 1.0;
 
         vec2 planeUv = nEyePlayerPos.xz * (6.0 / nEyePlayerPos.y);

@@ -251,10 +251,16 @@ void getPBR(inout dataPBR material, in int id){
             else if(id == 13003) material.emissive = float(sumOf(material.albedo.rg) > 1.1);
             else if(id == 13004) material.emissive = exp(sumOf(material.albedo.gb) * 8.0 - 16.0);
 
-            // Sculk
+            // Common sculk
             else if(id == 13005){
                 material.emissive = cubed(material.albedo.b);
-                material.smoothness = 0.5;
+                material.smoothness = 0.45;
+            }
+
+            // Uncommon sculk
+            else if(id == 13006){
+                material.emissive = cubed(material.albedo.b);
+                material.smoothness = 0.45;
             }
 
             /// -------------------------------- /// Crystal /// -------------------------------- ///

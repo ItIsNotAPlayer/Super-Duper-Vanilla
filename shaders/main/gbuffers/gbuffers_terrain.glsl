@@ -245,18 +245,28 @@
 	    dataPBR material;
         getPBR(material, blockId);
 
-        // If lava
-        if(blockId == 11100){
-            #ifdef LAVA_NOISE
-                // Lava tile size inverse
-                const float lavaTileSizeInv = 1.0 / LAVA_TILE_SIZE;
+        if(blockId == 11100 || blockId == 13005){
+            vec2 blockUv = vertexWorldPos.zy * TBN[2].x + vertexWorldPos.xz * TBN[2].y + vertexWorldPos.xy * TBN[2].z;
 
-                vec2 lavaUv = vertexWorldPos.zy * TBN[2].x + vertexWorldPos.xz * TBN[2].y + vertexWorldPos.xy * TBN[2].z;
-                float lavaNoise = saturate(max(getLavaNoise(lavaUv * lavaTileSizeInv) * 3.0, sumOf(material.albedo.rgb)) - 1.0);
-                material.albedo.rgb = floor(material.albedo.rgb * lavaNoise * LAVA_BRIGHTNESS * 32.0) * 0.03125;
-            #else
-                material.albedo.rgb = material.albedo.rgb * LAVA_BRIGHTNESS;
-            #endif
+            // Lava noise
+            if(blockId == 11100){
+                #ifdef LAVA_NOISE
+                    // Lava tile size inverse
+                    const float lavaTileSizeInv = 1.0 / LAVA_TILE_SIZE;
+
+                    float lavaNoise = saturate(max(getLavaNoise(blockUv * lavaTileSizeInv) * 3.0, sumOf(material.albedo.rgb)) - 1.0);
+                    material.albedo.rgb = floor(material.albedo.rgb * lavaNoise * LAVA_BRIGHTNESS * 32.0) * 0.03125;
+                #else
+                    material.albedo.rgb = material.albedo.rgb * LAVA_BRIGHTNESS;
+                #endif
+            }
+
+            // Sculk noise
+            else if(blockId == 13005){
+                float sculkNoise = texelFetch(noisetex, ivec2((blockUv + fragmentFrameTime) * 8.0) & 255, 0).z;
+
+                material.emissive = min(1.0, material.emissive * squared(squared(sculkNoise) * 4.0));
+            }
         }
 
         material.albedo.rgb = toLinear(material.albedo.rgb);
