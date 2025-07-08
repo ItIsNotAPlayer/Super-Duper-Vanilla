@@ -324,12 +324,10 @@
                 float cloudFinal = mix(cloudData.x, max(cloudData.x, cloudData.y), rainStrength) * 0.125;
             #endif
 
-            sceneColOut *= 1.0 - cloudFinal;
-
             #ifdef FORCE_DISABLE_DAY_CYCLE
-                sceneColOut += ((toLinear(nightVision * 0.5 + AMBIENT_LIGHTING) + lightningFlash) + lightCol + skyCol) * cloudFinal;
+                sceneColOut = mix(sceneColOut, ((toLinear(nightVision * 0.5 + AMBIENT_LIGHTING) + lightningFlash) + lightCol + skyCol), cloudFinal);
             #else
-                sceneColOut += ((toLinear(nightVision * 0.5 + AMBIENT_LIGHTING) + lightningFlash) + mix(moonCol, sunCol, dayCycleAdjust) + skyCol) * cloudFinal;
+                sceneColOut = mix(sceneColOut, ((toLinear(nightVision * 0.5 + AMBIENT_LIGHTING) + lightningFlash) + mix(moonCol, sunCol, dayCycleAdjust) + skyCol), cloudFinal);
             #endif
         #endif
 
