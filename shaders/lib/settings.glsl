@@ -74,7 +74,7 @@ const float sunPathRotation = 30.0; // Light path angle. This also affects sky a
 
 /// -------------------------------- /// Atmospherics /// -------------------------------- ///
 
-#define SUN_MOON_TYPE 0 // Sun and moon type [0 1 2]
+#define SUN_MOON_TYPE 0 // Changes sun and moon type [0 1 2]
 #define SUN_MOON_INTENSITY 4 // The sun or moon's intensity. Also affects specular reflections. [0 1 2 3 4 5 6 7 8]
 
 #define VOLUMETRIC_LIGHTING // Enables volumetric lighting.
@@ -85,7 +85,7 @@ const float sunPathRotation = 30.0; // Light path angle. This also affects sky a
 
 /// -------------------------------- /// Cloud settings /// -------------------------------- ///
 
-#define CLOUD_MODE 2 // Cloud mode [0 1 2] 0 for vanilla, 1 for skybox, and 2 for volumetric clouds.
+#define CLOUD_TYPE 2 // Changes cloud type. [0 1 2]
 #define DOUBLE_LAYERED_CLOUDS // Adds another layer of clouds (works on both vanilla and shader clouds), may use up performance.
 #define DYNAMIC_CLOUDS // Makes clouds more dynamic and allows weather to affect it. (affects on both vanilla and story mode clouds).
 #define FADE_SPEED 0.20 // Cloud fade speed [0.00 0.05 0.10 0.15 0.20 0.25 0.30 0.35 0.40 0.45 0.50 0.55 0.60 0.65 0.70 0.75 0.80 0.85 0.90 0.95 1.00 1.05 1.10 1.15 1.20 1.25 1.30 1.35 1.40 1.45 1.50 1.55 1.60 1.65 1.70 1.75 1.80 1.85 1.90 1.95 2.00 2.05 2.10 2.15 2.20 2.25 2.30 2.35 2.40 2.45 2.50 2.55 2.60 2.65 2.70 2.75 2.80 2.85 2.90 2.95 3.00 3.05 3.10 3.15 3.20 3.25 3.30 3.35 3.40 3.45 3.50 3.55 3.60 3.65 3.70 3.75 3.80 3.85 3.90 3.95 4.00]

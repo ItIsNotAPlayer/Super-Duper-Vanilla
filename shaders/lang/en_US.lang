@@ -2,6 +2,8 @@
 ## All other .lang files must update to the latest language format version on this main .lang file
 
 ## Profiles
+profile.comment = Changes performance profile to improve performance or quality
+
 profile.POTATO = Potato
 profile.LOW = Low
 profile.MEDIUM = Medium (Default)
@@ -181,16 +183,16 @@ screen.LIGHTING.comment = §6Lighting and shadow options including shadow mappin
 screen.ATMOSPHERICS = Atmospherics
 screen.ATMOSPHERICS.comment = §6Atmospheric effects including sun/moon, clouds, fog, border fog, and volumetric lighting.
     option.SUN_MOON_TYPE = Sun/moon type
-    option.SUN_MOON_TYPE.comment = Sun and moon type.
+    option.SUN_MOON_TYPE.comment = Changes sun and moon type.
         value.SUN_MOON_TYPE.0 = Default
         value.SUN_MOON_TYPE.1 = Round
         value.SUN_MOON_TYPE.2 = Vanilla
     
-    option.CLOUD_MODE = Cloud mode
-    option.CLOUD_MODE.comment = Cloud mode. 0 for vanilla, 1 for skybox, and 2 for volumetric clouds.
-        value.CLOUD_MODE.0 = Vanilla
-        value.CLOUD_MODE.1 = Skybox
-        value.CLOUD_MODE.2 = Volumetric
+    option.CLOUD_TYPE = Cloud type
+    option.CLOUD_TYPE.comment = Changes cloud type.
+        value.CLOUD_TYPE.0 = Vanilla
+        value.CLOUD_TYPE.1 = Skybox
+        value.CLOUD_TYPE.2 = Volumetric
 
     option.SUN_MOON_INTENSITY = Sun/moon intensity
     option.SUN_MOON_INTENSITY.comment = The sun or moon's intensity. Also affects specular reflections.

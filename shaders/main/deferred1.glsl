@@ -143,7 +143,7 @@
         uniform float dayCycleAdjust;
     #endif
 
-    #if CLOUD_MODE != 0 && !defined FORCE_DISABLE_CLOUDS
+    #if CLOUD_TYPE != 0 && !defined FORCE_DISABLE_CLOUDS
         uniform sampler2D colortex0;
     #endif
 

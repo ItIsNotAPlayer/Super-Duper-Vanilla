@@ -137,10 +137,10 @@
         uniform float dayCycleAdjust;
     #endif
 
-    #if CLOUD_MODE != 0 && !defined FORCE_DISABLE_CLOUDS
+    #if CLOUD_TYPE != 0 && !defined FORCE_DISABLE_CLOUDS
         uniform sampler2D colortex0;
 
-        #if CLOUD_MODE == 2
+        #if CLOUD_TYPE == 2
             uniform float volumetricCloudFar;
 
             #include "/lib/rayTracing/volumetricClouds.glsl"
@@ -284,7 +284,7 @@
         // Apply darkness pulsing effect
         sceneColOut *= 1.0 - darknessLightFactor;
 
-        #if defined WORLD_LIGHT || !defined FORCE_DISABLE_CLOUDS && CLOUD_MODE == 2
+        #if defined WORLD_LIGHT || !defined FORCE_DISABLE_CLOUDS && CLOUD_TYPE == 2
             bool isSky = depth == 1.0;
 
             float feetPlayerDot = lengthSquared(feetPlayerPos);
@@ -300,7 +300,7 @@
                 sceneColOut += getVolumetricLight(nFeetPlayerPos, feetPlayerDist, fogFactor, borderFog, dither.x, isSky);
         #endif
 
-        #if !defined FORCE_DISABLE_CLOUDS && CLOUD_MODE == 2
+        #if !defined FORCE_DISABLE_CLOUDS && CLOUD_TYPE == 2
             // Get the 1st layer of volumetric clouds position
             // Note that the clouds needs to move westward just as in vanilla
             vec3 cloudStartPos0 = vec3(cameraPosition.x + fragmentFrameTime, cameraPosition.y - volumetricCloudHeight, cameraPosition.z);

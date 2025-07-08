@@ -11,7 +11,7 @@ float getSunMoonShape(in vec2 skyPos){
     return min(1.0, exp2((WORLD_SUN_MOON_SIZE - pow(abs(skyPos.x * skyPos.x * skyPos.x) + abs(skyPos.y * skyPos.y * skyPos.y), 0.33333333)) * 256.0));
 }
 
-#if CLOUD_MODE != 0 && !defined FORCE_DISABLE_CLOUDS && defined WORLD_LIGHT
+#if CLOUD_TYPE != 0 && !defined FORCE_DISABLE_CLOUDS && defined WORLD_LIGHT
     // Depth size / cloud steps
     const uint skyBoxCloudSteps = uint(SKYBOX_CLOUD_STEPS);
     const float cloudStepSize = 1.0 / skyBoxCloudSteps;
@@ -228,7 +228,7 @@ vec3 getSkyReflection(in vec3 reflectViewDir){
     vec3 finalCol = getSkyHalf(reflectPlayerDir, skyPos, getSkyBasic(reflectPlayerDir.y, skyPos.z));
 
     // Skybox clouds should render in reflections when volumetrics are on
-    #if CLOUD_MODE != 0 && !defined FORCE_DISABLE_CLOUDS && defined WORLD_LIGHT
+    #if CLOUD_TYPE != 0 && !defined FORCE_DISABLE_CLOUDS && defined WORLD_LIGHT
         finalCol = getSkyClouds(reflectPlayerDir, finalCol);
     #endif
 
@@ -299,7 +299,7 @@ vec3 getFullSkyRender(in vec3 nEyePlayerPos, in vec3 skyPos, in vec3 currSkyCol)
     // Combine sky box color and sky half color
     currSkyCol = getSkyHalf(nEyePlayerPos, skyPos, currSkyCol);
 
-    #if CLOUD_MODE == 1 && !defined FORCE_DISABLE_CLOUDS && defined WORLD_LIGHT
+    #if CLOUD_TYPE == 1 && !defined FORCE_DISABLE_CLOUDS && defined WORLD_LIGHT
         currSkyCol = getSkyClouds(nEyePlayerPos, currSkyCol);
     #endif
 
