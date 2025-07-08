@@ -35,20 +35,20 @@
    If you want to request mod compatibility with this shader, create an issue post in this repository with the mod that you want to enable compatibility via linking. If you're planning to add mod compatibility by coding it yourself, see [**CONTRIBUTION**](CONTRIBUTION.md).
 
 ## Version Compatibility
-   Version compatibility varies across the 2 known shader loaders Iris and Optifine. Optifine support will not be prioritized or maintained starting from 1.3.7 of this shader.
+   Version compatibility varies across the 2 known shader loaders Iris and Optifine. Iris versions 1.6.10+ from Minecraft versions 1.18.2+ are compatible with this shader. For Optifine, it varies across GPU vendors. Please always choose the latest Iris or Optifine of your respective Minecraft version.
 
-   Iris versions 1.6.10+ from Minecraft versions 1.18.2+ are compatible with this shader. For Optifine, it varies across GPU vendors. Please always choose the latest Iris or Optifine of your respective Minecraft version.
+   Optifine support will not be prioritized or maintained starting from version 1.3.7 of this shader.
+
+| Iris     | Windows, Linux (Intel, AMD, NVidia) | Apple (M1)    |
+| -------- | ----------------------------------- | ------------- |
+| 1.18.2+  | Supported                           | Supported     |
+| 1.17.1-  | Not supported                       | Not supported |
 
 | Optifine | Windows, Linux (Intel, AMD, NVidia) | Apple (M1)    |
 | -------- | ----------------------------------- | ------------- |
-| 1.17.1+  | Supported                           | Supported     |
-| 1.14.2+  | Supported                           | Not supported |
+| 1.17.1+  | Partial support                     | Supported     |
+| 1.14.2+  | Partial support                     | Not supported |
 | 1.13.2-  | Not supported                       | Not supported |
-
-| Iris    | Windows, Linux (Intel, AMD, NVidia) | Apple (M1)    |
-| ------- | ----------------------------------- | ------------- |
-| 1.18.2+ | Supported                           | Supported     |
-| 1.17.1- | Not supported                       | Not supported |
 
 ## Releases
    See all available releases [here](https://github.com/Eldeston/Super-Duper-Vanilla/releases). More recent builds are found in their corresponding branches, to download simply switch to the latest version branch, go to code (green button) and download as zip.

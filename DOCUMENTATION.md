@@ -142,6 +142,9 @@ Notes for pending features/bug fixes to be implemented categorized by importance
 ## CURRENT
 * Implement bit packing for optimization
 
+* Refactor parallax occlusion mapping
+* Change cloud texture
+
 * Improve fog calculation and settings (medium priority)
 * Improve water absorption (low priority)
 * Improve tonemapping (medium priority)
