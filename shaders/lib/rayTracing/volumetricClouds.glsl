@@ -46,8 +46,8 @@ vec2 volumetricClouds(in vec3 nFeetPlayerPos, in vec3 cameraPos, in float feetPl
 
         // Apply cloud gradiante'
         // Check if ray is inside a cloud
-        if(cloudData.x < 0.5) clouds.x = max(clouds.x, -startPos.y * cloudFog);
-        if(cloudData.y < 0.5) clouds.y = max(clouds.y, -startPos.y * cloudFog);
+        if(cloudData.x > 0.5) clouds.x = max(clouds.x, -startPos.y * cloudFog);
+        if(cloudData.y > 0.5) clouds.y = max(clouds.y, -startPos.y * cloudFog);
 
         // Continue tracing
         startPos += endPos;

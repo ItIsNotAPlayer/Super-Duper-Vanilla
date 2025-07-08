@@ -129,8 +129,6 @@ Notes for pending features/bug fixes to be implemented categorized by importance
 
 * Separate iPBR for all gbuffers (medium priority)
 
-* Implement cloud absorption (low priority)
-
 * Optimize alpha testing (high priority)
 * Optimize DOF calculations with noise (low priority)
 * Optimize block ids in block.properties (medium priority)

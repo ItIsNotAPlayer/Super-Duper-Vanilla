@@ -27,8 +27,8 @@ float getSunMoonShape(in vec2 skyPos){
         vec2 cloudData = vec2(0);
         for(uint i = 1u; i <= skyBoxCloudSteps; i++){
             vec2 cloudMap = texelFetch(colortex0, ivec2(start) & 255, 0).xy;
-            if(cloudMap.x < 0.5) cloudData.x = i;
-            if(cloudMap.y < 0.5) cloudData.y = i;
+            if(cloudMap.x > 0.5) cloudData.x = i;
+            if(cloudMap.y > 0.5) cloudData.y = i;
             start -= end;
         }
 
