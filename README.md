@@ -21,10 +21,6 @@ This shader is sponsored by **Ember Host**. Open the image above or use the code
 
 Choose **Ember Host** to host your Minecraft server and take advantage of their **powerful AMD processors** and go beyond with excellent prices! ***50%*** of your first purchase will support the development of Super Duper Vanilla!
 
-## Video
-<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/1gaI9rWunhA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/7pNVfX_ywkM" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-
 ## Screenshots
 ![2022-06-28_19 28 13](https://cdn.modrinth.com/data/LMIZZNxZ/images/bd57c68a400e0722bc7132575ea7cec66ca529ab.png)
 ![2022-06-28_19 43 18](https://cdn.modrinth.com/data/LMIZZNxZ/images/1d38424b62d4461fae738019cbd1342145e9b4ac.png)
