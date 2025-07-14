@@ -48,11 +48,9 @@ List of programs with simpler shading. Common simple processes are in these prog
 List of discarded and disabled programs. They typically have no other purposes other than disabling a program by using `discard;` + `return;`. This method is used to conveniently disable programs without using `shaders.properties` to disable the program per world.
 
 ## Program Properties
-Found in their respective programs in .fsh and .vsh files. The following are the listed common program macros. These macros typically only defines the program.
+Found in their respective programs in .fsh and .vsh files. The following are the listed common program macros. These macros typically describes the program and its properties.
 
-This along with the `GBUFFERS` macro, are used to identify the quirks in the current program for the shader to detect.
-
-This list's purpose is to fully realize the shader pipeline and visualize the flow of data across programs and their purpose.
+This list's purpose is to fully realize the shader pipeline (based on Iris) and visualize the flow of data across programs and their purpose.
 
 ### Before Gbuffers
 | Program Macros        | Blend Type  | Program Type     | Shading Type | Usage            |

@@ -24,8 +24,8 @@ vec2 volumetricClouds(in vec3 nFeetPlayerPos, in vec3 cameraPos, in float feetPl
     float distInsideCloud = furthestPlane - nearestPlane;
 
     // Calculate cloud steps that dynamically increase with distance
-    uint volumetricCloudSteps = min(uint(distInsideCloud), volumetricCloudSteps);
-    float volumetricCloudStepsInverse = 1.0 / volumetricCloudSteps;
+    uint dynamicVolumetricCloudSteps = min(uint(distInsideCloud), volumetricCloudSteps);
+    float volumetricCloudStepsInverse = 1.0 / dynamicVolumetricCloudSteps;
 
     // Multiply by volumetricCloudStepsInverse to get the step size and scale with distance
     vec3 endPos = nFeetPlayerPos * (distInsideCloud * volumetricCloudStepsInverse);
@@ -37,7 +37,7 @@ vec2 volumetricClouds(in vec3 nFeetPlayerPos, in vec3 cameraPos, in float feetPl
     vec2 clouds = vec2(0);
 
     // LESSS GOOOOO RAT RACING!!!11!!11!!11!!
-    for(uint i = 0u; i < uint(volumetricCloudSteps); i++){
+    for(uint i = 0u; i < dynamicVolumetricCloudSteps; i++){
         // Get cloud fog
         float cloudFog = 1.0 - lengthSquared(startPos - cameraPos) * invCloudFarSqrd;
 
