@@ -8,7 +8,7 @@
     profile.HIGH = 高
     profile.ULTRA = 超高
 
-screen.DEBUG = Super Duper Vanilla v1.3.5
+screen.DEBUG = Super Duper Vanilla v1.3.8
     screen.DEBUG.comment = 开发: §2Eldeston§f§r, 呈现: §9FlameRender (C) §9Studios. §e单击我打开光影调试设置!
 
     option.COLOR_MODE = 颜色模式
@@ -18,7 +18,6 @@ screen.DEBUG = Super Duper Vanilla v1.3.5
         value.COLOR_MODE.3 = 植被模式
 
     option.NOISE_SPEED = 噪声速度
-    option.ENTITY_BLOCK_TRANSPARENCY = 实体方块透明度
 
 screen.POST = 后期处理
     option.OUTLINES = 描边
@@ -235,7 +234,6 @@ screen.CONFIGURATION = 配置
 ## Comments
     option.COLOR_MODE.comment = 反照率颜色模式. 全白模式使所有东西成为白色. 全黑模式使所有东西成为黑色. 植被模式只显示植被的颜色. 请保持材质开启.
     option.NOISE_SPEED.comment = 噪声使每帧随机化的速度. 对 TAA 很有用. 这种效果仅在启用 TAA 时可见.
-    option.ENTITY_BLOCK_TRANSPARENCY.comment = Iris 专属功能. 为实体和方块实体启用适当的透明度. 可能影响性能.
 
     option.OUTLINES.comment = 启用描边. 设置为标准来获得经典描边方块, 或 Dungeons 来获得 Dungeons/SDGP 风格的描边.
     option.OUTLINE_BRIGHTNESS.comment = 描边的亮度. 设置为 -1 获得黑色描边, 设置为 1 获得高亮描边.

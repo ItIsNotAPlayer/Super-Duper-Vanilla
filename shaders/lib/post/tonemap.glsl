@@ -25,6 +25,25 @@ vec3 modifiedReinhardExtended(in vec3 color){
 	return color * ((3.0 + sumCol * shoulderWhitePointFactor) / (shoulderFactor + sumCol));
 }
 
+/*
+vec3 modifiedReinhardExtended(in vec3 color){
+	color *= EXPOSURE;
+	float sumCol = sumOf(color);
+	float rainHardFactor = (3.0 + sumCol * shoulderWhitePointFactor) / (shoulderFactor + sumCol);
+	vec3 tonemapped = color * rainHardFactor;
+
+	// Color tinting, exposure, and tonemapping
+    const float coefficient = exp2(EXPOSURE) - 1.0;
+	vec3 exposureFactor = (coefficient * tonemapped) / (1.0 + (coefficient - 1.0) * tonemapped);
+
+	return tonemapped;
+}
+
+float coefficient = EXPOSURE * 0.00392156863;
+(coefficient * color + color) / (coefficient * color + 1.0)
+(coefficient * color) / (1.0 + (coefficient - 1.0) * color)
+*/
+
 // Modified Reinhard Jodie extended tonemapping
 // Might eventually become an option...maybe
 vec3 modifiedReinhardJodieExtended(in vec3 color){

@@ -3,7 +3,7 @@ vec2 getPrevScreenCoord(in vec2 currScreenPos, in float screenDepth){
 	vec3 currViewPos = getViewPos(gbufferProjectionInverse, vec3(currScreenPos, screenDepth));
 	vec3 currFeetPlayerPos = mat3(gbufferModelViewInverse) * currViewPos + gbufferModelViewInverse[3].xyz;
 
-	if(screenDepth > 0.56) currFeetPlayerPos += cameraPosition - previousCameraPosition;
+	if(screenDepth > 0.56) currFeetPlayerPos += camPosDelta;
 
 	vec3 prevViewPos = mat3(gbufferPreviousModelView) * currFeetPlayerPos + gbufferPreviousModelView[3].xyz;
 	return getScreenCoord(gbufferPreviousProjection, prevViewPos);

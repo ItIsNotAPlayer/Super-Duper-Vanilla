@@ -1,5 +1,5 @@
 /*
-================================ /// Super Duper Vanilla v1.3.5 /// ================================
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
 
     Developed by Eldeston, presented by FlameRender (C) Studios.
 
@@ -8,7 +8,7 @@
 
     By downloading this content you have agreed to the license and its terms of use.
 
-================================ /// Super Duper Vanilla v1.3.5 /// ================================
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
 */
 
 /// Buffer features: Solid screen space ambient occlusion
@@ -16,11 +16,15 @@
 /// -------------------------------- /// Vertex Shader /// -------------------------------- ///
 
 #ifdef VERTEX
-    noperspective out vec2 texCoord;
+    #ifdef SSAO
+        noperspective out vec2 texCoord;
+    #endif
 
     void main(){
-        // Get buffer texture coordinates
-        texCoord = gl_MultiTexCoord0.xy;
+        #ifdef SSAO
+            // Get buffer texture coordinates
+            texCoord = gl_MultiTexCoord0.xy;
+        #endif
 
         gl_Position = vec4(gl_Vertex.xy * 2.0 - 1.0, 0, 1);
     }
@@ -39,7 +43,9 @@
     // SSAO without normals fix for beacon
     const vec4 colortex1ClearColor = vec4(0, 0, 0, 1);
 
-    noperspective in vec2 texCoord;
+    #ifdef SSAO
+        noperspective in vec2 texCoord;
+    #endif
 
     uniform sampler2D colortex2;
 
@@ -56,7 +62,7 @@
         uniform sampler2D depthtex0;
 
         #if ANTI_ALIASING >= 2
-            uniform float frameTimeCounter;
+            uniform float frameFract;
         #endif
 
         #include "/lib/utility/projectionFunctions.glsl"

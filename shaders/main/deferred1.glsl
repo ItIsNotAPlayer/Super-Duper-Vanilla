@@ -1,5 +1,5 @@
 /*
-================================ /// Super Duper Vanilla v1.3.5 /// ================================
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
 
     Developed by Eldeston, presented by FlameRender (C) Studios.
 
@@ -8,7 +8,7 @@
 
     By downloading this content you have agreed to the license and its terms of use.
 
-================================ /// Super Duper Vanilla v1.3.5 /// ================================
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
 */
 
 /// Buffer features: Solid complex shading
@@ -72,16 +72,11 @@
 /// -------------------------------- /// Fragment Shader /// -------------------------------- ///
 
 #ifdef FRAGMENT
-    /* RENDERTARGETS: 0 */
-    layout(location = 0) out vec3 sceneColOut; // gcolor
+    /* RENDERTARGETS: 4 */
+    layout(location = 0) out vec3 sceneColOut; // colortex4
 
     // Sky silhoutte fix
     const vec4 gcolorClearColor = vec4(0, 0, 0, 1);
-
-    #if ANTI_ALIASING >= 2 || defined PREVIOUS_FRAME || defined AUTO_EXPOSURE
-        // Disable buffer clear if TAA, previous frame reflections, or auto exposure is on
-        const bool colortex5Clear = false;
-    #endif
 
     flat in vec3 skyCol;
 
@@ -101,15 +96,14 @@
 
     uniform int isEyeInWater;
 
-    uniform float near;
-    uniform float far;
+    uniform float borderFar;
 
-    uniform float blindness;
     uniform float nightVision;
-    uniform float darknessFactor;
+    uniform float effectFactor;
+    uniform float lightningFlash;
     uniform float darknessLightFactor;
 
-    uniform float frameTimeCounter;
+    uniform float fragmentFrameTime;
 
     uniform vec3 fogColor;
 
@@ -123,19 +117,21 @@
 
     uniform mat4 shadowModelView;
 
-    uniform sampler2D gcolor;
+    // Main HDR buffer
+    uniform sampler2D colortex4;
     uniform sampler2D colortex1;
+    // For SSAO and material masks
     uniform sampler2D colortex2;
     uniform sampler2D colortex3;
     
     uniform sampler2D depthtex0;
 
-    #ifdef IS_IRIS
-        uniform float lightningFlash;
-    #endif
-
     #ifdef WORLD_LIGHT
         uniform float shdFade;
+    #endif
+
+    #if ANTI_ALIASING >= 2
+        uniform float frameFract;
     #endif
 
     #ifndef FORCE_DISABLE_WEATHER
@@ -147,8 +143,15 @@
         uniform float dayCycleAdjust;
     #endif
 
-    #if defined STORY_MODE_CLOUDS && !defined FORCE_DISABLE_CLOUDS
-        uniform sampler2D colortex4;
+    #if CLOUD_TYPE != 0 && !defined FORCE_DISABLE_CLOUDS
+        uniform sampler2D colortex0;
+    #endif
+
+    #ifdef DISTANT_HORIZONS
+        uniform mat4 dhProjection;
+        uniform mat4 dhProjectionInverse;
+
+        uniform sampler2D dhDepthTex0;
     #endif
 
     #ifdef WORLD_CUSTOM_SKYLIGHT
@@ -161,8 +164,8 @@
 
     #include "/lib/utility/projectionFunctions.glsl"
 
-    #ifdef PREVIOUS_FRAME
-        uniform vec3 previousCameraPosition;
+    #if (defined SSR || defined SSGI) && defined PREVIOUS_FRAME
+        uniform vec3 camPosDelta;
 
         uniform mat4 gbufferPreviousModelView;
         uniform mat4 gbufferPreviousProjection;
@@ -187,7 +190,7 @@
     #endif
 
     #if ANTI_ALIASING == 2
-        uniform int frameMod8;
+        uniform int frameMod;
 
         uniform float pixelWidth;
         uniform float pixelHeight;
@@ -195,7 +198,13 @@
         #include "/lib/utility/taaJitter.glsl"
     #endif
 
+    #include "/lib/utility/depthTex.glsl"
+
     #if OUTLINES != 0
+        #if OUTLINES == 1
+            uniform float near;
+        #endif
+
         #include "/lib/post/outline.glsl"
     #endif
 
@@ -211,9 +220,20 @@
     void main(){
         // Screen texel coordinates
         ivec2 screenTexelCoord = ivec2(gl_FragCoord.xy);
+
+        bool realSky = false;
+
+        float depth = texelFetch(depthtex0, screenTexelCoord, 0).x;
+
+        // Distant Horizons apparently uses a different depth texture
+        #ifdef DISTANT_HORIZONS
+            realSky = depth == 1;
+            if(realSky) depth = texelFetch(dhDepthTex0, screenTexelCoord, 0).x;
+        #endif
+
         // Get screen pos
-        vec3 screenPos = vec3(texCoord, texelFetch(depthtex0, screenTexelCoord, 0).x);
-        
+        vec3 screenPos = vec3(texCoord, depth);
+
         // Get sky mask
         bool skyMask = screenPos.z == 1;
 
@@ -222,8 +242,13 @@
             if(skyMask) screenPos.xy += jitterPos(-0.5);
         #endif
 
-        // Get view pos
-        vec3 viewPos = getViewPos(gbufferProjectionInverse, screenPos);
+        // Distant Horizons apparently uses a different projection matrix
+        #ifdef DISTANT_HORIZONS
+            vec3 viewPos = getViewPos(realSky ? dhProjectionInverse : gbufferProjectionInverse, screenPos);
+        #else
+            vec3 viewPos = getViewPos(gbufferProjectionInverse, screenPos);
+        #endif
+
         // Get eye player pos
         vec3 eyePlayerPos = mat3(gbufferModelViewInverse) * viewPos;
 
@@ -235,7 +260,7 @@
         vec3 nEyePlayerPos = eyePlayerPos * viewDotInvSqrt;
 
         // Get scene color
-        sceneColOut = texelFetch(gcolor, screenTexelCoord, 0).rgb;
+        sceneColOut = texelFetch(colortex4, screenTexelCoord, 0).rgb;
 
         // Get sky pos by shadow model view
         vec3 skyPos = mat3(shadowModelView) * nEyePlayerPos;
@@ -250,14 +275,16 @@
 
         // If sky, do full sky render and return immediately
         if(skyMask){
-            sceneColOut = getFullSkyRender(nEyePlayerPos, skyPos, currSkyCol + sceneColOut) * exp2(-far * (blindness + darknessFactor));
+            // Calculate and output sky render
+            sceneColOut = getFullSkyRender(nEyePlayerPos, skyPos, currSkyCol + sceneColOut) * exp2(-borderFar * effectFactor);
+            // Exit function immediately
             return;
         }
 
         #if ANTI_ALIASING >= 2
-            vec3 dither = toRandPerFrame(getRand3(screenTexelCoord & 255), frameTimeCounter);
+            vec3 dither = fract(getRng3(screenTexelCoord & 255) + frameFract);
         #else
-            vec3 dither = getRand3(screenTexelCoord & 255);
+            vec3 dither = getRng3(screenTexelCoord & 255);
         #endif
 
         // Declare and get materials
@@ -266,7 +293,7 @@
         vec3 normal = texelFetch(colortex1, screenTexelCoord, 0).xyz;
 
         // Apply deffered shading
-        sceneColOut = complexShadingDeferred(sceneColOut, screenPos, viewPos, mat3(gbufferModelView) * normal, albedo, viewDotInvSqrt, matRaw0.x, matRaw0.y, dither);
+        sceneColOut = complexShadingDeferred(sceneColOut, screenPos, viewPos, mat3(gbufferModelView) * normal, albedo, dither, viewDotInvSqrt, matRaw0.x, matRaw0.y, realSky);
 
         #if OUTLINES != 0
             // Outline calculation
@@ -282,7 +309,17 @@
 
         // Get basic sky fog color
         vec3 fogSkyCol = getSkyFogRender(nEyePlayerPos, skyPos, currSkyCol);
-        // Do basic sky render and use it as fog color
-        sceneColOut = getFogRender(sceneColOut, fogSkyCol, viewDist, nEyePlayerPos.y, eyePlayerPos.y + gbufferModelViewInverse[3].y + cameraPosition.y);
+        // Get fog factor
+        float fogFactor = getFogFactor(viewDist, nEyePlayerPos.y, eyePlayerPos.y + gbufferModelViewInverse[3].y + cameraPosition.y);
+
+        // Border fog
+        #ifdef BORDER_FOG
+            fogFactor = (fogFactor - 1.0) * getBorderFog(viewDist) + 1.0;
+        #endif
+
+        // Apply fog and darkness fog
+        sceneColOut = ((fogSkyCol - sceneColOut) * fogFactor + sceneColOut) * getFogEffectFactor(viewDist);
+        // Clamp scene color to prevent NaNs during post processing
+        sceneColOut = max(sceneColOut, vec3(0));
     }
 #endif

@@ -1,5 +1,5 @@
 /*
-================================ /// Super Duper Vanilla v1.3.5 /// ================================
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
 
     Developed by Eldeston, presented by FlameRender (C) Studios.
 
@@ -8,7 +8,7 @@
 
     By downloading this content you have agreed to the license and its terms of use.
 
-================================ /// Super Duper Vanilla v1.3.5 /// ================================
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
 */
 
 /// Buffer features: Bloom blur 2nd pass
@@ -24,21 +24,21 @@
 /// -------------------------------- /// Fragment Shader /// -------------------------------- ///
 
 #ifdef FRAGMENT
-    /* RENDERTARGETS: 4 */
-    layout(location = 0) out vec3 bloomColOut; // colortex4
+    /* RENDERTARGETS: 0 */
+    layout(location = 0) out vec3 bloomColOut; // colortex0
 
     #ifdef BLOOM
         // No need to use mipmapping in this 2nd bloom pass, so we'll utilize texelFetch for some sweet, sweet performance
-        uniform sampler2D colortex4;
+        uniform sampler2D colortex0;
     #endif
 
     void main(){
         #ifdef BLOOM
-            vec3 sample0 = texelFetch(colortex4, ivec2(gl_FragCoord.x, gl_FragCoord.y - 2), 0).rgb +
-                texelFetch(colortex4, ivec2(gl_FragCoord.x, gl_FragCoord.y + 2), 0).rgb;
-            vec3 sample1 = texelFetch(colortex4, ivec2(gl_FragCoord.x, gl_FragCoord.y - 1), 0).rgb +
-                texelFetch(colortex4, ivec2(gl_FragCoord.x, gl_FragCoord.y + 1), 0).rgb;
-            vec3 sample2 = texelFetch(colortex4, ivec2(gl_FragCoord.xy), 0).rgb;
+            vec3 sample0 = texelFetch(colortex0, ivec2(gl_FragCoord.x, gl_FragCoord.y - 2), 0).rgb +
+                texelFetch(colortex0, ivec2(gl_FragCoord.x, gl_FragCoord.y + 2), 0).rgb;
+            vec3 sample1 = texelFetch(colortex0, ivec2(gl_FragCoord.x, gl_FragCoord.y - 1), 0).rgb +
+                texelFetch(colortex0, ivec2(gl_FragCoord.x, gl_FragCoord.y + 1), 0).rgb;
+            vec3 sample2 = texelFetch(colortex0, ivec2(gl_FragCoord.xy), 0).rgb;
 
             bloomColOut = sample0 * 0.0625 + sample1 * 0.25 + sample2 * 0.375;
         #else

@@ -19,14 +19,3 @@ struct dataPBR{
     // POM self shadows
     float parallaxShd;
 };
-
-/*
-// Texture coordinate data struct
-struct dataTexCoord{
-    // Derivatives
-    vec2 texDFdx;
-    vec2 texDFdy;
-    // Main texcoord
-    vec2 texCoord;
-};
-*/

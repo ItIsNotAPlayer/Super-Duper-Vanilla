@@ -1,26 +1,27 @@
 float getSSAO(in vec3 screenPos, in vec3 viewNormal){
     #if ANTI_ALIASING >= 2
-        vec3 dither = toRandPerFrame(getRand3(ivec2(gl_FragCoord.xy) & 255), frameTimeCounter);
+        vec3 dither = fract(getRng3(ivec2(gl_FragCoord.xy) & 255) + frameFract);
     #else
-        vec3 dither = getRand3(ivec2(gl_FragCoord.xy) & 255);
+        vec3 dither = getRng3(ivec2(gl_FragCoord.xy) & 255);
     #endif
 
     float occlusion = 0.25;
 
     // Instead of iterating by adding stepSize and using fract every time, we swizzle + one fract instead for pleasant and optimized results
-    vec3 baseDither = (dither.xyz - 0.5) * 0.5;
+    vec3 baseDither = dither.xyz * 0.5 - 0.25;
 	vec3 ditherSwizzle[4] = vec3[4](
 		baseDither.xyz,
 		baseDither.zxy,
 		baseDither.yzx,
-		(fract(dither.zyx + GOLDEN_RATIO) - 0.5) * 0.5
+		fract(dither.zyx + GOLDEN_RATIO) * 0.5 - 0.25
 	);
 
     float depthOrigin = near / (1.0 - screenPos.z);
+
     // Pre calculate base position
     vec3 basePos = getViewPos(gbufferProjectionInverse, screenPos) + viewNormal * 0.5;
 
-    for(int i = 0; i < 4; i++){
+    for(uint i = 0u; i < 4u; i++){
         // Add new offsets to origin
         vec3 samplePos = getScreenPos(gbufferProjection, basePos + ditherSwizzle[i]);
         // Sample new depth and linearize

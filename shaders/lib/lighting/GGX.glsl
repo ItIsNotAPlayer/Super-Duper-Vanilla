@@ -56,7 +56,7 @@ float getNoHSquared(in float NoL, in float NoV, in float VoL){
 
 // Modified fast specular BRDF
 // Thanks for LVutner#5199 for sharing his code!
-vec3 getSpecularBRDF(in vec3 V, in vec3 N, in vec3 albedo, in float NL, in float metallic, in float smoothness){
+vec3 getSpecularBRDF(in vec3 V, in vec3 N, in vec3 albedo, in float NL, in float NV, in float metallic, in float smoothness){
     // Halfway vector
     vec3 H = fastNormalize(vec3(shadowModelView[0].z, shadowModelView[1].z, shadowModelView[2].z) + V);
     // Light dot halfway vector
@@ -74,7 +74,7 @@ vec3 getSpecularBRDF(in vec3 V, in vec3 N, in vec3 albedo, in float NL, in float
     float specIntensity = sunMoonIntensitySqrd * specularMult;
 
     // Distribution
-    float NHSqr = getNoHSquared(NL, dot(N, V), dot(V, vec3(shadowModelView[0].z, shadowModelView[1].z, shadowModelView[2].z)));
+    float NHSqr = getNoHSquared(NL, NV, dot(V, vec3(shadowModelView[0].z, shadowModelView[1].z, shadowModelView[2].z)));
     float denominator = squared(NHSqr * (alphaSqrd - 1.0) + 1.0);
     float distribution = (specularMult * alphaSqrd * NL) / (denominator * visibility * PI);
 

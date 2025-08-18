@@ -1,5 +1,5 @@
 /*
-================================ /// Super Duper Vanilla v1.3.5 /// ================================
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
 
     Developed by Eldeston, presented by FlameRender (C) Studios.
 
@@ -8,7 +8,7 @@
 
     By downloading this content you have agreed to the license and its terms of use.
 
-================================ /// Super Duper Vanilla v1.3.5 /// ================================
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
 */
 
 /// Buffer features: Bloom blur 1st pass
@@ -33,18 +33,18 @@
 /// -------------------------------- /// Fragment Shader /// -------------------------------- ///
 
 #ifdef FRAGMENT
-    /* RENDERTARGETS: 4 */
-    layout(location = 0) out vec3 bloomColOut; // colortex4
+    /* RENDERTARGETS: 0 */
+    layout(location = 0) out vec3 bloomColOut; // colortex0
 
     #ifdef BLOOM
         // Needs to be enabled by force to be able to use LOD fully even with textureLod
-        const bool gcolorMipmapEnabled = true;
+        const bool colortex4MipmapEnabled = true;
 
         noperspective in vec2 texCoord;
 
         uniform float pixelWidth;
 
-        uniform sampler2D gcolor;
+        uniform sampler2D colortex4;
 
         vec3 bloomTile(in vec3 bloomCol, in vec2 bloomPos, in int scale, in int LOD){
             vec2 bloomUv = bloomPos * scale;
@@ -55,11 +55,11 @@
             // Get pixel size based on bloom tile scale
             float pixSize = scale * pixelWidth;
 
-            vec3 sample0 = textureLod(gcolor, vec2(bloomUv.x - pixSize * 2.0, bloomUv.y), LOD).rgb +
-                textureLod(gcolor, vec2(bloomUv.x + pixSize * 2.0, bloomUv.y), LOD).rgb;
-            vec3 sample1 = textureLod(gcolor, vec2(bloomUv.x - pixSize, bloomUv.y), LOD).rgb +
-                textureLod(gcolor, vec2(bloomUv.x + pixSize, bloomUv.y), LOD).rgb;
-            vec3 sample2 = textureLod(gcolor, bloomUv, LOD).rgb;
+            vec3 sample0 = textureLod(colortex4, vec2(bloomUv.x - pixSize * 2.0, bloomUv.y), LOD).rgb +
+                textureLod(colortex4, vec2(bloomUv.x + pixSize * 2.0, bloomUv.y), LOD).rgb;
+            vec3 sample1 = textureLod(colortex4, vec2(bloomUv.x - pixSize, bloomUv.y), LOD).rgb +
+                textureLod(colortex4, vec2(bloomUv.x + pixSize, bloomUv.y), LOD).rgb;
+            vec3 sample2 = textureLod(colortex4, bloomUv, LOD).rgb;
 
             return sample0 * 0.0625 + sample1 * 0.25 + sample2 * 0.375;
         }

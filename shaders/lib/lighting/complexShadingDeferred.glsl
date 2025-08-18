@@ -1,4 +1,4 @@
-vec3 complexShadingDeferred(in vec3 sceneCol, in vec3 screenPos, in vec3 viewPos, in vec3 normal, in vec3 albedo, in float viewDotInvSqrt, in float metallic, in float smoothness, in vec3 dither){
+vec3 complexShadingDeferred(in vec3 sceneCol, in vec3 screenPos, in vec3 viewPos, in vec3 normal, in vec3 albedo, in vec3 dither, in float viewDotInvSqrt, in float metallic, in float smoothness, in bool realSky){
 	#if defined ROUGH_REFLECTIONS || defined SSGI
 		vec3 noiseUnitVector = generateUnitVector(dither.xy);
 	#endif
@@ -12,7 +12,7 @@ vec3 complexShadingDeferred(in vec3 sceneCol, in vec3 screenPos, in vec3 viewPos
 		#ifdef PREVIOUS_FRAME
 			if(SSGIcoord.z > 0.5) sceneCol += albedo * textureLod(colortex5, getPrevScreenCoord(SSGIcoord.xy), 0).rgb;
 		#else
-			if(SSGIcoord.z > 0.5) sceneCol += albedo * textureLod(gcolor, SSGIcoord.xy, 0).rgb;
+			if(SSGIcoord.z > 0.5) sceneCol += albedo * textureLod(colortex4, SSGIcoord.xy, 0).rgb;
 		#endif
 	#endif
 
@@ -36,12 +36,28 @@ vec3 complexShadingDeferred(in vec3 sceneCol, in vec3 screenPos, in vec3 viewPos
 		// Get SSR screen coordinates
 		vec3 SSRCoord = rayTraceScene(screenPos, viewPos, reflectViewDir, dither.z);
 
+		#ifdef DISTANT_HORIZONS
+			if(realSky) SSRCoord.z = 0.0;
+		#endif
+
+		// Fake reflections, also helps with improving reflection quality
+		if(SSRCoord.z < 0.5){
+			// Using the original ray direction, get the reflected ray and increase its length
+			vec3 reflectDirF = viewPos + reflectViewDir * borderFar;
+
+			// This masks only the reflections in view
+			if(reflectDirF.z < viewPos.z){
+				vec3 SSRDH = getScreenPos(gbufferProjection, reflectDirF);
+				if(SSRDH.x >= 0 && SSRDH.y >= 0 && SSRDH.x <= 1 && SSRDH.y <= 1 && getDepthTex(SSRDH.xy) != 1) SSRCoord = vec3(SSRDH.xy, 1);
+			}
+		}
+
 		#ifdef PREVIOUS_FRAME
 			// Get reflections and check for sky
 			vec3 reflectCol = SSRCoord.z < 0.5 ? getSkyReflection(reflectViewDir) : textureLod(colortex5, getPrevScreenCoord(SSRCoord.xy), 0).rgb;
 		#else
 			// Get reflections and check for sky
-			vec3 reflectCol = SSRCoord.z < 0.5 ? getSkyReflection(reflectViewDir) : textureLod(gcolor, SSRCoord.xy, 0).rgb;
+			vec3 reflectCol = SSRCoord.z < 0.5 ? getSkyReflection(reflectViewDir) : textureLod(colortex4, SSRCoord.xy, 0).rgb;
 		#endif
 	#else
 		vec3 reflectCol = getSkyReflection(reflectViewDir);
@@ -53,6 +69,6 @@ vec3 complexShadingDeferred(in vec3 sceneCol, in vec3 screenPos, in vec3 viewPos
 	float smoothCosTheta = NV > 0 ? exp2(-9.28 * NV) * smoothness : smoothness;
 	float oneMinusCosTheta = smoothness - smoothCosTheta;
 
-	if(metallic <= 0.9) return sceneCol + (reflectCol - sceneCol) * (smoothCosTheta + metallic * oneMinusCosTheta);
-	return sceneCol * (1.0 - smoothness) + reflectCol * (smoothCosTheta + albedo * oneMinusCosTheta);
+	if(metallic <= 0.9) return sceneCol + reflectCol * (smoothCosTheta + metallic * oneMinusCosTheta);
+	return sceneCol + reflectCol * (smoothCosTheta + albedo * oneMinusCosTheta);
 }

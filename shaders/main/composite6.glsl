@@ -1,5 +1,5 @@
 /*
-================================ /// Super Duper Vanilla v1.3.5 /// ================================
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
 
     Developed by Eldeston, presented by FlameRender (C) Studios.
 
@@ -8,7 +8,7 @@
 
     By downloading this content you have agreed to the license and its terms of use.
 
-================================ /// Super Duper Vanilla v1.3.5 /// ================================
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
 */
 
 /// Buffer features: Lens flare, applied bloom, auto exposure, tonemapping, vignette and postColOut grading
@@ -75,7 +75,7 @@
 
     noperspective in vec2 texCoord;
 
-    uniform sampler2D gcolor;
+    uniform sampler2D colortex4;
 
     #ifdef AUTO_EXPOSURE
         uniform float frameTime;
@@ -87,7 +87,7 @@
         uniform float pixelWidth;
         uniform float pixelHeight;
 
-        uniform sampler2D colortex4;
+        uniform sampler2D colortex0;
 
         vec3 getBloomTile(in vec2 coords, in float invScale){
             // Remap to bloom tile texture coordinates
@@ -100,8 +100,8 @@
             vec2 bottomLeftCorner = baseCoord - pixelSize;
 
             // Apply box blur all tiles
-            return textureLod(colortex4, bottomLeftCorner, 0).rgb + textureLod(colortex4, topRightCorner, 0).rgb +
-                textureLod(colortex4, vec2(bottomLeftCorner.x, topRightCorner.y), 0).rgb + textureLod(colortex4, vec2(topRightCorner.x, bottomLeftCorner.y), 0).rgb;
+            return textureLod(colortex0, bottomLeftCorner, 0).rgb + textureLod(colortex0, topRightCorner, 0).rgb +
+                textureLod(colortex0, vec2(bottomLeftCorner.x, topRightCorner.y), 0).rgb + textureLod(colortex0, vec2(topRightCorner.x, bottomLeftCorner.y), 0).rgb;
         }
     #endif
 
@@ -112,6 +112,10 @@
         uniform float aspectRatio;
 
         uniform sampler2D depthtex0;
+
+        #ifdef DISTANT_HORIZONS
+            uniform sampler2D dhDepthTex1;
+        #endif
 
         #ifndef FORCE_DISABLE_WEATHER
             uniform float rainStrength;
@@ -129,7 +133,7 @@
         ivec2 screenTexelCoord = ivec2(gl_FragCoord.xy);
 
         // Get scene color
-        postColOut = texelFetch(gcolor, screenTexelCoord, 0).rgb;
+        postColOut = texelFetch(colortex4, screenTexelCoord, 0).rgb;
 
         #ifdef BLOOM
             // Uncompress the HDR colors and upscale
@@ -148,17 +152,22 @@
         #endif
 
         #if defined LENS_FLARE && defined WORLD_LIGHT
-            if(textureLod(depthtex0, shdLightDirScreenSpace.xy, 0).x == 1)
-                #ifdef FORCE_DISABLE_WEATHER
-                    postColOut += getLensFlare(texCoord - 0.5, shdLightDirScreenSpace.xy - 0.5) * (1.0 - blindness) * (1.0 - darknessFactor);
-                #else
-                    postColOut += getLensFlare(texCoord - 0.5, shdLightDirScreenSpace.xy - 0.5) * (1.0 - blindness) * (1.0 - darknessFactor) * (1.0 - rainStrength);
-                #endif
+            #ifdef DISTANT_HORIZONS
+                bool isSky = textureLod(dhDepthTex1, shdLightDirScreenSpace.xy, 0).x == 1 && textureLod(depthtex0, shdLightDirScreenSpace.xy, 0).x == 1;
+            #else
+                bool isSky = textureLod(depthtex0, shdLightDirScreenSpace.xy, 0).x == 1;
+            #endif
+
+            #ifdef FORCE_DISABLE_WEATHER
+                if(isSky) postColOut += getLensFlare(texCoord - 0.5, shdLightDirScreenSpace.xy - 0.5) * (1.0 - blindness) * (1.0 - darknessFactor);
+            #else
+                if(isSky) postColOut += getLensFlare(texCoord - 0.5, shdLightDirScreenSpace.xy - 0.5) * (1.0 - blindness) * (1.0 - darknessFactor) * (1.0 - rainStrength);
+            #endif
         #endif
 
         #ifdef AUTO_EXPOSURE
             // Get center pixel current average scene luminance and mix previous and current pixel...
-            float centerPixLuminance = sumOf(textureLod(gcolor, vec2(0.5), 8).rgb);
+            float centerPixLuminance = sumOf(textureLod(colortex4, vec2(0.5), 8).rgb);
 
             // Accumulate current luminance
             float frameTimeExposure = AUTO_EXPOSURE_SPEED * frameTime;

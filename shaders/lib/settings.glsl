@@ -61,7 +61,7 @@ const float sunPathRotation = 30.0; // Light path angle. This also affects sky a
 #define SSAO // Enables screenspace ambient occlusion.
 #define AMBIENT_LIGHTING 0.05 // Overall ambient lighting value. Increase if you dislike the pitch black darkness, higher values may make lighting unrealistic. Set it to zero for a more realistic approach if you have SSGI enabled. Set it to 0.50 for nightvision. [0.00 0.01 0.02 0.03 0.04 0.05 0.06 0.07 0.08 0.09 0.10 0.11 0.12 0.13 0.14 0.15 0.16 0.17 0.18 0.19 0.20 0.21 0.22 0.23 0.24 0.25 0.26 0.27 0.28 0.29 0.30 0.31 0.32 0.33 0.34 0.35 0.36 0.37 0.38 0.39 0.40 0.41 0.42 0.43 0.44 0.45 0.46 0.47 0.48 0.49 0.50]
 
-/// -------------------------------- /// Ray traing settings /// -------------------------------- ///
+/// -------------------------------- /// Ray tracing settings /// -------------------------------- ///
 
 // #define SSGI // Enables screen space global illumination. May improve the ambience of dark areas despite the noisiness. Currently experimental and unoptimized. Turn on TAA for best results.
 #define SSR // Enables screen space global reflections. May improve the reflections of smooth objects using PBR.
@@ -70,30 +70,38 @@ const float sunPathRotation = 30.0; // Light path angle. This also affects sky a
 #define RAYTRACER_BISTEPS 2 // Raytracer binary refinement steps. Improves quality especially when using a low step count. Balancing the values may be necessary for performance.  [0 2 4 6 8]
 
 // #define ROUGH_REFLECTIONS // Enables rougher objects to have rougher reflections. May show weird artifacts, but some AA might fix it.
-// #define PREVIOUS_FRAME // Reads previous frame buffer colors alowing SSR or SSGI to have infinite bounces of light. Impacts performance!
+#define PREVIOUS_FRAME // Reads previous frame buffer colors alowing SSR or SSGI to have infinite bounces of light. Impacts performance!
 
 /// -------------------------------- /// Atmospherics /// -------------------------------- ///
 
-#define SUN_MOON_TYPE 0 // Sun and moon type [0 1 2]
-#define SUN_MOON_INTENSITY 5 // The sun or moon's intensity. Also affects specular reflections. [2 3 4 5 6 7 8]
+#define SUN_MOON_TYPE 0 // Changes sun and moon type [0 1 2]
+#define SUN_MOON_INTENSITY 4 // The sun or moon's intensity. Also affects specular reflections. [0 1 2 3 4 5 6 7 8]
 
 #define VOLUMETRIC_LIGHTING // Enables volumetric lighting.
 #define VOLUMETRIC_LIGHTING_STRENGTH 0.50 // The strength of volumetric lighting, set it to zero to disable it [0.00 0.01 0.02 0.03 0.04 0.05 0.06 0.07 0.08 0.09 0.10 0.11 0.12 0.13 0.14 0.15 0.16 0.17 0.18 0.19 0.20 0.21 0.22 0.23 0.24 0.25 0.26 0.27 0.28 0.29 0.30 0.31 0.32 0.33 0.34 0.35 0.36 0.37 0.38 0.39 0.40 0.41 0.42 0.43 0.44 0.45 0.46 0.47 0.48 0.49 0.50 0.51 0.52 0.53 0.54 0.55 0.56 0.57 0.58 0.59 0.60 0.61 0.62 0.63 0.64 0.65 0.66 0.67 0.68 0.69 0.70 0.71 0.72 0.73 0.74 0.75 0.76 0.77 0.78 0.79 0.80 0.81 0.82 0.83 0.84 0.85 0.86 0.87 0.88 0.89 0.90 0.91 0.92 0.93 0.94 0.95 0.96 0.97 0.98 0.99 1.00]
 #define BORDER_FOG // Enables border fog to cover world edges
 #define GROUND_FOG_STRENGTH 0.50 // The strength of mist/ground fog. [0.00 0.01 0.02 0.03 0.04 0.05 0.06 0.07 0.08 0.09 0.10 0.11 0.12 0.13 0.14 0.15 0.16 0.17 0.18 0.19 0.20 0.21 0.22 0.23 0.24 0.25 0.26 0.27 0.28 0.29 0.30 0.31 0.32 0.33 0.34 0.35 0.36 0.37 0.38 0.39 0.40 0.41 0.42 0.43 0.44 0.45 0.46 0.47 0.48 0.49 0.50 0.51 0.52 0.53 0.54 0.55 0.56 0.57 0.58 0.59 0.60 0.61 0.62 0.63 0.64 0.65 0.66 0.67 0.68 0.69 0.70 0.71 0.72 0.73 0.74 0.75 0.76 0.77 0.78 0.79 0.80 0.81 0.82 0.83 0.84 0.85 0.86 0.87 0.88 0.89 0.90 0.91 0.92 0.93 0.94 0.95 0.96 0.97 0.98 0.99 1.00]
+#define SKYBOX_BRIGHTNESS 1.00 // Sky box brightness. [0.00 0.05 0.10 0.15 0.20 0.25 0.30 0.35 0.40 0.45 0.50 0.55 0.60 0.65 0.70 0.75 0.80 0.85 0.90 0.95 1.00 1.05 1.10 1.15 1.20 1.25 1.30 1.35 1.40 1.45 1.50 1.55 1.60 1.65 1.70 1.75 1.80 1.85 1.90 1.95 2.00]
 
-#define STORY_MODE_CLOUDS // Uses procedurally generated clouds (a.k.a. aerogel clouds) instead of vanilla clouds. Disable vanilla clouds for proper results.
-// #define DOUBLE_LAYERED_CLOUDS // Adds another layer of clouds (works on both vanilla and shader clouds), may use up performance.
+/// -------------------------------- /// Cloud settings /// -------------------------------- ///
+
+#define CLOUD_TYPE 2 // Changes cloud type. [0 1 2]
+#define DOUBLE_LAYERED_CLOUDS // Adds another layer of clouds (works on both vanilla and shader clouds), may use up performance.
 #define DYNAMIC_CLOUDS // Makes clouds more dynamic and allows weather to affect it. (affects on both vanilla and story mode clouds).
 #define FADE_SPEED 0.20 // Cloud fade speed [0.00 0.05 0.10 0.15 0.20 0.25 0.30 0.35 0.40 0.45 0.50 0.55 0.60 0.65 0.70 0.75 0.80 0.85 0.90 0.95 1.00 1.05 1.10 1.15 1.20 1.25 1.30 1.35 1.40 1.45 1.50 1.55 1.60 1.65 1.70 1.75 1.80 1.85 1.90 1.95 2.00 2.05 2.10 2.15 2.20 2.25 2.30 2.35 2.40 2.45 2.50 2.55 2.60 2.65 2.70 2.75 2.80 2.85 2.90 2.95 3.00 3.05 3.10 3.15 3.20 3.25 3.30 3.35 3.40 3.45 3.50 3.55 3.60 3.65 3.70 3.75 3.80 3.85 3.90 3.95 4.00]
-#define SECOND_CLOUD_HEIGHT 64.0 // 2nd layer cloud height, if double vanilla clouds is on [-128.0 -112.0 -96.0 -80.0 -64.0 -48.0 -32.0 -16.0 16.0 32.0 48.0 64.0 80.0 96.0 112.0 128.0]
-#define SKYBOX_BRIGHTNESS 1.00 // Sky box brightness. [0.00 0.05 0.10 0.15 0.20 0.25 0.30 0.35 0.40 0.45 0.50 0.55 0.60 0.65 0.70 0.75 0.80 0.85 0.90 0.95 1.00 1.05 1.10 1.15 1.20 1.25 1.30 1.35 1.40 1.45 1.50 1.55 1.60 1.65 1.70 1.75 1.80 1.85 1.90 1.95 2.00]
+#define SECOND_CLOUD_HEIGHT 128.0 // 2nd layer cloud height, if double vanilla clouds is on [0.0 4.0 8.0 12.0 16.0 20.0 24.0 28.0 32.0 36.0 40.0 44.0 48.0 52.0 56.0 60.0 64.0 68.0 72.0 76.0 80.0 84.0 88.0 92.0 96.0 100.0 104.0 108.0 112.0 116.0 120.0 124.0 128.0 132.0 136.0 140.0 144.0 148.0 152.0 156.0 160.0 164.0 168.0 172.0 176.0 180.0 184.0 188.0 192.0 196.0 200.0 204.0 208.0 212.0 216.0 220.0 224.0 228.0 232.0 236.0 240.0 244.0 248.0 252.0 256.0]
+
+#define VOLUMETRIC_CLOUD_STEPS 16 // Story mode clouds steps. Increasing may improve quality and demand more performance. [16 32 64 128 256]
+#define VOLUMETRIC_CLOUD_DEPTH 8.0 // Determines the story mode clouds' thickness. [4.0 6.0 8.0 10.0 12.0]
+
+#define SKYBOX_CLOUD_STEPS 16 // Story mode clouds steps. Increasing may improve quality and demand more performance. [16 32 64 128 256]
+#define SKYBOX_CLOUD_DEPTH 0.08 // Determines the story mode clouds' thickness. [0.00 0.01 0.02 0.03 0.04 0.05 0.06 0.07 0.08 0.09 0.10 0.11 0.12 0.13 0.14 0.15 0.16 0.17 0.18 0.19 0.20 0.21 0.22 0.23 0.24 0.25 0.26 0.27 0.28 0.29 0.30 0.31 0.32 0.33 0.34 0.35 0.36 0.37 0.38 0.39 0.40 0.41 0.42 0.43 0.44 0.45 0.46 0.47 0.48 0.49 0.50 0.51 0.52 0.53 0.54 0.55 0.56 0.57 0.58 0.59 0.60 0.61 0.62 0.63 0.64 0.65 0.66 0.67 0.68 0.69 0.70 0.71 0.72 0.73 0.74 0.75 0.76 0.77 0.78 0.79 0.80 0.81 0.82 0.83 0.84 0.85 0.86 0.87 0.88 0.89 0.90 0.91 0.92 0.93 0.94 0.95 0.96 0.97 0.98 0.99 1.00]
 
 /// -------------------------------- /// World /// -------------------------------- ///
 
 #define TERRAIN_ANIMATION // Enables terrain waving animation.
 #define WATER_ANIMATION // Enables water waving animation.
-#define WEATHER_ANIMATION // Enables rain waving animation. 
+#define WEATHER_ANIMATION // Enables rain waving animation.
 
 #define TIMELAPSE_MODE 0 // Enable timelapse mode. This smoothens the transition of animations of the sky, the foliage waving etc according to current world time instead of frame time. Set to fragment for water normals and sky only and full for the water normals, sky, and waves. This feature does not work on vanilla clouds, skybox, and the sun and moon. [0 1 2]
 
@@ -111,15 +119,18 @@ const float sunPathRotation = 30.0; // Light path angle. This also affects sky a
 #define PBR_MODE 1 // Enables PBR. Integrated PBR depends on the vanilla albedo textures to map out the materials. Resource PBR uses your resource packs' PBR, if available. Resource PBR requires latest LabPBR version! [0 1 2]
 #define SPECULAR_HIGHLIGHTS // Enables specular highlight. Specular highlights are the approximate reflections of the sun.
 #define ENVIRONMENT_PBR // Enables enviroment materials. Environment materials affects your surrounding according to your environment such as rain.
-// #define NORMAL_GENERATION // Enables normal generation. Disabled when LabPBR is on. Works mostly on vanilla resource packs.
-#define NORMAL_GENERATION_RESOLUTION 128 // Auto generated normal resolution. Minor effects to performance. [16 32 64 128 256 512 1024]
 #define SUBSURFACE_SCATTERING // Enables subsurface scattering. 
-
 #define EMISSIVE_INTENSITY 8 // Emissive maps intensity. Does not affect lightmaps and requires PBR on. [2 4 8 16 32]
-// #define SLOPE_NORMALS // Enables slope normals. Disable this feature if you're using a high resolution pack with normal maps. Thanks @Null!
 #define NORMAL_STRENGTH 1.00 // Normal map strength. Effective only if PBR is on with the RP normals, and slope normals is off. [0.00 0.01 0.02 0.03 0.04 0.05 0.06 0.07 0.08 0.09 0.10 0.11 0.12 0.13 0.14 0.15 0.16 0.17 0.18 0.19 0.20 0.21 0.22 0.23 0.24 0.25 0.26 0.27 0.28 0.29 0.30 0.31 0.32 0.33 0.34 0.35 0.36 0.37 0.38 0.39 0.40 0.41 0.42 0.43 0.44 0.45 0.46 0.47 0.48 0.49 0.50 0.51 0.52 0.53 0.54 0.55 0.56 0.57 0.58 0.59 0.60 0.61 0.62 0.63 0.64 0.65 0.66 0.67 0.68 0.69 0.70 0.71 0.72 0.73 0.74 0.75 0.76 0.77 0.78 0.79 0.80 0.81 0.82 0.83 0.84 0.85 0.86 0.87 0.88 0.89 0.90 0.91 0.92 0.93 0.94 0.95 0.96 0.97 0.98 0.99 1.00]
+
+// #define SLOPE_NORMALS // Enables slope normals. Disable this feature if you're using a high resolution pack with normal maps. Thanks @Null!
 // #define DIRECTIONAL_LIGHTMAPS // Enables directional lightmaps. Effective only if auto generated normals or normal maps from PBR is enabled.
 #define DIRECTIONAL_LIGHTMAP_STRENGTH 1.00 // Directional lightmap strength. Effective if directional lightmaps is enabled. [0.00 0.01 0.02 0.03 0.04 0.05 0.06 0.07 0.08 0.09 0.10 0.11 0.12 0.13 0.14 0.15 0.16 0.17 0.18 0.19 0.20 0.21 0.22 0.23 0.24 0.25 0.26 0.27 0.28 0.29 0.30 0.31 0.32 0.33 0.34 0.35 0.36 0.37 0.38 0.39 0.40 0.41 0.42 0.43 0.44 0.45 0.46 0.47 0.48 0.49 0.50 0.51 0.52 0.53 0.54 0.55 0.56 0.57 0.58 0.59 0.60 0.61 0.62 0.63 0.64 0.65 0.66 0.67 0.68 0.69 0.70 0.71 0.72 0.73 0.74 0.75 0.76 0.77 0.78 0.79 0.80 0.81 0.82 0.83 0.84 0.85 0.86 0.87 0.88 0.89 0.90 0.91 0.92 0.93 0.94 0.95 0.96 0.97 0.98 0.99 1.00]
+
+/// -------------------------------- /// iPBR settings /// -------------------------------- ///
+
+// #define NORMAL_GENERATION // Enables normal generation. Disabled when LabPBR is on. Works mostly on vanilla resource packs.
+#define NORMAL_GENERATION_RESOLUTION 128 // Auto generated normal resolution. Minor effects to performance. [16 32 64 128 256 512 1024]
 
 /// -------------------------------- /// Water material settings /// -------------------------------- ///
 
@@ -140,6 +151,12 @@ const float sunPathRotation = 30.0; // Light path angle. This also affects sky a
 #define LAVA_BRIGHTNESS 1.00 // Lava brightness, lower values mean darker colors [0.00 0.01 0.02 0.03 0.04 0.05 0.06 0.07 0.08 0.09 0.10 0.11 0.12 0.13 0.14 0.15 0.16 0.17 0.18 0.19 0.20 0.21 0.22 0.23 0.24 0.25 0.26 0.27 0.28 0.29 0.30 0.31 0.32 0.33 0.34 0.35 0.36 0.37 0.38 0.39 0.40 0.41 0.42 0.43 0.44 0.45 0.46 0.47 0.48 0.49 0.50 0.51 0.52 0.53 0.54 0.55 0.56 0.57 0.58 0.59 0.60 0.61 0.62 0.63 0.64 0.65 0.66 0.67 0.68 0.69 0.70 0.71 0.72 0.73 0.74 0.75 0.76 0.77 0.78 0.79 0.80 0.81 0.82 0.83 0.84 0.85 0.86 0.87 0.88 0.89 0.90 0.91 0.92 0.93 0.94 0.95 0.96 0.97 0.98 0.99 1.00]
 #define LAVA_NOISE // Enables lava noise. Varies the lava brightness by noise similar to Minecraft Dungeons.
 #define LAVA_TILE_SIZE 16 // Tile size of the lava [4 8 16 24 32]
+
+/// -------------------------------- /// Sculk material settings /// -------------------------------- ///
+
+#define SCULK_BRIGHTNESS 1.00 // Lava brightness, lower values mean darker colors [0.00 0.01 0.02 0.03 0.04 0.05 0.06 0.07 0.08 0.09 0.10 0.11 0.12 0.13 0.14 0.15 0.16 0.17 0.18 0.19 0.20 0.21 0.22 0.23 0.24 0.25 0.26 0.27 0.28 0.29 0.30 0.31 0.32 0.33 0.34 0.35 0.36 0.37 0.38 0.39 0.40 0.41 0.42 0.43 0.44 0.45 0.46 0.47 0.48 0.49 0.50 0.51 0.52 0.53 0.54 0.55 0.56 0.57 0.58 0.59 0.60 0.61 0.62 0.63 0.64 0.65 0.66 0.67 0.68 0.69 0.70 0.71 0.72 0.73 0.74 0.75 0.76 0.77 0.78 0.79 0.80 0.81 0.82 0.83 0.84 0.85 0.86 0.87 0.88 0.89 0.90 0.91 0.92 0.93 0.94 0.95 0.96 0.97 0.98 0.99 1.00]
+#define SCULK_NOISE // Enables sculk noise. Varies the sculk emissives by noise.
+#define SCULK_TILE_SIZE 8 // Tile size of the lava [2 4 8 16 24]
 
 /// -------------------------------- /// Parallax occlussion settings /// -------------------------------- ///
 
@@ -162,7 +179,6 @@ const vec3 blockLightColor = vec3(BLOCKLIGHT_R, BLOCKLIGHT_G, BLOCKLIGHT_B) * (B
 /// -------------------------------- /// Secret settings /// -------------------------------- ///
 
 #define COLOR_MODE 0 // Albedo color mode. White mode makes everything white. Black mode makes everything black. Foliage mode shows only foliage colors. Keeps materials on. [0 1 2 3]
-// #define ENTITY_BLOCK_TRANSPARENCY // Iris exclusive feature. Enables proper transparency for entities and block entities. May impact performance.
 #define NOISE_SPEED 8 // The speed in which the noise randomises each frame. Useful for TAA. This effect is visible only when TAA is enabled. [2 4 8 16 32]
 
 /// -------------------------------- /// Physics mod settings /// -------------------------------- ///
@@ -204,9 +220,6 @@ const float PHYSICS_NORMAL_STRENGTH = 0.6;
 #ifdef VOLUMETRIC_LIGHTING
 #endif
 
-#ifdef STORY_MODE_CLOUDS
-#endif
-
 #ifdef SPECULAR_HIGHLIGHTS
 #endif
 
@@ -225,9 +238,6 @@ const float PHYSICS_NORMAL_STRENGTH = 0.6;
 #ifdef PARALLAX_SHADOW
 #endif
 
-#ifdef ENTITY_BLOCK_TRANSPARENCY
-#endif
-
 // Precalculated constants
 
 // Raytracer steps inverse
@@ -235,6 +245,9 @@ const float rayTracerStepsInv = 1.0 / RAYTRACER_STEPS;
 
 // Sun and moon intensity squared
 const float sunMoonIntensitySqrd = SUN_MOON_INTENSITY * SUN_MOON_INTENSITY;
+
+// Sky box intensity squared
+const float skyBoxIntensitySqrd = SKYBOX_BRIGHTNESS * SKYBOX_BRIGHTNESS;
 
 // Sky box brightness squared
 const float skyBoxBrightnessSqrd = SKYBOX_BRIGHTNESS * SKYBOX_BRIGHTNESS;

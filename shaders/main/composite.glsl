@@ -1,5 +1,5 @@
 /*
-================================ /// Super Duper Vanilla v1.3.5 /// ================================
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
 
     Developed by Eldeston, presented by FlameRender (C) Studios.
 
@@ -8,7 +8,7 @@
 
     By downloading this content you have agreed to the license and its terms of use.
 
-================================ /// Super Duper Vanilla v1.3.5 /// ================================
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
 */
 
 /// Buffer features: Transparent complex shading and volumetric lighting
@@ -73,8 +73,8 @@
 /// -------------------------------- /// Fragment Shader /// -------------------------------- ///
 
 #ifdef FRAGMENT
-    /* RENDERTARGETS: 0 */
-    layout(location = 0) out vec3 sceneColOut; // gcolor
+    /* RENDERTARGETS: 4 */
+    layout(location = 0) out vec3 sceneColOut; // colortex4
 
     flat in vec3 skyCol;
 
@@ -94,14 +94,14 @@
 
     uniform int isEyeInWater;
 
-    uniform float far;
+    uniform float borderFar;
 
-    uniform float blindness;
     uniform float nightVision;
-    uniform float darknessFactor;
+    uniform float effectFactor;
+    uniform float lightningFlash;
     uniform float darknessLightFactor;
 
-    uniform float frameTimeCounter;
+    uniform float fragmentFrameTime;
 
     uniform vec3 fogColor;
 
@@ -115,16 +115,17 @@
 
     uniform mat4 shadowModelView;
 
-    uniform sampler2D gcolor;
+    // Main HDR buffer
+    uniform sampler2D colortex4;
     uniform sampler2D colortex1;
+    // For SSAO and material masks
     uniform sampler2D colortex2;
     uniform sampler2D colortex3;
 
     uniform sampler2D depthtex0;
-    uniform sampler2D depthtex1;
 
-    #ifdef IS_IRIS
-        uniform float lightningFlash;
+    #if ANTI_ALIASING >= 2
+        uniform float frameFract;
     #endif
 
     #ifndef FORCE_DISABLE_WEATHER
@@ -136,8 +137,24 @@
         uniform float dayCycleAdjust;
     #endif
 
-    #if defined STORY_MODE_CLOUDS && !defined FORCE_DISABLE_CLOUDS
-        uniform sampler2D colortex4;
+    #if CLOUD_TYPE != 0 && !defined FORCE_DISABLE_CLOUDS
+        uniform sampler2D colortex0;
+
+        #if CLOUD_TYPE == 2
+            uniform float volumetricCloudFar;
+
+            #include "/lib/rayTracing/volumetricClouds.glsl"
+        #endif
+    #endif
+
+    #ifdef DISTANT_HORIZONS
+        uniform float near;
+        uniform float dhNearPlane;
+
+        uniform mat4 dhProjection;
+        uniform mat4 dhProjectionInverse;
+
+        uniform sampler2D dhDepthTex0;
     #endif
 
     #ifdef WORLD_CUSTOM_SKYLIGHT
@@ -150,8 +167,8 @@
 
     #include "/lib/utility/projectionFunctions.glsl"
 
-    #ifdef PREVIOUS_FRAME
-        uniform vec3 previousCameraPosition;
+    #if (defined SSR || defined SSGI) && defined PREVIOUS_FRAME
+        uniform vec3 camPosDelta;
 
         uniform mat4 gbufferPreviousModelView;
         uniform mat4 gbufferPreviousProjection;
@@ -170,8 +187,10 @@
             #include "/lib/lighting/shdMapping.glsl"
         #endif
 
-        #include "/lib/rayTracing/volLight.glsl"
+        #include "/lib/rayTracing/volumetricLight.glsl"
     #endif
+
+    #include "/lib/utility/depthTex.glsl"
 
     #include "/lib/utility/noiseFunctions.glsl"
 
@@ -182,86 +201,134 @@
 
     #include "/lib/lighting/complexShadingDeferred.glsl"
 
-    #ifndef IS_IRIS
-        bool isSpectralMask(in ivec2 iUv){
-            return texelFetch(colortex3, iUv, 0).z == 1;
-        }
-
-        float getSpectral(in ivec2 iUv){
-            ivec2 topRightCorner = iUv - 1;
-            ivec2 bottomLeftCorner = iUv + 1;
-
-            bool sample0 = isSpectralMask(topRightCorner);
-            bool sample1 = isSpectralMask(bottomLeftCorner);
-
-            if(sample0 && !sample1 || sample1 && !sample0) return EMISSIVE_INTENSITY;
-
-            bool sample2 = isSpectralMask(ivec2(topRightCorner.x, bottomLeftCorner.y));
-            bool sample3 = isSpectralMask(ivec2(bottomLeftCorner.x, topRightCorner.y));
-
-            if(sample2 && !sample3 || sample3 && !sample2) return EMISSIVE_INTENSITY;
-
-            return 0.0;
-        }
-    #endif
-
     void main(){
         // Screen texel coordinates
         ivec2 screenTexelCoord = ivec2(gl_FragCoord.xy);
+
+        bool realSky = false;
+
+        float depth = texelFetch(depthtex0, screenTexelCoord, 0).x;
+
+        // Distant Horizons apparently uses a different depth texture
+        #ifdef DISTANT_HORIZONS
+            realSky = depth == 1;
+            if(realSky) depth = texelFetch(dhDepthTex0, screenTexelCoord, 0).x;
+        #endif
+
         // Get screen pos
-        vec3 screenPos = vec3(texCoord, texelFetch(depthtex0, screenTexelCoord, 0).x);
-        // Get view pos
-        vec3 viewPos = getViewPos(gbufferProjectionInverse, screenPos);
+        vec3 screenPos = vec3(texCoord, depth);
+        
+        // Distant Horizons apparently uses a different projection matrix
+        #ifdef DISTANT_HORIZONS
+            vec3 viewPos = getViewPos(realSky ? dhProjectionInverse : gbufferProjectionInverse, screenPos);
+        #else
+            vec3 viewPos = getViewPos(gbufferProjectionInverse, screenPos);
+        #endif
+
         // Get eye player pos
         vec3 eyePlayerPos = mat3(gbufferModelViewInverse) * viewPos;
         // Get feet player pos
         vec3 feetPlayerPos = eyePlayerPos + gbufferModelViewInverse[3].xyz;
 
         // Get scene color
-        sceneColOut = texelFetch(gcolor, screenTexelCoord, 0).rgb;
+        sceneColOut = texelFetch(colortex4, screenTexelCoord, 0).rgb;
 
         #if ANTI_ALIASING >= 2
-            vec3 dither = toRandPerFrame(getRand3(screenTexelCoord & 255), frameTimeCounter);
+            vec3 dither = fract(getRng3(screenTexelCoord & 255) + frameFract);
         #else
-            vec3 dither = getRand3(screenTexelCoord & 255);
+            vec3 dither = getRng3(screenTexelCoord & 255);
         #endif
 
-        // If the object is a transparent render separate lighting
-        if(texelFetch(depthtex1, screenTexelCoord, 0).x > screenPos.z){
-            // Get view distance
-            float viewDot = lengthSquared(viewPos);
-            float viewDotInvSqrt = inversesqrt(viewDot);
-            float viewDist = viewDot * viewDotInvSqrt;
+        // Get view distance
+        float viewDot = lengthSquared(viewPos);
+        float viewDotInvSqrt = inversesqrt(viewDot);
+        float viewDist = viewDot * viewDotInvSqrt;
 
-            // Get normalized eyePlayerPos
-            vec3 nEyePlayerPos = eyePlayerPos * viewDotInvSqrt;
+        // Get normalized eyePlayerPos
+        vec3 nEyePlayerPos = eyePlayerPos * viewDotInvSqrt;
 
+        // Get fog factor
+        float fogFactor = getFogFactor(viewDist, nEyePlayerPos.y, feetPlayerPos.y + cameraPosition.y);
+
+        // Border fog
+        #ifdef BORDER_FOG
+            float borderFog = getBorderFog(viewDist);
+        #else
+            float borderFog = 0.0;
+        #endif
+
+        // Materials and programs that come after deferred mask
+        vec3 matRaw0 = texelFetch(colortex3, screenTexelCoord, 0).xyz;
+
+        // If the object renders after deferred apply separate lighting
+        if(matRaw0.z > 0 && matRaw0.z < 1){
             // Declare and get materials
-            vec2 matRaw0 = texelFetch(colortex3, screenTexelCoord, 0).xy;
             vec3 albedo = texelFetch(colortex2, screenTexelCoord, 0).rgb;
             vec3 normal = texelFetch(colortex1, screenTexelCoord, 0).xyz;
 
             // Apply deffered shading
-            sceneColOut = complexShadingDeferred(sceneColOut, screenPos, viewPos, mat3(gbufferModelView) * normal, albedo, viewDotInvSqrt, matRaw0.x, matRaw0.y, dither);
+            sceneColOut = complexShadingDeferred(sceneColOut, screenPos, viewPos, mat3(gbufferModelView) * normal, albedo, dither, viewDotInvSqrt, matRaw0.x, matRaw0.y, realSky);
 
             // Get basic sky fog color
             vec3 fogSkyCol = getSkyFogRender(nEyePlayerPos);
-            // Do basic sky render and use it as fog color
-            sceneColOut = getFogRender(sceneColOut, fogSkyCol, viewDist, nEyePlayerPos.y, feetPlayerPos.y + cameraPosition.y);
+
+            // Border fog
+            #ifdef BORDER_FOG
+                fogFactor = (fogFactor - 1.0) * borderFog + 1.0;
+            #endif
+
+            // Apply fog and darkness fog
+            sceneColOut = ((fogSkyCol - sceneColOut) * fogFactor + sceneColOut) * getFogEffectFactor(viewDist);
         }
 
         // Apply darkness pulsing effect
         sceneColOut *= 1.0 - darknessLightFactor;
 
-        #ifndef IS_IRIS
-            // Apply spectral effect
-            sceneColOut += getSpectral(screenTexelCoord);
+        #if defined WORLD_LIGHT || !defined FORCE_DISABLE_CLOUDS && CLOUD_TYPE == 2
+            bool isSky = depth == 1.0;
+
+            float feetPlayerDot = lengthSquared(feetPlayerPos);
+            float feetPlayerDotInvSqrt = inversesqrt(feetPlayerDot);
+            float feetPlayerDist = feetPlayerDot * feetPlayerDotInvSqrt;
+
+            vec3 nFeetPlayerPos = feetPlayerPos * feetPlayerDotInvSqrt;
         #endif
 
         #ifdef WORLD_LIGHT
             // Apply volumetric light
             if(VOLUMETRIC_LIGHTING_STRENGTH != 0 && isEyeInWater != 2)
-                sceneColOut += getVolumetricLight(feetPlayerPos, screenPos.z, dither.x);
+                sceneColOut += getVolumetricLight(nFeetPlayerPos, feetPlayerDist, fogFactor, borderFog, dither.x, isSky);
+        #endif
+
+        #if !defined FORCE_DISABLE_CLOUDS && CLOUD_TYPE == 2
+            // Get the 1st layer of volumetric clouds position
+            // Note that the clouds needs to move westward just as in vanilla
+            vec3 cloudStartPos0 = vec3(cameraPosition.x + fragmentFrameTime, cameraPosition.y - volumetricCloudHeight, cameraPosition.z);
+
+            // Get the volumetric clouds
+            vec2 cloudData = volumetricClouds(nFeetPlayerPos, cloudStartPos0, feetPlayerDist, dither.x, isSky);
+
+            #ifdef DOUBLE_LAYERED_CLOUDS
+                // Get the 2nd layer of volumetric clouds position by reusing the 1st layer's position
+                vec3 cloudStartPos1 = vec3(cloudStartPos0.x, cloudStartPos0.y - SECOND_CLOUD_HEIGHT, cloudStartPos0.z);
+
+                // Variate by swizzling the 2 cloud channels
+                cloudData = max(volumetricClouds(nFeetPlayerPos, cloudStartPos1, feetPlayerDist, dither.x, isSky).yx, cloudData);
+            #endif
+
+            #ifdef DYNAMIC_CLOUDS
+                float fadeTime = saturate(sin(fragmentFrameTime * FADE_SPEED) * 0.8 + 0.5);
+
+                float cloudFinal = mix(mix(cloudData.x, cloudData.y, fadeTime), max(cloudData.x, cloudData.y), rainStrength) * 0.125;
+            #else
+                float cloudFinal = mix(cloudData.x, max(cloudData.x, cloudData.y), rainStrength) * 0.125;
+            #endif
+
+            #ifdef FORCE_DISABLE_DAY_CYCLE
+                sceneColOut = mix(sceneColOut, ((toLinear(nightVision * 0.5 + AMBIENT_LIGHTING) + lightningFlash) + lightCol + skyCol), cloudFinal);
+            #else
+                sceneColOut = mix(sceneColOut, ((toLinear(nightVision * 0.5 + AMBIENT_LIGHTING) + lightningFlash) + mix(moonCol, sunCol, dayCycleAdjust) + skyCol), cloudFinal);
+            #endif
         #endif
 
         // Clamp scene color to prevent NaNs during post processing

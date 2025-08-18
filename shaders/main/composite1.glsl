@@ -1,5 +1,5 @@
 /*
-================================ /// Super Duper Vanilla v1.3.5 /// ================================
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
 
     Developed by Eldeston, presented by FlameRender (C) Studios.
 
@@ -8,7 +8,7 @@
 
     By downloading this content you have agreed to the license and its terms of use.
 
-================================ /// Super Duper Vanilla v1.3.5 /// ================================
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
 */
 
 /// Buffer features: Temporal Anti-Aliasing (TAA)
@@ -29,11 +29,11 @@
 /// -------------------------------- /// Fragment Shader /// -------------------------------- ///
 
 #ifdef FRAGMENT
-    /* RENDERTARGETS: 0 */
-    layout(location = 0) out vec3 sceneColOut; // gcolor
+    /* RENDERTARGETS: 4 */
+    layout(location = 0) out vec3 sceneColOut; // colortex4
 
     #if (defined PREVIOUS_FRAME && (defined SSR || defined SSGI)) || ANTI_ALIASING >= 2
-        /* RENDERTARGETS: 0,5 */
+        /* RENDERTARGETS: 4,5 */
         #ifdef AUTO_EXPOSURE
             out vec4 temporalDataOut; // colortex5
         #else
@@ -43,7 +43,7 @@
 
     noperspective in vec2 texCoord;
 
-    uniform sampler2D gcolor;
+    uniform sampler2D colortex4;
 
     #if (defined PREVIOUS_FRAME && (defined SSR || defined SSGI)) || ANTI_ALIASING >= 2
         uniform sampler2D colortex5;
@@ -51,7 +51,7 @@
 
     #if ANTI_ALIASING >= 2
         uniform vec3 cameraPosition;
-        uniform vec3 previousCameraPosition;
+        uniform vec3 camPosDelta;
 
         uniform mat4 gbufferModelViewInverse;
         uniform mat4 gbufferPreviousModelView;
@@ -71,10 +71,10 @@
         #if ANTI_ALIASING >= 2
             sceneColOut = textureTAA(ivec2(gl_FragCoord.xy));
         #else
-            sceneColOut = texelFetch(gcolor, ivec2(gl_FragCoord.xy), 0).rgb;
+            sceneColOut = texelFetch(colortex4, ivec2(gl_FragCoord.xy), 0).rgb;
         #endif
 
-        #if (defined PREVIOUS_FRAME && (defined SSR || defined SSGI)) || ANTI_ALIASING >= 2
+        #if ((defined SSR || defined SSGI) && defined PREVIOUS_FRAME) || ANTI_ALIASING >= 2
             #ifdef AUTO_EXPOSURE
                 temporalDataOut = vec4(sceneColOut, texelFetch(colortex5, ivec2(0), 0).a);
             #else

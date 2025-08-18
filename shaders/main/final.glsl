@@ -1,5 +1,5 @@
 /*
-================================ /// Super Duper Vanilla v1.3.5 /// ================================
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
 
     Developed by Eldeston, presented by FlameRender (C) Studios.
 
@@ -8,7 +8,7 @@
 
     By downloading this content you have agreed to the license and its terms of use.
 
-================================ /// Super Duper Vanilla v1.3.5 /// ================================
+================================ /// Super Duper Vanilla v1.3.8 /// ================================
 */
 
 /// Buffer features: Buffer settings, retro filter, chromatic aberration, and sharpen filter
@@ -33,9 +33,9 @@
     layout(location = 0) out vec3 finalColOut;
 
     /*
-    Buffer settings
+    Buffer settings, the compiler will attempt to read the commented lines:
 
-    const int gcolorFormat = R11F_G11F_B10F;
+    const int colortex0Format = R11F_G11F_B10F;
     const int colortex1Format = RGB16_SNORM;
     const int colortex2Format = RGBA8;
     const int colortex3Format = RGB8;
@@ -43,7 +43,7 @@
     const int colortex5Format = RGBA16F;
     */
 
-    #if ANTI_ALIASING >= 2 || defined PREVIOUS_FRAME || defined AUTO_EXPOSURE
+    #if ((defined SSR || defined SSGI) && defined PREVIOUS_FRAME) || ANTI_ALIASING >= 2 || defined AUTO_EXPOSURE
         // Disable buffer clear if TAA, previous frame reflections, or auto exposure is on
         const bool colortex5Clear = false;
     #endif

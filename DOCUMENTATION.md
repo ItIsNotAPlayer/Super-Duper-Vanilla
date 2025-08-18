@@ -1,107 +1,160 @@
-## Coding Standards
-   These standards must be kept in order to keep the code format consistent and readable.
+# Coding Standards
+These standards must be kept in order to keep the code format consistent and readable.
 
 * Minimizing resources and maximizing performance is top priority. Quality is secondary.
 * Follow the rules of code formatting. See [CONTRIBUTION.md](CONTRIBUTION.md) for more information.
 * Document and explain your code if possible.
 
-## GLSL Version
-   The shader version used for this pipeline is **GLSL 3.3 compatibility**. There is an exception however for the program `gbuffers_line` where it uses **GLSL 3.3 core**.
+# GLSL Version
+The shader version used for this pipeline is **GLSL 3.3 compatibility**. There is an exception however for the program `gbuffers_line` where it uses **GLSL 3.3 core**.
 
-   For more information of the specifications of this version see this [documentation provided by Khronos](https://registry.khronos.org/OpenGL/specs/gl/GLSLangSpec.3.30.pdf).
+For more information of the specifications of this version see this [documentation provided by Khronos](https://registry.khronos.org/OpenGL/specs/gl/GLSLangSpec.3.30.pdf).
 
-## Used Buffers
-   Current shader pipeline uses 6 framebuffers to minimize resources used and maximize performance. Their usages are listed in order of what's written first separated by forward slashes and channels separated by commas.
+# Used Buffers
+Current shader pipeline uses 6 framebuffers to minimize resources used and maximize performance. Their usages are listed in order of what's written first separated by forward slashes and channels separated by commas.
 
-| Buffers   | Format         | Usage                                                         |
-| --------- | -------------- | ------------------------------------------------------------- |
-| gcolor    | R11F_G11F_B10F | Main HDR (RGB) / Vanilla skybox (RGB)                         |
-| colortex1 | RGB16_SNORM    | Normals (RGB)                                                 |
-| colortex2 | RGBA8          | Albedo (RGB), SSAO (A)                                        |
-| colortex3 | RGB8           | Metal (R), Smooth (G), Glow (B) / Main LDR (RGB) / FXAA (RGB) |
-| colortex4 | R11F_G11F_B10F | Clouds (RG) / Bloom (RGB)                                     |
-| colortex5 | RGBA16F        | TAA (RGB) / Previous frame (RGB), Auto exposure (A)           |
+| Buffers   | Format         | Usage                                                                             |
+| --------- | -------------- | --------------------------------------------------------------------------------- |
+| colortex0 | R11F_G11F_B10F | Clouds (RG) / Bloom (RGB)                                                         |
+| colortex1 | RGB16_SNORM    | Normals (RGB)                                                                     |
+| colortex2 | RGBA8          | Albedo (RGB), SSAO (A)                                                            |
+| colortex3 | RGB8           | Metal (R), Smooth (G), Glow / Translucents mask (B) / Main LDR (RGB) / FXAA (RGB) |
+| colortex4 | R11F_G11F_B10F | Main HDR (RGB) / Vanilla skybox (RGB)                                             |
+| colortex5 | RGBA16F        | TAA (RGB) / Previous frame (RGB), Auto exposure (A)                               |
 
-## Custom Defined Macros
-   This shader uses custom defined macros in every program and .glsl file for each world folders all connected to the main programs in the main folder. This is to keep the workflow minimized and understandable, and to identify what folder/program the shader is being used.
+# Custom Defined Macros
+This shader uses custom defined macros in every program and .glsl file for each world folders all connected to the main programs in the main folder. This is to keep the workflow minimized and understandable, and to identify what folder/program the shader is being used.
 
-### Dimension Macros
-   Found in all world.glsl files. Dimension macros define the world's lighting properties. These are not finalized and are still a work in progress as they tend to be inconsistent thus the reason of it being not available to the common user.
+## Dimension Macros
+Found in all world.glsl files. Dimension macros define the world's lighting properties. These are not finalized and are still a work in progress as they tend to be inconsistent thus the reason of it being not available to the common user.
 
-| Dimension Macros    | Type    | Usage                   |
-| ------------------- | ------- | ----------------------- |
-| WORLD_ID            | int     | World ID                |
-| WORLD_LIGHT         | defined | World enabled shadows   |
-| WORLD_SUN_MOON      | int     | World light source type |
-| WORLD_SUN_MOON_SIZE | float   | World light source size |
+| Dimension Macros    | Data Type | Usage                   |
+| ------------------- | --------- | ----------------------- |
+| WORLD_ID            | int       | World ID                |
+| WORLD_LIGHT         | none      | World enabled shadows   |
+| WORLD_SUN_MOON      | int       | World light source type |
+| WORLD_SUN_MOON_SIZE | float     | World light source size |
 
-### Program Macros
-   Found in their respective programs in .fsh and .vsh files. The following are the listed common program macros. These macros typically only defines the program.
+## Complex Programs
+List of programs with complex lighting. Common complex processes are in these programs. They compute complex processes such as PBR and vertex displacement for animations and tend to be very expensive.
 
-| Program Macros  | Type    |
-| --------------- | ------- |
-| SHADOW          | defined |
-| GBUFFERS        | defined |
-| DEFERRED        | defined |
-| DEFERRED(1-99)  | defined |
-| COMPOSITE       | defined |
-| COMPOSITE(1-99) | defined |
-| FINAL           | defined |
+## Basic Programs
+List of programs with basic lighting. Common basic processes are in these programs. They compute basic processes that complex programs have, but with removed features that the program doesn't necessarily need.
 
-This along with the `GBUFFERS` macro, are used to identify the quirks in the current program for the shader to detect.
+## Simple programs
+List of programs with simpler shading. Common simple processes are in these programs. As the name suggests, they compute very simple and fast processes. The reason is usually because they don't need additional features as they tend to slow GPU performance.
 
-### Complex Programs
-   List of programs with complex lighting. Common complex processes are in these programs. They compute complex processes such as PBR and vertex displacement for animations and tend to be very expensive.
+## Disabled programs
+List of discarded and disabled programs. They typically have no other purposes other than disabling a program by using `discard;` + `return;`. This method is used to conveniently disable programs without using `shaders.properties` to disable the program per world.
 
-| Program Macros   | Type    |
-| ---------------- | ------- |
-| TERRAIN          | defined |
-| WATER            | defined |
-| BLOCK            | defined |
-| ENTITIES_GLOWING | defined |
-| ENTITIES         | defined |
-| HAND             | defined |
-| HAND_WATER       | defined |
+## Program Properties
+Found in their respective programs in .fsh and .vsh files. The following are the listed common program macros. These macros typically describes the program and its properties.
 
-### Basic Programs
-   List of programs with basic lighting. Common basic processes are in these programs. They compute basic processes that complex programs have, but with removed features that the program doesn't necessarily need.
+This list's purpose is to fully realize the shader pipeline (based on Iris) and visualize the flow of data across programs and their purpose.
 
-| Program Macros | Type    |
-| -------------- | ------- |
-| BASIC          | defined |
-| CLOUDS         | defined |
-| TEXTURED       | defined |
+### Before Gbuffers
+| Program Macros        | Blend Type  | Program Type     | Shading Type | Usage            |
+| --------------------- | ----------- | ---------------- | ------------ | ---------------- |
+| PHYSICS_OCEAN_SHADOW  | Solid       | PHYSICS_SHADOW   | Shadow       | Physics Mod      |
+| SHADOW_BLOCK          | Solid       | SHADOW           | Shadow       | Iris             |
+| SHADOW_CUTOUT         | Solid       | SHADOW           | Shadow       | Iris/Optifine    |
+| SHADOW_ENTITIES       | Solid       | SHADOW           | Shadow       | Iris             |
+| SHADOW_LIGHTNING      | Solid       | SHADOW           | Disabled     | Iris             |
+| SHADOW_SOLID          | Solid       | SHADOW           | Shadow       | Iris/Optifine    |
+| SHADOW_WATER          | Solid       | SHADOW           | Shadow       | Iris             |
+| SHADOW                | Solid       | SHADOW           | Shadow       | Iris/Optifine    |
 
-### Simple programs
-   List of programs with simpler shading. Common simple processes are in these programs. As the name suggests, they compute very simple and fast processes. The reason is usually because they don't need additional features as they tend to slow GPU performance.
+### Before Deferred
+| Program Macros        | Blend Type  | Program Type     | Shading Type | Usage            |
+| --------------------- | ----------- | ---------------- | ------------ | ---------------- |
+| DH_TERRAIN            | Solid       | DH_GBUFFERS      | Complex      | Distant Horizons |
+| DH_GENERIC            | Solid       | DH_GBUFFERS      | Basic        | Distant Horizons |
+| ARMOR_GLINT           | Add         | GBUFFER          | Simple       | Iris/Optifine    |
+| BASIC                 | Solid       | GBUFFER          | Basic        | Iris/Optifine    |
+| BEACON_BEAM           | Add         | GBUFFER          | Simple       | Iris/Optifine    |
+| DAMAGED_BLOCK         | Solid       | GBUFFER          | Simple       | Iris/Optifine    |
+| LINE                  | Solid       | GBUFFER          | Basic        | Iris/Optifine    |
+| SKY_BASIC             | Solid       | GBUFFER          | Disabled     | Iris/Optifine    |
+| SKY_TEXTURED          | Solid       | GBUFFER          | Simple       | Iris/Optifine    |
+| TERRAIN               | Solid       | GBUFFER          | Complex      | Iris/Optifine    |
+| DEFERRED(0-99)        | None        | DEFERRED         | Post         | Iris/Optifine    |
 
-| Program Macros | Type    |
-| -------------- | ------- |
-| ARMOR_GLINT    | defined |
-| BEACON_BEAM    | defined |
-| SPIDER_EYES    | defined |
-| DAMAGED_BLOCK  | defined |
-| WEATHER        | defined |
-| SKY_TEXTURED   | defined |
-| LINE           | defined |
+## Mixed
+| Program Macros        | Blend Type  | Program Type     | Shading Type | Usage            |
+| --------------------- | ----------- | ---------------- | ------------ | ---------------- |
+| PARTICLES             | Transparent | GBUFFER          | Basic        | Iris             |
+| ENTITIES              | Transparent | GBUFFER          | Complex      | Iris/Optifine    |
+| BLOCK                 | Transparent | GBUFFER          | Complex      | Iris/Optifine    |
+| HAND                  | Transparent | GBUFFER          | Complex      | Iris/Optifine    |
 
-### Disabled programs
-   List of discarded and disabled programs. They typically have no other purposes other than disabling a program by using `discard;` + `return;`. This method is used to conveniently disable programs without using `shaders.properties` to disable the program per world.
+### Before Composite
+| Program Macros        | Blend Type  | Program Type     | Shading Type | Usage            |
+| --------------------- | ----------- | ---------------- | ------------ | ---------------- |
+| PHYSICS_OCEAN         | Solid       | PHYSICS_GBUFFERS | Complex      | Physics Mod      |
+| DH_WATER              | Transparent | DH_GBUFFERS      | Complex      | Distant Horizons |
+| CLOUDS                | Transparent | GBUFFER          | Simple       | Iris/Optifine    |
+| LIGHTNING             | Add         | GBUFFER          | Basic        | Iris             |
+| TEXTURED              | Transparent | GBUFFER          | Basic        | Iris/Optifine    |
+| SPIDER_EYES           | Add         | GBUFFER          | Simple       | Iris/Optifine    |
+| WATER                 | Transparent | GBUFFER          | Complex      | Iris/Optifine    |
+| WEATHER               | Transparent | GBUFFER          | Simple       | Iris/Optifine    |
+| COMPOSITE(0-99)       | None        | COMPOSITE        | Post         | Iris/Optifine    |
 
-| Program Macros | Type    |
-| -------------- | ------- |
-| SKY_BASIC      | defined |
+Note to Eldeston: Clarify program names with its purpose.
 
-## TO DO (for Eldeston)
-* Refactor uniform usage and remove unecessary ones
-* Optimize DOF calculations with noise
-* Create a custom shadow model view
-* Replace vertex space calculations
-* Fix transparency issues with CTM
-* Optimize albedo alpha testing
-* Fix glint z fighting
-* Document the shader pipeline
-* Optimize block ids in block.properties
+# Incompatible Mods
+List of incompatible mods.
 
-* Implement cloud absorption
-* Improve water absorption
+| Mods       | Compatibility | Status       |
+| ---------- | ------------- | ------------ |
+| Astrocraft | Visual bug    | Low priority |
+| Nuit       | Visual bug    | Low priority |
+
+# TO DO (for Eldeston)
+Notes for pending features/bug fixes to be implemented categorized by importance.
+
+## PENDING
+* Create a custom shadow model view (low priority)
+* Fix gbuffers_skytextured (medium priority)
+
+* Find a way to make translucent detection more dynamic (medium priority)
+
+* Improve world properties calculation
+* Improve settings UI
+
+* Rebuild pipeline and include visualization (high priority)
+* Document the shader pipeline (high priority)
+
+* Separate iPBR for all gbuffers (medium priority)
+
+* Optimize alpha testing (high priority)
+* Optimize DOF calculations with noise (low priority)
+* Optimize block ids in block.properties (medium priority)
+* Optimize day and night transition calculations (medium priority)
+
+* Refactor uniform usage and remove unecessary ones (medium priority)
+* Format the goodness knows how much nesting I used in my code because BROTHA EWWHH (maximum priority)
+
+## CURRENT
+* Implement bit packing for optimization
+
+* Refactor parallax occlusion mapping
+* Change cloud texture
+
+* Improve fog calculation and settings (medium priority)
+* Improve water absorption (low priority)
+* Improve tonemapping (medium priority)
+* Improve Distant Horizons depth
+* Improve subsurface scattering
+* Improve shadow filtering
+* Improve shader menu UI
+
+## DONE
+* Abandon Optifine support (high priority)
+
+* Finish programming dh_generic (medium priority)
+
+* Fix dragon death beam (medium priority) ?
+* Fix FXAA, it was broken the whole time (high priority)
+
+* Implement portal depth for Nether and End
